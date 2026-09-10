@@ -25,6 +25,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pl.eskulapp.mobile
         TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # Podpis manualny certyfikatem/profilem z fastlane match.
         DEVELOPMENT_TEAM: "7LT2VFV9MJ"
         CODE_SIGN_STYLE: Manual

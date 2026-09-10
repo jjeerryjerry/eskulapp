@@ -14,9 +14,9 @@ on:
 
 jobs:
   build:
-    # macos-15 = domyslnie Xcode 16 (XcodeGen generuje projekt w formacie 77,
-    # ktorego Xcode 15.4 na macos-14 nie otwiera).
-    runs-on: macos-15
+    # macos-26 = Xcode 26 / iOS 26 SDK (Apple wymaga min. iOS 26 SDK do uploadu
+    # na App Store Connect od 2026; macos-15/Xcode16 dawal iOS 18.5 SDK = odrzucenie).
+    runs-on: macos-26
     # Twardy limit , gdyby codesign/upload znowu wisial, job pada szybko zamiast
     # zjadac 6h minut macOS (liczonych 10x).
     timeout-minutes: 45
