@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .leg{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5B6B72;font-weight:500;}
+  .nav{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:#9AA7AD;font-weight:500;flex:1;}
+</style>
+</helmet>
+<div style="box-sizing:border-box;width:390px;height:844px;background:#F6F8F9;color:#0A1B2A;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;">
+  <!-- header -->
+  <div style="background:#fff;border-bottom:1px solid #E1E7E9;padding:52px 20px 14px;display:flex;align-items:center;gap:10px;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A1B2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+    <div style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;">Mapa</div>
+    <div style="margin-left:auto;font-size:13px;color:#5B6B72;">Parter · Hala Expo</div>
+  </div>
+
+  <!-- legend -->
+  <div style="display:flex;gap:16px;padding:12px 20px 4px;">
+    <span class="leg"><span style="width:11px;height:11px;border-radius:3px;background:#D7EAEC;border:1px solid #B7D6D9;"></span>Sale</span>
+    <span class="leg"><span style="width:11px;height:11px;border-radius:3px;background:#fff;border:1.5px solid #0C5A63;"></span>Stoiska</span>
+    <span class="leg"><span style="width:11px;height:11px;border-radius:999px;background:#FF6B57;"></span>Wybrane</span>
+  </div>
+
+  <!-- floor plan -->
+  <div style="margin:8px 20px 0;background:#fff;border:1px solid #E1E7E9;border-radius:18px;padding:14px;">
+    <svg viewBox="0 0 320 360" width="100%" style="display:block;">
+      <rect x="4" y="4" width="312" height="352" rx="12" fill="#F6F8F9" stroke="#E1E7E9"/>
+      <!-- rooms -->
+      <rect x="20" y="22" width="126" height="96" rx="8" fill="#D7EAEC" stroke="#B7D6D9"/>
+      <text x="83" y="66" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="15" fill="#0C5A63">Sala A</text>
+      <text x="83" y="84" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#5B6B72">220 miejsc</text>
+      <rect x="174" y="22" width="126" height="96" rx="8" fill="#D7EAEC" stroke="#B7D6D9"/>
+      <text x="237" y="66" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="15" fill="#0C5A63">Sala B</text>
+      <text x="237" y="84" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#5B6B72">120 miejsc</text>
+      <rect x="20" y="140" width="90" height="70" rx="8" fill="#D7EAEC" stroke="#B7D6D9"/>
+      <text x="65" y="180" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="13" fill="#0C5A63">Sala C</text>
+      <!-- booths -->
+      <rect x="132" y="150" width="46" height="46" rx="7" fill="#fff" stroke="#0C5A63" stroke-width="1.5"/>
+      <text x="155" y="178" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="12" fill="#0C5A63">A1</text>
+      <rect x="200" y="150" width="46" height="46" rx="7" fill="#fff" stroke="#0C5A63" stroke-width="1.5"/>
+      <text x="223" y="178" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="12" fill="#0C5A63">A3</text>
+      <rect x="132" y="250" width="46" height="46" rx="7" fill="#fff" stroke="#0C5A63" stroke-width="1.5"/>
+      <text x="155" y="278" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="12" fill="#0C5A63">B2</text>
+      <rect x="200" y="250" width="46" height="46" rx="7" fill="#fff" stroke="#0C5A63" stroke-width="1.5"/>
+      <text x="223" y="278" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="12" fill="#0C5A63">B4</text>
+      <!-- selected pin on A3 -->
+      <circle cx="223" cy="150" r="13" fill="#FF6B57"/>
+      <path d="M223 143a4.4 4.4 0 0 1 4.4 4.4c0 3.1-4.4 6.9-4.4 6.9s-4.4-3.8-4.4-6.9A4.4 4.4 0 0 1 223 143z" fill="#0A1B2A"/>
+      <circle cx="223" cy="147.4" r="1.7" fill="#FF6B57"/>
+      <!-- entrance -->
+      <rect x="130" y="326" width="60" height="14" rx="4" fill="#0C5A63"/>
+      <text x="160" y="336" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="#fff">WEJŚCIE</text>
+      <!-- catering -->
+      <rect x="262" y="150" width="38" height="146" rx="7" fill="#F0F4F5" stroke="#E1E7E9"/>
+      <text x="281" y="226" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#9AA7AD" transform="rotate(90 281 223)">Catering</text>
+    </svg>
+  </div>
+
+  <!-- selected booth sheet -->
+  <div style="position:absolute;left:20px;right:20px;bottom:88px;background:#fff;border:1px solid #FFD2C9;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(10,27,42,.08);">
+    <div style="width:44px;height:44px;border-radius:12px;background:#D7EAEC;display:flex;align-items:center;justify-content:center;font-family:Sora,sans-serif;font-weight:800;color:#0C5A63;flex:none;">Md</div>
+    <div style="flex:1;">
+      <div style="font-family:Sora,sans-serif;font-weight:700;font-size:15px;">MedTech · Stoisko A3</div>
+      <div style="font-size:12px;color:#5B6B72;margin-top:2px;">Aparatura USG i diagnostyka</div>
+    </div>
+    <a style="font-size:13px;font-weight:600;text-decoration:none;">Szczegóły</a>
+  </div>
+
+  <!-- bottom nav -->
+  <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #E1E7E9;display:flex;padding:10px 8px 16px;">
+    <div class="nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9AA7AD" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>Wydarzenie</div>
+    <div class="nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9AA7AD" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Agenda</div>
+    <div class="nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9AA7AD" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Aktualności</div>
+    <div class="nav" style="color:#0C5A63;font-weight:600;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Mapa</div>
+    <div class="nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9AA7AD" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Więcej</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

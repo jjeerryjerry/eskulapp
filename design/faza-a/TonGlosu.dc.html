@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .cap{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B72; font-weight:600;}
+  .pill{font-family:Sora,sans-serif; font-weight:600; font-size:15px; color:#0C5A63; background:#D7EAEC; padding:8px 14px; border-radius:999px;}
+</style>
+</helmet>
+<div style="box-sizing:border-box; width:1280px; height:760px; background:#F6F8F9; color:#0A1B2A; font-family:Inter,system-ui,sans-serif; padding:56px 64px;">
+  <div class="cap" style="margin-bottom:6px;">A6, Ton głosu</div>
+  <h2 style="font-family:Sora,sans-serif; font-weight:700; font-size:32px; margin:0 0 6px;">Rzeczowo, klarownie, z szacunkiem do czasu</h2>
+  <p style="font-size:15px; color:#5B6B72; margin:0 0 24px; max-width:820px;">Archetyp: Mędrzec + Opiekun. Krótkie zdania, zero żargonu marketingowego i zero medycznego przeciążenia. Piszemy do zajętego profesjonalisty.</p>
+
+  <div style="display:flex; gap:12px; margin-bottom:28px; flex-wrap:wrap;">
+    <span class="pill">Zaufanie</span>
+    <span class="pill">Klarowność</span>
+    <span class="pill">Rzetelność</span>
+    <span class="pill">Nowoczesność</span>
+    <span class="pill">Szacunek dla czasu</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+    <div style="background:#fff; border:1px solid #E1E7E9; border-top:3px solid #1E9E6A; border-radius:14px; padding:24px;">
+      <div style="font-family:Sora,sans-serif; font-weight:700; font-size:18px; color:#1E9E6A; margin-bottom:16px;">Mówimy</div>
+      <div style="display:flex; flex-direction:column; gap:14px; font-size:16px; line-height:1.4;">
+        <div>„Twoja agenda na dziś.”</div>
+        <div>„Dołącz do wydarzenia kodem.”</div>
+        <div>„Brak zasięgu? Program działa offline.”</div>
+        <div>„Przypomnimy Ci 15 minut przed prelekcją.”</div>
+      </div>
+    </div>
+    <div style="background:#fff; border:1px solid #E1E7E9; border-top:3px solid #D64545; border-radius:14px; padding:24px;">
+      <div style="font-family:Sora,sans-serif; font-weight:700; font-size:18px; color:#D64545; margin-bottom:16px;">Nie mówimy</div>
+      <div style="display:flex; flex-direction:column; gap:14px; font-size:16px; line-height:1.4; color:#5B6B72;">
+        <div>„Odjazdowy harmonogram!”</div>
+        <div>„Odblokuj magiczny event 🎉”</div>
+        <div>„Rewolucyjna technologia synchronizacji”</div>
+        <div>„Nie przegap NICZEGO!!!”</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; background:#08363B; color:#C4D6D7; border-radius:14px; padding:22px 26px; font-size:15px; line-height:1.6;">
+    <span style="color:#FF6B57; font-weight:600;">Zasada nadrzędna:</span> jeśli zdanie mógłbyś usłyszeć od dobrego organizatora konferencji, pasuje. Jeśli brzmi jak baner reklamowy, wytnij.
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

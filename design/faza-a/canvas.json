@@ -1,0 +1,38 @@
+{
+  "pages": [
+    { "id": "brand", "name": "Branding (Faza A)" },
+    { "id": "www",   "name": "WWW, Identyfikator (Faza B)" },
+    { "id": "app",   "name": "Aplikacja (Faza C)" }
+  ],
+  "artboards": [
+    { "file": "App-Wejscie.dc.html",       "title": "App 1 · Wejście kodem",  "page": "app", "x": 0,    "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Eventy.dc.html",         "title": "App 2 · Moje wydarzenia","page": "app", "x": 470,  "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Event.dc.html",          "title": "App 3 · Ekran eventu",   "page": "app", "x": 940,  "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Agenda.dc.html",         "title": "App 4 · Agenda",         "page": "app", "x": 1410, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Aktualnosci.dc.html",    "title": "App 5 · Aktualności",    "page": "app", "x": 1880, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Prelekcja.dc.html",      "title": "App 6 · Prelekcja",      "page": "app", "x": 2350, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Prelegenci.dc.html",     "title": "App 7 · Prelegenci",     "page": "app", "x": 2820, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Partnerzy.dc.html",      "title": "App 8 · Partnerzy",      "page": "app", "x": 3290, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Mapa.dc.html",           "title": "App 9 · Mapa",           "page": "app", "x": 3760, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Kontakt.dc.html",        "title": "App 10 · Kontakt",       "page": "app", "x": 4230, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Offline.dc.html",        "title": "App 11 · Tryb offline",  "page": "app", "x": 4700, "y": 0, "w": 390, "h": 844 },
+    { "file": "App-Pusty.dc.html",          "title": "App 12 · Stan pusty",    "page": "app", "x": 5170, "y": 0, "w": 390, "h": 844 },
+
+    { "file": "WWW-Recepta.dc.html",       "title": "V1 · Recepta (Rp.)",   "page": "www",   "x": 0,    "y": 0,    "w": 1440, "h": 1180 },
+    { "file": "WWW-Monitor.dc.html",        "title": "V2 · Monitor / EKG",   "page": "www",   "x": 1540, "y": 0,    "w": 1440, "h": 1180 },
+    { "file": "WWW-Identyfikator.dc.html",  "title": "V3 · Identyfikator ★", "page": "www",   "x": 3080, "y": 0,    "w": 1440, "h": 1180 },
+
+    { "file": "Main.dc.html",       "title": "A1 · Okładka",     "page": "brand", "x": 0,    "y": 0,    "w": 1280, "h": 832 },
+    { "file": "Logo.dc.html",       "title": "A2 · Logo",        "page": "brand", "x": 1400, "y": 0,    "w": 1280, "h": 900 },
+    { "file": "Kolory.dc.html",     "title": "A3 · Kolory",      "page": "brand", "x": 0,    "y": 1000, "w": 1280, "h": 820 },
+    { "file": "Typografia.dc.html", "title": "A4 · Typografia",  "page": "brand", "x": 1400, "y": 1000, "w": 1280, "h": 840 },
+    { "file": "Komponenty.dc.html", "title": "A5 · Komponenty",  "page": "brand", "x": 0,    "y": 1920, "w": 1280, "h": 880 },
+    { "file": "TonGlosu.dc.html",   "title": "A6 · Ton głosu",   "page": "brand", "x": 1400, "y": 1920, "w": 1280, "h": 760 }
+  ],
+  "annotations": [
+    { "id": "app-note", "x": 0, "y": -150, "w": 1180, "page": "app", "text": "Faza C, Aplikacja (Android, Material 3 na brandingu). BEZ logowania: kod eventu dane lokalnie. 12 ekranów: Wejście · Moje wydarzenia · Ekran eventu · Agenda · Aktualności (+ push promo) · Prelekcja · Prelegenci · Partnerzy · Mapa · Kontakt · Tryb offline · Stan pusty. Komplet modułów + stany offline/pusty. Do dorobienia po stronie web: kreator powiadomień w CMS." },
+    { "id": "www-note", "x": 0, "y": -170, "w": 900, "page": "www", "text": "Faza B, WWW. Wybrany kierunek: V3 Identyfikator ★ (na głównej: link do apki + formularz kontaktu dla organizatora). V1/V2 zostają dla porównania." },
+    { "id": "brand-note", "x": 0, "y": -150, "w": 620, "page": "brand", "text": "Faza A, branding zatwierdzony. Petrol + coral · Sora + Inter · znak E1 w pieczęci." }
+  ],
+  "launch": { "view": "canvas", "page": "app" }
+}

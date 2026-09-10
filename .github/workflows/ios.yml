@@ -1,0 +1,49 @@
+name: iOS build (TestFlight)
+
+# Kompilacja i podpis iOS wykonuja sie WYLACZNIE na macOS runnerze.
+# Serwer agenta (Linux) weryfikuje tylko warstwe wspolna :shared (android/common).
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/shared/**'
+      - 'app/iosApp/**'
+      - '.github/workflows/ios.yml'
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Zbuduj framework Shared (XCFramework, release)
+        working-directory: app
+        run: ./gradlew :shared:assembleSharedReleaseXCFramework --no-daemon
+
+      - name: Zainstaluj XcodeGen
+        run: brew install xcodegen
+
+      - name: Wygeneruj projekt Xcode
+        working-directory: app/iosApp
+        run: xcodegen generate
+
+      - name: Fastlane beta (build + podpis + TestFlight)
+        working-directory: app/iosApp
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTH }}
+        run: |
+          gem install fastlane --no-document
+          fastlane beta

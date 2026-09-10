@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .cap{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B72; font-weight:600;}
+  .panel{background:#fff; border:1px solid #E1E7E9; border-radius:14px; padding:24px;}
+  .btn{font-family:Inter,sans-serif; font-weight:600; font-size:15px; border-radius:10px; padding:12px 20px; border:1px solid transparent; cursor:pointer;}
+  .badge{font-family:Inter,sans-serif; font-weight:600; font-size:12px; padding:5px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;}
+  .icn{width:56px; height:56px; border-radius:14px; background:#D7EAEC; display:flex; align-items:center; justify-content:center;}
+</style>
+</helmet>
+<div style="box-sizing:border-box; width:1280px; height:880px; background:#F6F8F9; color:#0A1B2A; font-family:Inter,system-ui,sans-serif; padding:56px 64px;">
+  <div class="cap" style="margin-bottom:6px;">A5, Ikony i komponenty (design system)</div>
+  <h2 style="font-family:Sora,sans-serif; font-weight:700; font-size:32px; margin:0 0 24px;">Zestaw startowy UI</h2>
+
+  <div style="display:grid; grid-template-columns:1.15fr 1fr; gap:24px;">
+    <!-- left column -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      <!-- icons -->
+      <div class="panel">
+        <div class="cap" style="margin-bottom:16px;">Ikony modułów · linia 1.75</div>
+        <div style="display:flex; gap:18px; flex-wrap:wrap;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:76px;">
+            <div class="icn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h5"/></svg></div>
+            <span style="font-size:12px; color:#5B6B72;">Agenda</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:76px;">
+            <div class="icn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+            <span style="font-size:12px; color:#5B6B72;">Prelegenci</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:76px;">
+            <div class="icn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l6-3 6 3 6-3v14M9 4v14M15 7v14"/></svg></div>
+            <span style="font-size:12px; color:#5B6B72;">Partnerzy</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:76px;">
+            <div class="icn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+            <span style="font-size:12px; color:#5B6B72;">Mapa</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:76px;">
+            <div class="icn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v12H8l-4 4z"/></svg></div>
+            <span style="font-size:12px; color:#5B6B72;">Kontakt</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; width:76px;">
+            <div class="icn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF6B57" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></div>
+            <span style="font-size:12px; color:#5B6B72;">Przypomnij</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- buttons + inputs -->
+      <div class="panel">
+        <div class="cap" style="margin-bottom:16px;">Przyciski i pola</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+          <button class="btn" style="background:#0C5A63; color:#fff;">Dołącz kodem</button>
+          <button class="btn" style="background:#fff; color:#0C5A63; border-color:#0C5A63;">Zobacz agendę</button>
+          <button class="btn" style="background:transparent; color:#5B6B72;">Anuluj</button>
+          <button class="btn" style="background:#D9503B; color:#fff;">Usuń</button>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:16px;">
+          <div style="flex:1;">
+            <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Kod eventu</label>
+            <input value="FND2027" style="width:100%; box-sizing:border-box; font-family:Inter,sans-serif; font-size:16px; letter-spacing:.14em; padding:12px 14px; border:1px solid #CBD5D8; border-radius:10px; color:#0A1B2A; background:#fff;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Filtr sali</label>
+            <div style="display:flex; gap:8px; padding-top:4px; flex-wrap:wrap;">
+              <span style="font-size:13px; font-weight:600; padding:8px 12px; border-radius:999px; background:#0C5A63; color:#fff;">Wszystkie</span>
+              <span style="font-size:13px; font-weight:600; padding:8px 12px; border-radius:999px; background:#EAF0F1; color:#0A1B2A;">Sala A</span>
+              <span style="font-size:13px; font-weight:600; padding:8px 12px; border-radius:999px; background:#EAF0F1; color:#0A1B2A;">Sala B</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- badges -->
+      <div class="panel">
+        <div class="cap" style="margin-bottom:16px;">Statusy eventu</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <span class="badge" style="background:#FF6B57; color:#0A1B2A;"><span style="width:7px; height:7px; border-radius:999px; background:#0A1B2A;"></span>NA ŻYWO</span>
+          <span class="badge" style="background:#D7EAEC; color:#0C5A63;">NADCHODZI</span>
+          <span class="badge" style="background:#EDF1F2; color:#9AA7AD;">ARCHIWALNY</span>
+          <span class="badge" style="background:#E7F5EE; color:#1E9E6A;">DOŁĄCZONO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- right column: cards -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      <div class="panel" style="padding:0; overflow:hidden;">
+        <div class="cap" style="padding:20px 24px 0;">Karta eventu, aktywny</div>
+        <div style="padding:20px 24px 24px;">
+          <div style="display:flex; justify-content:space-between; align-items:start; gap:12px;">
+            <div>
+              <div style="font-family:Sora,sans-serif; font-weight:700; font-size:20px;">Forum Nefrologii Dziecięcej</div>
+              <div style="font-size:14px; color:#5B6B72; margin-top:4px;">14-15 marca 2027 · Warszawa</div>
+            </div>
+            <span class="badge" style="background:#FF6B57; color:#0A1B2A;"><span style="width:7px; height:7px; border-radius:999px; background:#0A1B2A;"></span>NA ŻYWO</span>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:16px;">
+            <span style="font-size:12px; color:#0C5A63; background:#D7EAEC; padding:5px 10px; border-radius:999px;">42 prelekcje</span>
+            <span style="font-size:12px; color:#0C5A63; background:#D7EAEC; padding:5px 10px; border-radius:999px;">18 prelegentów</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="opacity:.7;">
+        <div style="display:flex; justify-content:space-between; align-items:start;">
+          <div>
+            <div style="font-family:Sora,sans-serif; font-weight:700; font-size:18px; color:#5B6B72;">Kongres Kardiologii 2025</div>
+            <div style="font-size:13px; color:#9AA7AD; margin-top:4px;">8-10 listopada 2025 · Kraków</div>
+          </div>
+          <span class="badge" style="background:#EDF1F2; color:#9AA7AD;">ARCHIWALNY</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="cap" style="margin-bottom:14px;">Karta prelegenta</div>
+        <div style="display:flex; gap:14px; align-items:center;">
+          <div style="width:56px; height:56px; border-radius:999px; background:#D7EAEC; display:flex; align-items:center; justify-content:center; font-family:Sora,sans-serif; font-weight:700; color:#0C5A63; font-size:18px;">AK</div>
+          <div>
+            <div style="font-family:Sora,sans-serif; font-weight:600; font-size:17px;">prof. Anna Kowalska</div>
+            <div style="font-size:13px; color:#5B6B72; margin-top:2px;">Kierownik Kliniki Nefrologii</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

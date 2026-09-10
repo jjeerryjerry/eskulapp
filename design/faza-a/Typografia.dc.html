@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .cap{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B72; font-weight:600;}
+  .row{display:flex; align-items:baseline; gap:20px; border-bottom:1px solid #E1E7E9; padding:14px 0;}
+  .tag{width:150px; flex:none; font-size:12px; color:#5B6B72; font-family:Inter,sans-serif;}
+</style>
+</helmet>
+<div style="box-sizing:border-box; width:1280px; height:840px; background:#F6F8F9; color:#0A1B2A; font-family:Inter,system-ui,sans-serif; padding:56px 64px; display:flex; gap:48px;">
+  <!-- left: families -->
+  <div style="width:420px; flex:none;">
+    <div class="cap" style="margin-bottom:6px;">A4, Typografia</div>
+    <h2 style="font-family:Sora,sans-serif; font-weight:700; font-size:32px; margin:0 0 28px;">Sora + Inter</h2>
+
+    <div style="background:#fff; border:1px solid #E1E7E9; border-radius:14px; padding:24px; margin-bottom:20px;">
+      <div class="cap">Nagłówki / display</div>
+      <div style="font-family:Sora,sans-serif; font-weight:800; font-size:56px; letter-spacing:-1.5px; line-height:1; margin:10px 0 6px;">Sora</div>
+      <div style="font-family:Sora,sans-serif; font-size:15px; color:#5B6B72;">Aa Bb Cc Ćć Śś Żż 0123456789</div>
+      <div style="font-size:13px; color:#5B6B72; margin-top:10px;">Wagi 600 / 700 / 800 · nowoczesny, zdecydowany</div>
+    </div>
+
+    <div style="background:#fff; border:1px solid #E1E7E9; border-radius:14px; padding:24px;">
+      <div class="cap">UI / tekst / agenda</div>
+      <div style="font-family:Inter,sans-serif; font-weight:600; font-size:56px; letter-spacing:-1px; line-height:1; margin:10px 0 6px;">Inter</div>
+      <div style="font-family:Inter,sans-serif; font-size:15px; color:#5B6B72;">Aa Bb Cc Ćć Śś Żż <span style="font-variant-numeric:tabular-nums;">09:40 · 12:15</span></div>
+      <div style="font-size:13px; color:#5B6B72; margin-top:10px;">Wagi 400 / 500 / 600 · tabular figures dla godzin</div>
+    </div>
+  </div>
+
+  <!-- right: scale -->
+  <div style="flex:1;">
+    <div class="cap" style="margin-bottom:10px;">Skala (web)</div>
+    <div class="row"><span class="tag">H1 · Sora 700 · 48</span><span style="font-family:Sora,sans-serif; font-weight:700; font-size:48px; letter-spacing:-1px;">Agenda konferencji</span></div>
+    <div class="row"><span class="tag">H2 · Sora 700 · 36</span><span style="font-family:Sora,sans-serif; font-weight:700; font-size:36px; letter-spacing:-.5px;">Prelegenci i partnerzy</span></div>
+    <div class="row"><span class="tag">H3 · Sora 600 · 28</span><span style="font-family:Sora,sans-serif; font-weight:600; font-size:28px;">Sesja plenarna, Sala A</span></div>
+    <div class="row"><span class="tag">H4 · Sora 600 · 22</span><span style="font-family:Sora,sans-serif; font-weight:600; font-size:22px;">Dołącz do wydarzenia</span></div>
+    <div class="row"><span class="tag">Body · Inter 400 · 16</span><span style="font-family:Inter,sans-serif; font-size:16px; line-height:1.55; max-width:520px;">Wpisz kod eventu, aby dodać zamknięte wydarzenie do swojej listy. Program działa offline.</span></div>
+    <div class="row"><span class="tag">Label · Inter 600 · 14</span><span style="font-family:Inter,sans-serif; font-weight:600; font-size:14px;">Sala B · 10:30-11:15</span></div>
+    <div class="row"><span class="tag">Caption · Inter 500 · 12</span><span style="font-family:Inter,sans-serif; font-weight:500; font-size:12px; color:#5B6B72; letter-spacing:.02em;">Ostatnia aktualizacja programu</span></div>
+    <div style="margin-top:22px; font-size:13px; color:#5B6B72; line-height:1.6;">Line-height: 1.2 nagłówki / 1.55 tekst. &nbsp;App (sp): Title 22 · Section 18 · Body 15 · Label 13 · Caption 11. &nbsp;Fallback: Sora„Segoe UI”, Intersystem-ui.</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

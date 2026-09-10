@@ -1,0 +1,40 @@
+# sekrety
+.env
+keystore.properties
+*.jks
+*.p12
+*.keystore
+
+# PHP
+web/vendor/
+web/**/config.local.php
+web/public/app/leads.log
+web/public/app/.env
+
+# Android
+app/.gradle/
+app/build/
+app/app/build/
+app/shared/build/
+app/local.properties
+app/**/build.log
+app/*.log
+*.apk
+
+# iOS (framework Shared + projekt generowany przez XcodeGen na Macu)
+app/iosApp/Eskulapp.xcodeproj/
+app/iosApp/build/
+app/iosApp/DerivedData/
+*.p8
+*.mobileprovision
+*.cer
+
+# różne
+.DS_Store
+node_modules/
+dist/
+
+# render zrzutow
+tools/shots/node_modules/
+tools/shots/out1x/
+.secrets/

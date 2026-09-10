@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- allowBackup=false w manifescie; ponizsze wykluczenia sa dodatkowym zabezpieczeniem
+     gdyby backup kiedys wlaczono - lokalna baza Room nie opuszcza urzadzenia. -->
+<full-backup-content>
+    <exclude domain="database" path="eskulapp.db" />
+    <exclude domain="database" path="eskulapp.db-wal" />
+    <exclude domain="database" path="eskulapp.db-shm" />
+</full-backup-content>

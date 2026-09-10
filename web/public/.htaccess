@@ -1,0 +1,29 @@
+# Eskulapp - public_html
+# (Wersje PHP/lsphp ustawia panel cyber-folks; AddHandler tu tylko 500-uje na LiteSpeed.)
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Wymus HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Kod aplikacji (app/) nie jest dostepny z sieci - tylko przez front controller
+  RewriteRule ^app(/|$) - [F]
+
+  # Realne pliki/katalogi (assets) serwuj wprost
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Reszta -> front controller
+  RewriteRule ^ index.php [L]
+</IfModule>
+
+# Nie wydawaj plikow wrazliwych, gdyby trafily do webroota
+<FilesMatch "(^\.env|\.env\.|composer\.(json|lock)|\.log$|\.sql$)">
+  Require all denied
+</FilesMatch>

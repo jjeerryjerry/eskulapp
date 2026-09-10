@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .seal{display:flex;align-items:center;justify-content:center;border-radius:999px;background:#0C5A63;flex:none;}
+  .btn{font-family:Inter,sans-serif;font-weight:600;font-size:15px;border-radius:10px;padding:12px 22px;border:1px solid transparent;}
+  .mono{font-family:'Space Mono',monospace;}
+  .dot{border-bottom:2px dotted #9AA7AD;}
+</style>
+</helmet>
+<div style="box-sizing:border-box;width:1440px;height:1180px;background:#F6F8F9;color:#0A1B2A;font-family:Inter,system-ui,sans-serif;">
+  <!-- NAV -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 64px;border-bottom:1px solid #E1E7E9;background:#fff;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="seal" style="width:38px;height:38px;"><svg width="23" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg></div>
+      <span style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.5px;">Eskulapp</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:28px;font-size:15px;color:#5B6B72;">
+      <span>Funkcje</span><span>Dla organizatora</span><span>Pobierz</span>
+      <span class="btn" style="background:#0C5A63;color:#fff;">Załóż konto</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div style="display:grid;grid-template-columns:1.05fr .95fr;gap:56px;padding:64px 64px 40px;align-items:center;">
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#0C5A63;font-weight:600;background:#D7EAEC;padding:7px 12px;border-radius:999px;">Rp. &nbsp;dla uczestnika eventu medycznego</div>
+      <h1 style="font-family:Sora,sans-serif;font-weight:800;font-size:58px;line-height:1.05;letter-spacing:-1.5px;margin:20px 0 20px;">Cała konferencja<br>medyczna -<br><span style="color:#0C5A63;">przepisana</span> do kieszeni.</h1>
+      <p style="font-size:18px;line-height:1.55;color:#5B6B72;max-width:520px;margin:0 0 28px;">Agenda, prelegenci, partnerzy, mapa i przypomnienia, jedna aplikacja na cały event. Działa offline, nawet gdy na sali nie ma zasięgu.</p>
+      <div style="display:flex;gap:14px;align-items:center;">
+        <span class="btn" style="background:#0C5A63;color:#fff;padding:14px 26px;font-size:16px;">Pobierz Eskulapp</span>
+        <span class="btn" style="background:#fff;color:#0C5A63;border-color:#CBD5D8;padding:14px 22px;">Mam kod eventu</span>
+      </div>
+      <div class="mono" style="font-size:13px;color:#9AA7AD;margin-top:22px;">// dawkowanie: 1 event, wielokrotnie dziennie, bez recepty</div>
+    </div>
+
+    <!-- RECEPTA CARD -->
+    <div style="background:#fff;border:1px solid #E1E7E9;border-radius:16px;box-shadow:0 18px 44px rgba(10,27,42,.10);overflow:hidden;">
+      <div style="background:#0C5A63;color:#fff;padding:18px 26px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:Sora,sans-serif;font-weight:700;font-size:18px;">Recepta uczestnika</span>
+        <span class="mono" style="font-size:12px;color:#BfE0E2;opacity:.9;">nr FND2027</span>
+      </div>
+      <div style="padding:28px 30px;">
+        <div style="display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-family:Sora,sans-serif;font-weight:800;font-size:56px;color:#0C5A63;line-height:.9;">Rp.</div>
+          <div style="flex:1;padding-top:6px;">
+            <div class="mono" style="font-size:13px;color:#5B6B72;">Uczestnik</div>
+            <div class="dot" style="padding-bottom:6px;margin-bottom:14px;font-size:16px;">dr [Twoje imię i nazwisko]</div>
+            <div class="mono" style="font-size:13px;color:#5B6B72;">Wydarzenie</div>
+            <div class="dot" style="padding-bottom:6px;font-size:16px;">Forum Nefrologii Dziecięcej 2027</div>
+          </div>
+        </div>
+        <div style="margin-top:22px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:15px;"><span>1 × Agenda z przypomnieniami</span><span class="mono" style="color:#0C5A63;">✓</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;"><span>1 × Prelegenci i partnerzy</span><span class="mono" style="color:#0C5A63;">✓</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;"><span>1 × Mapa eventu + kontakt</span><span class="mono" style="color:#0C5A63;">✓</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;color:#5B6B72;"><span>Dostęp offline</span><span class="mono" style="color:#0C5A63;">à la carte</span></div>
+        </div>
+        <div style="margin-top:26px;display:flex;justify-content:space-between;align-items:flex-end;">
+          <div>
+            <div class="dot" style="width:160px;padding-bottom:4px;"></div>
+            <div class="mono" style="font-size:12px;color:#9AA7AD;margin-top:4px;">podpis organizatora</div>
+          </div>
+          <div style="width:78px;height:78px;border:2px solid #FF6B57;border-radius:999px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#FF6B57;transform:rotate(-8deg);">
+            <span style="font-family:Sora,sans-serif;font-weight:800;font-size:13px;">Rp.</span>
+            <span class="mono" style="font-size:8px;">ESKULAPP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div style="padding:24px 64px 40px;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+      <div style="background:#fff;border:1px solid #E1E7E9;border-radius:14px;padding:24px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h5"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;">Agenda</div>
+        <div style="font-size:14px;color:#5B6B72;line-height:1.5;">Dni, filtr sal, przypomnienia o prelekcjach.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E1E7E9;border-radius:14px;padding:24px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;">Prelegenci</div>
+        <div style="font-size:14px;color:#5B6B72;line-height:1.5;">Profile, tytuły, bio, ich prelekcje.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E1E7E9;border-radius:14px;padding:24px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;">Mapa + partnerzy</div>
+        <div style="font-size:14px;color:#5B6B72;line-height:1.5;">Stoiska partnerów i plan przestrzeni.</div>
+      </div>
+      <div style="background:#0C5A63;color:#fff;border-radius:14px;padding:24px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF6B57" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;">Offline-first</div>
+        <div style="font-size:14px;color:#BfE0E2;line-height:1.5;">Program w kieszeni, bez zasięgu na sali.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORGANIZER + FOOTER -->
+  <div style="margin:0 64px;background:#08363B;color:#EAF2F2;border-radius:16px;padding:30px 36px;display:flex;justify-content:space-between;align-items:center;">
+    <div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:22px;">Organizujesz event medyczny?</div><div style="font-size:15px;color:#BfE0E2;margin-top:4px;">Panel CMS: agenda, prelegenci, partnerzy, kody dostępu, w jednym miejscu.</div></div>
+    <span class="btn" style="background:#FF6B57;color:#0A1B2A;padding:14px 24px;">Wypisz receptę na event </span>
+  </div>
+  <div style="padding:24px 64px 30px;color:#6B7A80;font-size:13px;">© 2027 Eskulapp · System dla uczestników eventów medycznych · [kontakt] · [regulamin]</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

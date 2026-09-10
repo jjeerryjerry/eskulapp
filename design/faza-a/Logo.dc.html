@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .cap{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B72; font-weight:600;}
+  .card{background:#fff; border:1px solid #E1E7E9; border-radius:14px;}
+  .seal{display:flex; align-items:center; justify-content:center; border-radius:999px; flex:none;}
+  .word{font-family:Sora,sans-serif; font-weight:800; letter-spacing:-1px; color:#0A1B2A;}
+</style>
+</helmet>
+<div style="box-sizing:border-box; width:1280px; height:900px; background:#F6F8F9; color:#0A1B2A; font-family:Inter,system-ui,sans-serif; padding:56px 64px;">
+  <div class="cap" style="margin-bottom:6px;">A2, Znak i system logo</div>
+  <h2 style="font-family:Sora,sans-serif; font-weight:700; font-size:34px; margin:0 0 28px;">Pieczęć Eskulapa, laska + wąż w kształcie „E”</h2>
+
+  <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px;">
+    <!-- primary lockup -->
+    <div class="card" style="padding:32px; display:flex; flex-direction:column; gap:20px; grid-column:span 2;">
+      <span class="cap">Lockup poziomy, podstawowy</span>
+      <div style="display:flex; align-items:center; gap:22px; padding:12px 0;">
+        <div class="seal" style="width:96px; height:96px; background:#0C5A63;">
+          <svg width="58" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg>
+        </div>
+        <div class="word" style="font-size:52px;">Eskul<span style="color:#0C5A63;">app</span></div>
+      </div>
+    </div>
+    <!-- app icon -->
+    <div class="card" style="padding:32px; display:flex; flex-direction:column; gap:20px; align-items:center;">
+      <span class="cap" style="align-self:flex-start;">App icon / sygnet</span>
+      <div class="seal" style="width:132px; height:132px; background:#0C5A63; box-shadow:0 8px 24px rgba(10,27,42,.18);">
+        <svg width="79" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px; margin-top:24px;">
+    <!-- stacked -->
+    <div class="card" style="padding:28px; display:flex; flex-direction:column; gap:16px; align-items:center;">
+      <span class="cap" style="align-self:flex-start;">Lockup pionowy</span>
+      <div class="seal" style="width:64px; height:64px; background:#0C5A63;">
+        <svg width="38" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg>
+      </div>
+      <div class="word" style="font-size:24px; letter-spacing:-.5px;">Eskulapp</div>
+    </div>
+    <!-- mono ink -->
+    <div class="card" style="padding:28px; display:flex; flex-direction:column; gap:16px; align-items:center;">
+      <span class="cap" style="align-self:flex-start;">Mono, ink (1 kolor)</span>
+      <div class="seal" style="width:64px; height:64px; background:#0A1B2A;">
+        <svg width="38" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#fff"/></svg>
+      </div>
+      <div class="word" style="font-size:20px;">Eskulapp</div>
+    </div>
+    <!-- mono on dark -->
+    <div class="card" style="padding:28px; display:flex; flex-direction:column; gap:16px; align-items:center; background:#0A1B2A; border-color:#0A1B2A;">
+      <span class="cap" style="align-self:flex-start; color:#7FB2B6;">Mono, na ciemnym</span>
+      <div class="seal" style="width:64px; height:64px; background:#EAF2F2;">
+        <svg width="38" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#0A1B2A"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#0A1B2A" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#0A1B2A" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#0A1B2A"/></svg>
+      </div>
+      <div class="word" style="font-size:20px; color:#EAF2F2;">Eskulapp</div>
+    </div>
+    <!-- clearspace -->
+    <div class="card" style="padding:28px; display:flex; flex-direction:column; gap:16px;">
+      <span class="cap">Pole ochronne · min.</span>
+      <div style="border:1px dashed #9AA7AD; border-radius:8px; padding:16px; display:flex; align-items:center; justify-content:center;">
+        <div class="seal" style="width:56px; height:56px; background:#0C5A63;">
+          <svg width="34" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg>
+        </div>
+      </div>
+      <div style="font-size:13px; color:#5B6B72; line-height:1.5;">Odstęp = 1/2 średnicy pieczęci. Sygnet min. 20 px, wordmark min. 96 px.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px; padding:24px 28px; display:flex; gap:32px; align-items:center;">
+    <span class="cap" style="color:#D64545;">Nie wolno</span>
+    <div style="font-size:14px; color:#0A1B2A; line-height:1.6;">
+      ✗ używać kaduceusza (dwa węże + skrzydła, to symbol handlu, nie medycyny) &nbsp;·&nbsp; ✗ deformować koła (owal) &nbsp;·&nbsp; ✗ zmieniać kolory znaku &nbsp;·&nbsp; ✗ dodawać cień/obrys do samego znaku &nbsp;·&nbsp; ✗ znak petrolowy na niespokojnym tle bez wersji mono
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

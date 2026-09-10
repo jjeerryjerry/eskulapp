@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- allowBackup=false; wykluczenia bazy Room jako dodatkowe zabezpieczenie (backup w chmurze
+     oraz transfer urzadzenie->urzadzenie) gdyby backup kiedys wlaczono. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" path="eskulapp.db" />
+        <exclude domain="database" path="eskulapp.db-wal" />
+        <exclude domain="database" path="eskulapp.db-shm" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="database" path="eskulapp.db" />
+        <exclude domain="database" path="eskulapp.db-wal" />
+        <exclude domain="database" path="eskulapp.db-shm" />
+    </device-transfer>
+</data-extraction-rules>

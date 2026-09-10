@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .seal{display:flex;align-items:center;justify-content:center;border-radius:999px;background:#0C5A63;flex:none;}
+  .badge{font-family:Inter,sans-serif;font-weight:600;font-size:11px;padding:5px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;}
+  .card{background:#fff;border:1px solid #E1E7E9;border-radius:16px;padding:18px 18px;}
+</style>
+</helmet>
+<div style="box-sizing:border-box;width:390px;height:844px;background:#F6F8F9;color:#0A1B2A;font-family:Inter,system-ui,sans-serif;padding:52px 20px 24px;display:flex;flex-direction:column;">
+  <!-- top bar -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+    <div class="seal" style="width:36px;height:36px;"><svg width="22" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg></div>
+    <div style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.5px;">Moje wydarzenia</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;flex:1;">
+    <!-- active -->
+    <div class="card" style="border-color:#FFD2C9;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div style="font-family:Sora,sans-serif;font-weight:700;font-size:18px;line-height:1.2;">Forum Nefrologii<br>Dziecięcej 2027</div>
+        <span class="badge" style="background:#FF6B57;color:#0A1B2A;"><span style="width:6px;height:6px;border-radius:999px;background:#0A1B2A;"></span>NA ŻYWO</span>
+      </div>
+      <div style="font-size:13px;color:#5B6B72;margin-top:8px;">14-15 marca 2027 · Warszawa</div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <span style="font-size:11px;color:#0C5A63;background:#D7EAEC;padding:5px 9px;border-radius:999px;">Dziś: 12 prelekcji</span>
+        <span style="font-size:11px;color:#D9503B;background:#FDE6E1;padding:5px 9px;border-radius:999px;">2 aktualności</span>
+      </div>
+    </div>
+    <!-- upcoming -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div style="font-family:Sora,sans-serif;font-weight:700;font-size:18px;line-height:1.2;">Kongres Diabetologii 2027</div>
+        <span class="badge" style="background:#D7EAEC;color:#0C5A63;">NADCHODZI</span>
+      </div>
+      <div style="font-size:13px;color:#5B6B72;margin-top:8px;">9-11 maja 2027 · Gdańsk</div>
+    </div>
+    <!-- archived -->
+    <div class="card" style="opacity:.6;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div style="font-family:Sora,sans-serif;font-weight:700;font-size:17px;line-height:1.2;color:#5B6B72;">Kongres Kardiologii 2025</div>
+        <span class="badge" style="background:#EDF1F2;color:#9AA7AD;">ARCHIWALNY</span>
+      </div>
+      <div style="font-size:13px;color:#9AA7AD;margin-top:8px;">8-10 listopada 2025 · Kraków</div>
+    </div>
+  </div>
+
+  <!-- add by code -->
+  <button style="width:100%;margin-top:16px;font-family:Inter,sans-serif;font-weight:600;font-size:16px;color:#fff;background:#0C5A63;border:none;border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+    Dodaj wydarzenie kodem
+  </button>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

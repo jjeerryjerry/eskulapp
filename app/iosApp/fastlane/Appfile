@@ -1,0 +1,2 @@
+app_identifier("pl.eskulapp.mobile")
+# apple_id i team_id nie sa potrzebne przy autoryzacji kluczem App Store Connect API.

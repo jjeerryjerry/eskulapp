@@ -1,0 +1,9 @@
+<svg class="brandmark" viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+  <circle cx="24" cy="24" r="24" fill="#0C5A63"/>
+  <g transform="translate(6.5,4) scale(0.73)">
+    <rect x="9" y="7" width="6" height="34" rx="3" fill="#fff"/>
+    <path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="31" cy="9" r="3.2" fill="#FF6B57"/>
+  </g>
+</svg>

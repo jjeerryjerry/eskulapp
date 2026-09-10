@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .cap{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B72; font-weight:600;}
+  .card{background:#fff; border:1px solid #E1E7E9; border-radius:16px; padding:26px; display:flex; flex-direction:column; gap:18px;}
+  .stage{background:#F6F8F9; border-radius:12px; height:200px; display:flex; align-items:center; justify-content:center; gap:26px;}
+  .seal{display:flex; align-items:center; justify-content:center; border-radius:999px; background:#0C5A63; flex:none;}
+  .small{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .slabel{font-size:11px; color:#9AA7AD;}
+  .trade{font-size:13px; color:#5B6B72; line-height:1.5;}
+</style>
+</helmet>
+<div style="box-sizing:border-box; width:2680px; height:560px; background:#EDF1F2; color:#0A1B2A; font-family:Inter,system-ui,sans-serif; padding:44px 56px;">
+  <div class="cap" style="margin-bottom:4px;">A2 · Sygnet w pieczęci, poprawki czytelności</div>
+  <h2 style="font-family:Sora,sans-serif; font-weight:700; font-size:28px; margin:0 0 4px;">Koło zostaje, poprawiamy znak w środku</h2>
+  <p style="font-size:14px; color:#5B6B72; margin:0 0 22px; max-width:1000px;">Grubszy trzon i wąż, mniej zwojów, znak większy w kole. Sprawdź w 24&nbsp;px (realny rozmiar w pasku).</p>
+
+  <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:24px;">
+
+    <!-- A: grubszy wąż, 2 zwoje -->
+    <div class="card">
+      <span class="cap">A · Grubszy wąż (2 zwoje)</span>
+      <div class="stage">
+        <div class="seal" style="width:120px; height:120px;">
+          <svg width="72" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M12 39 C 31 34 29 26 20 23 C 11 20 11 13 21 9" stroke="#FF6B57" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="9" r="4" fill="#FF6B57"/></svg>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="small"><div class="seal" style="width:40px; height:40px;"><svg width="24" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M12 39 C 31 34 29 26 20 23 C 11 20 11 13 21 9" stroke="#FF6B57" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="9" r="4" fill="#FF6B57"/></svg></div><span class="slabel">40</span></div>
+          <div class="small"><div class="seal" style="width:24px; height:24px;"><svg width="15" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M12 39 C 31 34 29 26 20 23 C 11 20 11 13 21 9" stroke="#FF6B57" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="9" r="4" fill="#FF6B57"/></svg></div><span class="slabel">24</span></div>
+        </div>
+      </div>
+      <div class="trade">Ten sam pomysł, ale wszystko grubsze i tylko 2 zwoje. Zachowuje symbol laski Eskulapa.</div>
+    </div>
+
+    <!-- B: wąż-wstążka (bardzo gruby, 1 S) -->
+    <div class="card">
+      <span class="cap">B · Wąż-wstążka (1 fala)</span>
+      <div class="stage">
+        <div class="seal" style="width:120px; height:120px;">
+          <svg width="72" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M13 37 C 30 33 30 26 20 23 C 10 20 10 14 27 10" stroke="#FF6B57" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="small"><div class="seal" style="width:40px; height:40px;"><svg width="24" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M13 37 C 30 33 30 26 20 23 C 10 20 10 14 27 10" stroke="#FF6B57" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="slabel">40</span></div>
+          <div class="small"><div class="seal" style="width:24px; height:24px;"><svg width="15" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M13 37 C 30 33 30 26 20 23 C 10 20 10 14 27 10" stroke="#FF6B57" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="slabel">24</span></div>
+        </div>
+      </div>
+      <div class="trade">Najgrubszy, najbardziej „pełny”. Wąż jako jedna mocna wstążka, świetnie czyta się w mini.</div>
+    </div>
+
+    <!-- C: laska + 1 pętla -->
+    <div class="card">
+      <span class="cap">C · Laska + 1 pętla</span>
+      <div class="stage">
+        <div class="seal" style="width:120px; height:120px;">
+          <svg width="72" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M26 15 C 26 9 12 9 12 17 C 12 25 28 25 28 31 C 28 36 16 37 14 33" stroke="#FF6B57" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="small"><div class="seal" style="width:40px; height:40px;"><svg width="24" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M26 15 C 26 9 12 9 12 17 C 12 25 28 25 28 31 C 28 36 16 37 14 33" stroke="#FF6B57" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="slabel">40</span></div>
+          <div class="small"><div class="seal" style="width:24px; height:24px;"><svg width="15" viewBox="0 0 40 48" fill="none"><rect x="16.5" y="5" width="7" height="36" rx="3.5" fill="#fff"/><circle cx="20" cy="5" r="4" fill="#fff"/><path d="M26 15 C 26 9 12 9 12 17 C 12 25 28 25 28 31 C 28 36 16 37 14 33" stroke="#FF6B57" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="slabel">24</span></div>
+        </div>
+      </div>
+      <div class="trade">Uproszczone do jednej wyraźnej pętli węża. Najczystsze, najmniej „szumu” w małych rozmiarach.</div>
+    </div>
+
+    <!-- D: monogram E -->
+    <div class="card">
+      <span class="cap">D · Monogram „E” + akcent</span>
+      <div class="stage">
+        <div class="seal" style="width:120px; height:120px; position:relative;">
+          <span style="font-family:Sora,sans-serif; font-weight:800; font-size:74px; color:#fff; line-height:1;">E</span>
+          <span style="position:absolute; right:26px; bottom:30px; width:14px; height:14px; border-radius:999px; background:#FF6B57;"></span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="small"><div class="seal" style="width:40px; height:40px; position:relative;"><span style="font-family:Sora,sans-serif; font-weight:800; font-size:25px; color:#fff; line-height:1;">E</span><span style="position:absolute; right:9px; bottom:10px; width:5px; height:5px; border-radius:999px; background:#FF6B57;"></span></div><span class="slabel">40</span></div>
+          <div class="small"><div class="seal" style="width:24px; height:24px; position:relative;"><span style="font-family:Sora,sans-serif; font-weight:800; font-size:15px; color:#fff; line-height:1;">E</span><span style="position:absolute; right:5px; bottom:6px; width:3px; height:3px; border-radius:999px; background:#FF6B57;"></span></div><span class="slabel">24</span></div>
+        </div>
+      </div>
+      <div class="trade">Rezygnacja z laski: litera czyta się zawsze, nawet 16 px. Coralowa kropka = akcent. Minus: gubi symbol medyczny.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

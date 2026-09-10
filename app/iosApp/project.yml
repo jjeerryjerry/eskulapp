@@ -1,0 +1,34 @@
+# Specyfikacja projektu Xcode generowana przez XcodeGen (tekstowo, bez recznego pbxproj).
+# CI: `xcodegen generate` tworzy Eskulapp.xcodeproj tuz przed buildem na Macu.
+name: Eskulapp
+options:
+  bundleIdPrefix: pl.eskulapp
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: "YES"
+    INFOPLIST_KEY_CFBundleDisplayName: "Eskulapp"
+    INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+    INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
+    INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+targets:
+  Eskulapp:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.eskulapp.mobile
+        TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      # Statyczny XCFramework budowany przez Gradle:
+      #   ../shared -> :shared:assembleSharedXCFramework (release)
+      # Statyczny = linkujemy, nie osadzamy (embed: false).
+      - framework: ../shared/build/XCFrameworks/release/Shared.xcframework
+        embed: false
+        link: true

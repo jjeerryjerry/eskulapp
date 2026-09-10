@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#7FE0D6;} a:hover{color:#fff;}
+  .seal{display:flex;align-items:center;justify-content:center;border-radius:999px;flex:none;}
+  .btn{font-family:Inter,sans-serif;font-weight:600;font-size:15px;border-radius:10px;padding:12px 22px;border:1px solid transparent;}
+  .tile{background:#0E4A52;border:1px solid #16606A;border-radius:14px;padding:20px 22px;}
+  .num{font-family:Sora,sans-serif;font-weight:800;font-size:34px;letter-spacing:-1px;color:#fff;line-height:1;}
+</style>
+</helmet>
+<div style="box-sizing:border-box;width:1440px;height:1180px;background:#08363B;color:#EAF2F2;font-family:Inter,system-ui,sans-serif;">
+  <!-- NAV -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 64px;border-bottom:1px solid #16606A;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="seal" style="width:38px;height:38px;background:#EAF2F2;"><svg width="23" viewBox="0 0 40 48" fill="none"><rect x="9" y="7" width="6" height="34" rx="3" fill="#0C5A63"/><path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="31" cy="9" r="3.2" fill="#FF6B57"/></svg></div>
+      <span style="font-family:Sora,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.5px;color:#fff;">Eskulapp</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:28px;font-size:15px;color:#BfE0E2;">
+      <span>Funkcje</span><span>Dla organizatora</span><span>Pobierz</span>
+      <span class="btn" style="background:#FF6B57;color:#0A1B2A;">Załóż konto</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div style="padding:44px 64px 22px;">
+    <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#7FE0D6;font-weight:600;">● &nbsp;monitorujesz każdy event na żywo</div>
+    <h1 style="font-family:Sora,sans-serif;font-weight:800;font-size:60px;line-height:1.04;letter-spacing:-1.5px;margin:18px 0 0;max-width:900px;">Trzymaj rękę na <span style="color:#FF6B57;">pulsie</span> konferencji medycznej.</h1>
+    <p style="font-size:18px;line-height:1.55;color:#BfE0E2;max-width:600px;margin:20px 0 26px;">Agenda, prelegenci, partnerzy i mapa, wszystko na żywo w jednej aplikacji. Przypomnienia o prelekcjach i pełny program offline.</p>
+    <div style="display:flex;gap:14px;align-items:center;">
+      <span class="btn" style="background:#FF6B57;color:#0A1B2A;padding:14px 26px;font-size:16px;">Pobierz Eskulapp</span>
+      <span class="btn" style="background:transparent;color:#EAF2F2;border-color:#2C6a72;padding:14px 22px;">Mam kod eventu</span>
+    </div>
+
+    <!-- EKG line -->
+    <div style="margin-top:22px;background:#0B4249;border:1px solid #16606A;border-radius:16px;padding:8px 20px;overflow:hidden;">
+      <svg width="100%" height="90" viewBox="0 0 1300 90" preserveAspectRatio="none" fill="none">
+        <path d="M0 45 H120 l18 -30 12 55 14 -25 H360 l18 -34 12 60 14 -26 H700 l18 -30 12 55 14 -25 H1020 l18 -34 12 60 14 -26 H1300" stroke="#FF6B57" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- VITALS TILES -->
+  <div style="padding:6px 64px 34px;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+      <div class="tile"><div class="num">42</div><div style="font-size:14px;color:#8FBEC2;margin-top:6px;">prelekcje w programie</div></div>
+      <div class="tile"><div class="num">18</div><div style="font-size:14px;color:#8FBEC2;margin-top:6px;">prelegentów</div></div>
+      <div class="tile"><div class="num">3</div><div style="font-size:14px;color:#8FBEC2;margin-top:6px;">dni · 4 sale</div></div>
+      <div class="tile" style="background:#FF6B57;border-color:#FF6B57;"><div class="num" style="color:#0A1B2A;">100%</div><div style="font-size:14px;color:#5A2018;margin-top:6px;font-weight:600;">program dostępny offline</div></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div style="padding:6px 64px 34px;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <div class="tile" style="background:#0E4A52;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7FE0D6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h5"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;color:#fff;">Agenda na żywo</div>
+        <div style="font-size:14px;color:#8FBEC2;line-height:1.5;">Dni, filtr sal, przypomnienia, zmiany w programie od razu u uczestnika.</div>
+      </div>
+      <div class="tile" style="background:#0E4A52;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7FE0D6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;color:#fff;">Ludzie i partnerzy</div>
+        <div style="font-size:14px;color:#8FBEC2;line-height:1.5;">Prelegenci z bio, partnerzy z lokalizacją stoiska.</div>
+      </div>
+      <div class="tile" style="background:#0E4A52;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7FE0D6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px;color:#fff;">Mapa + dołącz kodem</div>
+        <div style="font-size:14px;color:#8FBEC2;line-height:1.5;">Plan przestrzeni i szybkie dołączenie do zamkniętego eventu.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORGANIZER + FOOTER -->
+  <div style="margin:0 64px;background:#0B4249;border:1px solid #16606A;border-radius:16px;padding:28px 36px;display:flex;justify-content:space-between;align-items:center;">
+    <div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:22px;color:#fff;">Organizujesz event medyczny?</div><div style="font-size:15px;color:#8FBEC2;margin-top:4px;">Panel CMS steruje programem, ludźmi i kodami dostępu, na żywo.</div></div>
+    <span class="btn" style="background:#FF6B57;color:#0A1B2A;padding:14px 24px;">Uruchom panel </span>
+  </div>
+  <div style="padding:22px 64px 30px;color:#8FBEC2;font-size:13px;">© 2027 Eskulapp · System dla uczestników eventów medycznych · [kontakt] · [regulamin]</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

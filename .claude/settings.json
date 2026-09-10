@@ -1,0 +1,25 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/jjeerry/agents/eskulapp/.claude/statusline.sh"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew:*)",
+      "Bash(~/jdk17/bin/*)",
+      "Bash(composer:*)",
+      "Bash(php:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(ssh edu-serwer:*)",
+      "Bash(scp:*)",
+      "Bash(rsync:*)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep"
+    ]
+  }
+}

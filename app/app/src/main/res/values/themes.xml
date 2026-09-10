@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Eskulapp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#0C5A63</item>
+        <item name="android:windowBackground">#F6F8F9</item>
+    </style>
+</resources>

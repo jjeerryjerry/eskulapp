@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;}
+  a{color:#0C5A63;} a:hover{color:#08363B;}
+  .meta{display:flex;align-items:center;gap:8px;font-size:14px;color:#0A1B2A;font-weight:500;background:#fff;border:1px solid #E1E7E9;border-radius:10px;padding:10px 12px;}
+</style>
+</helmet>
+<div style="box-sizing:border-box;width:390px;height:844px;background:#F6F8F9;color:#0A1B2A;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;">
+  <!-- header -->
+  <div style="background:#0C5A63;color:#fff;padding:52px 20px 24px;border-radius:0 0 20px 20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      <span style="font-size:11px;font-weight:600;color:#0A1B2A;background:#FF6B57;padding:5px 10px;border-radius:999px;">NA ŻYWO</span>
+    </div>
+    <div style="font-family:Sora,sans-serif;font-weight:800;font-size:24px;line-height:1.18;margin-top:16px;">Nowe wytyczne leczenia 2027</div>
+  </div>
+
+  <div style="padding:18px 20px;display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;gap:10px;">
+      <div class="meta" style="flex:1;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span style="font-variant-numeric:tabular-nums;">10:00-10:45</span></div>
+      <div class="meta" style="flex:1;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C5A63" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Sala A</div>
+    </div>
+
+    <button style="width:100%;font-family:Inter,sans-serif;font-weight:600;font-size:16px;color:#fff;background:#0C5A63;border:none;border-radius:14px;padding:15px;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+      Przypomnij mi (15 min przed)
+    </button>
+
+    <div>
+      <div style="font-family:Sora,sans-serif;font-weight:600;font-size:16px;margin-bottom:8px;">Opis</div>
+      <p style="font-size:14px;color:#5B6B72;line-height:1.6;margin:0;">Przegląd najnowszych wytycznych leczenia z uwzględnieniem pacjentów pediatrycznych. Praktyczne wnioski dla codziennej pracy klinicznej i dyskusja przypadków.</p>
+    </div>
+
+    <div>
+      <div style="font-family:Sora,sans-serif;font-weight:600;font-size:16px;margin-bottom:10px;">Prelegent</div>
+      <div style="background:#fff;border:1px solid #E1E7E9;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center;">
+        <div style="width:56px;height:56px;border-radius:999px;background:#D7EAEC;display:flex;align-items:center;justify-content:center;font-family:Sora,sans-serif;font-weight:800;color:#0C5A63;font-size:18px;flex:none;">AK</div>
+        <div style="flex:1;">
+          <div style="font-family:Sora,sans-serif;font-weight:600;font-size:17px;">prof. Anna Kowalska</div>
+          <div style="font-size:13px;color:#5B6B72;margin-top:2px;">Kierownik Kliniki Nefrologii Dziecięcej</div>
+        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA7AD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals(){ return {}; } }
+</script>
+</body>
+</html>

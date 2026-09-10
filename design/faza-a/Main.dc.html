@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  body { margin:0; }
+  a { color:#FF6B57; } a:hover { color:#FF8A79; }
+  .board { box-sizing:border-box; }
+</style>
+</helmet>
+<div class="board" style="width:1280px; height:832px; background:#08363B; color:#EAF2F2; font-family:Inter,system-ui,sans-serif; position:relative; overflow:hidden;">
+  <!-- subtle agenda-grid motif -->
+  <div style="position:absolute; inset:0; background-image:linear-gradient(#0e5b6322 1px,transparent 1px); background-size:100% 56px; opacity:.5;"></div>
+  <div style="position:absolute; right:-140px; top:-140px; width:520px; height:520px; border-radius:999px; background:#0C5A63; opacity:.35;"></div>
+
+  <div style="position:relative; height:100%; box-sizing:border-box; padding:80px 96px; display:flex; flex-direction:column; justify-content:space-between;">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="width:52px; height:52px; border-radius:999px; background:#EAF2F2; display:flex; align-items:center; justify-content:center; flex:none;">
+        <svg width="31" viewBox="0 0 40 48" fill="none" aria-hidden="true">
+          <rect x="9" y="7" width="6" height="34" rx="3" fill="#0C5A63"/>
+          <path d="M31 9 L18 9 L18 39 L31 39" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 24 L28 24" stroke="#FF6B57" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <circle cx="31" cy="9" r="3.2" fill="#FF6B57"/>
+        </svg>
+      </div>
+      <span style="font-family:Sora,sans-serif; font-weight:800; font-size:26px; letter-spacing:-.5px;">Eskulapp</span>
+      <span style="margin-left:12px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:#7FB2B6;">Brand · Faza A</span>
+    </div>
+
+    <div>
+      <div style="font-size:14px; letter-spacing:.16em; text-transform:uppercase; color:#FF6B57; font-weight:600; margin-bottom:20px;">System dla uczestników eventów medycznych</div>
+      <h1 style="font-family:Sora,sans-serif; font-weight:800; font-size:88px; line-height:1.02; letter-spacing:-2px; margin:0 0 24px;">Twój przewodnik<br>po wydarzeniu<br>medycznym.</h1>
+      <p style="max-width:620px; font-size:19px; line-height:1.55; color:#C4D6D7; margin:0;">Cała konferencja w kieszeni, uporządkowana, zawsze pod ręką, działa nawet bez zasięgu. Profesjonalna jak medycyna, wygodna jak dobra aplikacja.</p>
+    </div>
+
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span style="width:28px; height:28px; border-radius:6px; background:#0C5A63; display:inline-block;"></span>
+      <span style="width:28px; height:28px; border-radius:6px; background:#FF6B57; display:inline-block;"></span>
+      <span style="width:28px; height:28px; border-radius:6px; background:#0A1B2A; border:1px solid #26454a; display:inline-block;"></span>
+      <span style="width:28px; height:28px; border-radius:6px; background:#F6F8F9; display:inline-block;"></span>
+      <span style="margin-left:12px; font-size:13px; color:#7FB2B6; font-family:Sora,sans-serif;">Petrol · Coral · Ink · Sora + Inter</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
