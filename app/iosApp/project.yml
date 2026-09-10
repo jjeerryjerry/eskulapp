@@ -25,6 +25,11 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pl.eskulapp.mobile
         TARGETED_DEVICE_FAMILY: "1"
+        # Podpis manualny certyfikatem/profilem z fastlane match.
+        DEVELOPMENT_TEAM: "7LT2VFV9MJ"
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Apple Distribution"
+        PROVISIONING_PROFILE_SPECIFIER: "match AppStore pl.eskulapp.mobile"
     dependencies:
       # Statyczny XCFramework budowany przez Gradle:
       #   ../shared -> :shared:assembleSharedXCFramework (release)

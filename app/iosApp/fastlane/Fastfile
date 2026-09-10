@@ -31,6 +31,13 @@ platform :ios do
       project: "Eskulapp.xcodeproj",
       scheme: "Eskulapp",
       export_method: "app-store",
+      export_team_id: "7LT2VFV9MJ",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: {
+          "pl.eskulapp.mobile" => "match AppStore pl.eskulapp.mobile"
+        }
+      },
       clean: true
     )
 
