@@ -13,10 +13,12 @@ platform :ios do
       is_key_content_base64: true
     )
 
+    # readonly: false , przy pierwszym uruchomieniu match sam tworzy certyfikat
+    # dystrybucji i profil, i zapisuje je w repo eskulapp-match. Kolejne buildy je reuzywaja.
     match(
       type: "appstore",
       app_identifier: "pl.eskulapp.mobile",
-      readonly: true,
+      readonly: false,
       api_key: api_key
     )
 

@@ -35,6 +35,18 @@ jobs:
         working-directory: app/iosApp
         run: xcodegen generate
 
+      - name: SSH deploy key do repo match
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.MATCH_DEPLOY_KEY }}" > ~/.ssh/match_ed25519
+          chmod 600 ~/.ssh/match_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+          cat >> ~/.ssh/config <<'EOF'
+          Host github.com
+            IdentityFile ~/.ssh/match_ed25519
+            IdentitiesOnly yes
+          EOF
+
       - name: Fastlane beta (build + podpis + TestFlight)
         working-directory: app/iosApp
         env:
@@ -43,7 +55,6 @@ jobs:
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.ASC_KEY_P8_BASE64 }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTH }}
         run: |
           gem install fastlane --no-document
           fastlane beta
