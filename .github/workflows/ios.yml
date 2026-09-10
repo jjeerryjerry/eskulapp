@@ -17,6 +17,9 @@ jobs:
     # macos-15 = domyslnie Xcode 16 (XcodeGen generuje projekt w formacie 77,
     # ktorego Xcode 15.4 na macos-14 nie otwiera).
     runs-on: macos-15
+    # Twardy limit , gdyby codesign/upload znowu wisial, job pada szybko zamiast
+    # zjadac 6h minut macOS (liczonych 10x).
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
