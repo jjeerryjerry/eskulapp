@@ -553,6 +553,11 @@ Actions macOS runner**. Android w Compose nietkniety. Pelna dokumentacja:
   framework `Shared` (XCFramework z Gradle: `assembleSharedReleaseXCFramework`).
 - **CI**: `.github/workflows/ios.yml` (macOS-14) + `app/iosApp/fastlane/` (lane
   `beta`: build + podpis kluczem App Store Connect API + match + TestFlight).
+- **Repo GitHub (2026-09-10)**: **prywatne** `jjeerryjerry/eskulapp`, branch `main`,
+  https://github.com/jjeerryjerry/eskulapp . Caly projekt wypchniety bez sekretow
+  (skan przeszedl: .env/.secrets/keystore/.jks ignorowane). gh remote na HTTPS
+  (token gh, scope repo+workflow). Auto-run workflow z pierwszego pusha ANULOWANY
+  (brak sekretow Apple = i tak by padl; macOS liczy sie 10x).
 - **iOS NIE kompiluje sie na serwerze agenta** (brak macOS/Xcode, nie do obejscia).
   Faktyczny build iOS = na Macu w CI.
 - **BLOKUJE (do Jarka)**: Apple Developer Program (99 USD/rok, konto firmowe = D-U-N-S),
@@ -562,3 +567,37 @@ Actions macOS runner**. Android w Compose nietkniety. Pelna dokumentacja:
 - **Nastepne kroki iOS**: reszta ekranow SwiftUI (Agenda/Prelegenci/Partnerzy/Mapa/
   Kontakt/Aktualnosci), persystencja offline (SQLDelight w :shared albo natywnie),
   powiadomienia lokalne (UNUserNotificationCenter), ikona/listing.
+
+### iOS CI , przebieg pierwszych buildow (2026-09-10)
+Konto Apple Developer: **Individual** (JDG , Apple odrzucil Organization bo D&B
+klasyfikuje JDG jako sole proprietorship). Team ID **7LT2VFV9MJ** (Apple
+Distribution: Jaroslaw Gilewicz). Klucz App Store Connect API: Key ID `PJA73Q47KP`,
+Issuer `3f0451eb-...`. Sekrety w GitHub Actions repo `eskulapp`: ASC_KEY_ID,
+ASC_ISSUER_ID, ASC_KEY_P8_BASE64, MATCH_PASSWORD (kopia w .env), MATCH_GIT_URL,
+MATCH_DEPLOY_KEY. Repo certyfikatow: prywatne `jjeerryjerry/eskulapp-match`
+(dostep CI przez deploy key SSH).
+- **Dziala end-to-end (potwierdzone na Macu w CI)**: build `:shared` Kotlin/Native
+  -> `Shared.xcframework`, XcodeGen generuje projekt, `match` UTWORZYL certyfikat
+  dystrybucji + profil ("match AppStore pl.eskulapp.mobile"), podpis manualny.
+- **Naprawione po drodze**: (1) runner macos-14/Xcode15.4 nie czytal formatu projektu
+  77 -> `runs-on: macos-15` (Xcode 16); (2) build_app "requires a development team"
+  -> DEVELOPMENT_TEAM + CODE_SIGN_STYLE Manual + PROVISIONING_PROFILE_SPECIFIER w
+  project.yml oraz export_options w Fastfile; (3) codesign wieszal job na popupie
+  keychaina (run anulowany po 6h!) -> `setup_ci` w Fastfile + `timeout-minutes: 45`.
+- **Billing (rozwiazane)**: 6h wiszacy run przebil darmowe minuty (macOS 10x). Jarek
+  ustawil repo `eskulapp` jako **PUBLICZNE** (darmowe minuty Actions). `eskulapp-match`
+  zostaje PRYWATNE. Po zakonczeniu testow mozna wrocic eskulapp na prywatne (wtedy pilnujemy
+  spending limit; udany build to ~10 min macOS).
+
+### iOS , PIERWSZY BUILD NA TESTFLIGHT (2026-09-11) , SUKCES
+Run https://github.com/jjeerryjerry/eskulapp/actions/runs/34540524138 , wszystkie kroki
+zielone (10m04s), `upload_to_testflight` OK, "fastlane.tools finished successfully".
+Build iOS jest na TestFlight (App Store Connect app id **6810647099**), Apple go
+przetwarza. **Automat wydan iOS dziala end-to-end** (push na main -> AAB/IPA -> TestFlight).
+- Ostatnie dwie naprawy do sukcesu: (1) brak ikony/CFBundleIconName -> `Assets.xcassets`
+  z AppIcon 1024 (upscale z `tools/shots/store/icon-512.png`, RGB bez alfy) +
+  `ASSETCATALOG_COMPILER_APPICON_NAME`; (2) Apple wymaga iOS 26 SDK -> runner `macos-26`
+  (Xcode 26; wczesniej macos-15/Xcode16 dawal iOS 18.5 SDK = odrzucenie 409).
+- **Do zrobienia po stronie Jarka w App Store Connect**: dodac testerow (Internal Testing)
+  do buildu, gdy Apple skonczy przetwarzanie; docelowo lepsza ikona (teraz upscale 512->1024).
+- **Nastepne**: reszta ekranow iOS w SwiftUI (na razie tylko wejscie kodem + podglad bundla).
