@@ -601,3 +601,22 @@ przetwarza. **Automat wydan iOS dziala end-to-end** (push na main -> AAB/IPA -> 
 - **Do zrobienia po stronie Jarka w App Store Connect**: dodac testerow (Internal Testing)
   do buildu, gdy Apple skonczy przetwarzanie; docelowo lepsza ikona (teraz upscale 512->1024).
 - **Nastepne**: reszta ekranow iOS w SwiftUI (na razie tylko wejscie kodem + podglad bundla).
+
+### iOS , PELNY UI 1:1 NA TESTFLIGHT (2026-09-11)
+Run https://github.com/jjeerryjerry/eskulapp/actions/runs/34577402612 , SUCCESS
+(12m41s), upload_to_testflight OK. Cala apka 1:1 z Androidem jest na TestFlight.
+- **Architektura iOS**: natywne SwiftUI + natywna warstwa danych (URLSession +
+  Codable, offline zapis na dysk `events.json`, powiadomienia lokalne przez
+  UNUserNotificationCenter 10 min przed prelekcja, stan dzwonki/przypomnienia/
+  przeczytane w UserDefaults). Modul `:shared` (KMP) zostaje w repo i w CI (nadal
+  budowany jako XCFramework), ale apka iOS go NIE importuje , dla pewnosci
+  kompilacji bez Maca poszlismy natywnie; konwergencja na :shared pozniej.
+- **Ekrany (pl/eskulapp.mobile) w app/iosApp/Sources/**: EntryView, EventsView
+  (statusy + dzwonek), EventContainer (TabView: Wydarzenie/Agenda/Partnerzy/Mapa/
+  Wiecej) + EventHome (baner aktualnosci + kafle), Agenda (dni/sale/Obserwowane +
+  przypomnienia) + Talk, Speakers + SpeakerDetail, Partners + PartnerDetail, Map
+  (piny/pinch-zoom/pan/lista), Contact (tel/mail), News (auto-oznacz przeczytane),
+  More (+ usuwanie). Nawigacja: TabView + NavigationStack(path) per zakladka.
+- **Deployment target iOS 16** (NavigationStack). AppIcon jak wczesniej.
+- **Znane odstepstwo do poprawy**: statyczne etykiety UI bez polskich ogonkow
+  (transliteracja ASCII); tresc z API ma pelna polszczyzne. Do podmiany na ep/ac.
