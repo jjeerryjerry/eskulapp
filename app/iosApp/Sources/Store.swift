@@ -23,6 +23,8 @@ enum TopScreen: Equatable {
 @MainActor
 final class AppStore: ObservableObject {
     static let apiBase = "https://eskulapp.pl/api"
+    // Static bundle na CDN (architektura B), produkcyjny custom domain R2.
+    static let cdnBase = "https://cdn.eskulapp.pl"
 
     @Published var top: TopScreen = .entry
     @Published private(set) var storedEvents: [StoredEvent] = []
@@ -42,6 +44,8 @@ final class AppStore: ObservableObject {
         readNewsIds = Self.loadIds("readNewsIds")
         top = storedEvents.isEmpty ? .entry : .events
         Task { _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) }
+        // Odswiez dane z CDN w tle (manifest -> bundel tylko gdy wersja nowsza).
+        if !storedEvents.isEmpty { Task { await refreshAll() } }
     }
 
     // MARK: dostep
@@ -70,9 +74,9 @@ final class AppStore: ObservableObject {
 
     // MARK: siec
 
-    func fetchBundle(_ code: String) async throws -> EventBundle {
-        let c = code.trimmingCharacters(in: .whitespaces).uppercased()
-        guard let url = URL(string: "\(Self.apiBase)/public/events/\(c)/bundle") else { throw APIError.network }
+    /// Wspolny GET zwracajacy dane. 404 -> notFound; inne bledy -> server/network.
+    private func httpGet(_ urlString: String) async throws -> Data {
+        guard let url = URL(string: urlString) else { throw APIError.network }
         var req = URLRequest(url: url)
         req.setValue("application/json", forHTTPHeaderField: "Accept")
         req.timeoutInterval = 15
@@ -86,10 +90,59 @@ final class AppStore: ObservableObject {
         let status = (resp as? HTTPURLResponse)?.statusCode ?? 0
         if status == 404 { throw APIError.notFound }
         guard (200...299).contains(status) else { throw APIError.server(status) }
+        return data
+    }
+
+    // ---- CDN (architektura B): manifest + wersjonowany bundel ----
+
+    struct ManifestDTO: Decodable {
+        let version: String
+        let bundlePath: String
+        enum CodingKeys: String, CodingKey { case version; case bundlePath = "bundle_path" }
+    }
+
+    func fetchManifest(_ code: String) async throws -> ManifestDTO {
+        let c = code.trimmingCharacters(in: .whitespaces).uppercased()
+        let data = try await httpGet("\(Self.cdnBase)/events/\(c)/manifest.json")
+        return try JSONDecoder().decode(ManifestDTO.self, from: data)
+    }
+
+    func fetchBundleAt(_ path: String) async throws -> EventBundle {
+        let p = path.hasPrefix("/") ? String(path.dropFirst()) : path
+        let data = try await httpGet("\(Self.cdnBase)/\(p)")
+        return try JSONDecoder().decode(EventBundle.self, from: data)
+    }
+
+    // ---- Fallback: bezposrednio z PHP API ----
+
+    func fetchBundle(_ code: String) async throws -> EventBundle {
+        let c = code.trimmingCharacters(in: .whitespaces).uppercased()
+        let data = try await httpGet("\(Self.apiBase)/public/events/\(c)/bundle")
         do {
             return try JSONDecoder().decode(EventBundle.self, from: data)
         } catch {
-            throw APIError.server(status)
+            throw APIError.server(0)
+        }
+    }
+
+    // Wersja bundla per kod (z manifestu), zeby nie pobierac gdy bez zmian.
+    private static func cdnVersion(_ code: String) -> String? {
+        UserDefaults.standard.string(forKey: "cdnVer_\(code.uppercased())")
+    }
+    private static func setCdnVersion(_ code: String, _ v: String) {
+        UserDefaults.standard.set(v, forKey: "cdnVer_\(code.uppercased())")
+    }
+
+    /// CDN najpierw (manifest + wersjonowany bundel), a gdy niedostepny to PHP.
+    private func fetchSmart(_ code: String) async throws -> EventBundle {
+        let c = code.trimmingCharacters(in: .whitespaces).uppercased()
+        do {
+            let m = try await fetchManifest(c)
+            let b = try await fetchBundleAt(m.bundlePath)
+            Self.setCdnVersion(c, m.version)
+            return b
+        } catch {
+            return try await fetchBundle(c)
         }
     }
 
@@ -97,13 +150,31 @@ final class AppStore: ObservableObject {
 
     @discardableResult
     func addEvent(_ code: String) async throws -> Int64 {
-        let bundle = try await fetchBundle(code)
+        let bundle = try await fetchSmart(code)
         upsert(bundle)
         return bundle.event.id
     }
 
+    /// Odswiezenie: pobiera bundel tylko gdy wersja w manifescie sie zmienila.
     func refresh(_ code: String) async {
-        if let bundle = try? await fetchBundle(code) { upsert(bundle) }
+        let c = code.trimmingCharacters(in: .whitespaces).uppercased()
+        do {
+            let m = try await fetchManifest(c)
+            let exists = storedEvents.contains { $0.bundle.event.accessCode.uppercased() == c }
+            if exists && Self.cdnVersion(c) == m.version { return }
+            let b = try await fetchBundleAt(m.bundlePath)
+            Self.setCdnVersion(c, m.version)
+            upsert(b)
+        } catch {
+            if let b = try? await fetchBundle(c) { upsert(b) }
+        }
+    }
+
+    /// Odswiezenie wszystkich dodanych eventow (np. przy starcie apki).
+    func refreshAll() async {
+        for code in storedEvents.map({ $0.bundle.event.accessCode }) {
+            await refresh(code)
+        }
     }
 
     private func upsert(_ bundle: EventBundle) {

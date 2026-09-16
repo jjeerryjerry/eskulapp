@@ -26,6 +26,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             val s = if (repo.dao.eventCount() > 0) Screen.Events else Screen.Entry
             nav = Navigator(s)
             startScreen = s
+            // Odswiez dane z CDN w tle (manifest -> bundel tylko gdy wersja nowsza).
+            if (s == Screen.Events) launch { repo.refreshAll() }
         }
     }
 

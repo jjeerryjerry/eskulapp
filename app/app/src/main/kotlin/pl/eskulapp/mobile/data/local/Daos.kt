@@ -21,6 +21,9 @@ interface EskDao {
     @Query("SELECT COUNT(*) FROM events")
     suspend fun eventCount(): Int
 
+    @Query("SELECT accessCode FROM events")
+    suspend fun allCodes(): List<String>
+
     // per-event content (Flows)
     @Query("SELECT * FROM days WHERE eventId = :e ORDER BY sort, date")
     fun days(e: Long): Flow<List<DayEntity>>

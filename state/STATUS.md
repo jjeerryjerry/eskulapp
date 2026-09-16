@@ -450,6 +450,38 @@ Zatwierdzone przez Jarka, wdrozone (poza release-signing/keystore/AAB = na konie
   zweryfikowane 200: strona prywatnosci, homepage, /api/health, /api/.../bundle, /panel/logowanie.
   (mod_rewrite z `!-f !-d` nie rusza /api /panel /_app /zrzuty.)
 
+## ARCHITEKTURA B: static bundle na Cloudflare R2 + CDN (2026-09-16, WIP)
+Decyzja Jarka: bundel eventu ma byc pieczony do R2 i serwowany z CDN, zeby szpica
+(event 5000 osob, ~1000 pobran naraz) NIE uderzala w PHP/MySQL cyber-folks
+(dzis endpoint = 9 SQL/hit, zero cache, shared LiteSpeed wspolny z klientami).
+- **R2 dziala end-to-end**: bucket `eskulapp-cdn`, zapis przez S3 (rclone), publiczny
+  odczyt przez r2.dev (TESTOWO). Sekrety w `.env` (R2_*, R2_PUBLIC_BASE, CLOUDFLARE_R2_TOKEN).
+  **WAZNE: serwer agenta nie ma egressu IPv6 -> zawsze IPv4** (rclone `--bind 0.0.0.0`,
+  curl `-4`); szczegoly w pamieci [[r2-cloudflare]].
+- **Pieczenie**: `scripts/bake-bundle.sh KOD...` (albo `--all`). Pobiera bundel z zywego
+  API, normalizuje (usuwa generated_at/_demo), wersja = sha256 tresci (content-addressed),
+  wgrywa NIEZMIENNY `events/KOD/<wersja>.json` (cache 1 rok immutable) + maly
+  `events/KOD/manifest.json` (cache 30 s + ETag) z numerem wersji. Manifest trzyma
+  sciezke WZGLEDNA (bundle_path), wiec przelaczenie r2.dev -> cdn.eskulapp.pl NIE wymaga
+  ponownego pieczenia. Przetestowane: FND2025, FND2027 (http=200, idempotencja OK).
+- **Wzorzec dla apki (do zbudowania)**: apka odpytuje maly manifest, bundel ciagnie
+  tylko gdy wersja nowsza. Warstwa "na zywo" = push FCM na topic event_<id> przy publikacji.
+  Obrazy (zdjecia/loga/mapa) lazy-load, nie w JSON. Dzis apka NIE odswieza w ogole
+  (refresh() bez callera, brak naglowkow warunkowych, brak push) - do naprawy.
+- **cdn.eskulapp.pl DZIALA (2026-09-16)**: cala domena eskulapp.pl przeniesiona do
+  Cloudflare (zone id `1f7e7e53f5436e881bb600eaf2a66b22`, NS deb/vicente.ns.cloudflare.com,
+  13 rekordow 1:1 DNS-only, poczta/strona bez zmian). cdn.eskulapp.pl podpiety jako R2
+  custom domain, HTTPS OK. Apka (Android i iOS) celuje w `https://cdn.eskulapp.pl`.
+  Szczegoly i dostepy w pamieci [[r2-cloudflare]] (Cloudflare token "agentai" w .env,
+  DirectAdmin API cyberfolks: host :2223, user jjeerry).
+- **PUBLIKACJA testowa nowej architektury (2026-09-16)**:
+  - Android **versionCode 18 / 1.1.0** wdrozony na **Play internal testing**
+    (`tools/play/release.sh internal`, AAB 3.4 MB, offline build + Publisher API).
+  - iOS: kod wpiety w `Store.swift`, push na main odpala CI -> TestFlight.
+  - Wszystkie 4 eventy (FND2025/FND2027/KARD26/DIAB26) upieczone na cdn.
+- **TODO nastepne**: auto-pieczenie z CMS przy publikacji (dzis reczne
+  `scripts/bake-bundle.sh`), push FCM (warstwa na zywo), lazy-load obrazow.
+
 ## Następny krok (po Androidzie)
 1. Test APK na telefonie Jarka (kody FND2027/FND2025/KARD26/DIAB26) + feedback UI.
 2. CMS: edytor agendy/prelegentów (napełnianie eventów), potem partnerzy/mapa, push.
