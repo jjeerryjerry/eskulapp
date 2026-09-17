@@ -1,8 +1,13 @@
 name: ASC status (TestFlight)
 
-# Tylko odczyt: stan buildow i grup testerow w App Store Connect.
+# Stan buildow i grup testerow w App Store Connect (z fix: przypisanie buildu do grup wewnetrznych).
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      fix:
+        description: "Dodaj najnowszy build do grup wewnetrznych + auto dystrybucja"
+        type: boolean
+        default: false
 
 jobs:
   status:
@@ -15,4 +20,4 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
-        run: python3 tools/asc/status.py
+        run: python3 tools/asc/status.py ${{ inputs.fix && '--fix' || '' }}
