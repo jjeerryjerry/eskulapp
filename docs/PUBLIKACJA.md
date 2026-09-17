@@ -109,7 +109,7 @@ Login wymagany: **NIE** (odznaczyć „Sign-in required").
 
 ### A. Przed wysyłką, test (Jarek, ok. 20 min na telefon)
 - [ ] Android: zainstalować 1.2.0 z Internal testing (link testera, aktualizacja w Play).
-- [ ] iOS: zainstalować najnowszy build z TestFlight.
+- [ ] iOS: zainstalować najnowszy build z TestFlight (1.2.0 build 13 lub nowszy; CI sam przypisuje nowe buildy do grupy „Jerry").
 - [ ] Na obu: ekran startowy bez przykładu FND2027, pole pokazuje „Kod wydarzenia".
 - [ ] Dodać **TEST01**: kafle Agenda/Prelegenci/Partnerzy/Mapa, dolne menu z Mapą.
 - [ ] Dodać **TEST03**: brak kafla Mapa, brak zakładki Mapa w dolnym menu, brak pinezki przy partnerze i „Zobacz na mapie".
@@ -118,12 +118,13 @@ Login wymagany: **NIE** (odznaczyć „Sign-in required").
 - [ ] iOS: polskie znaki w etykietach (Więcej, Aktualności, Dołącz...).
 - [ ] Usunięcie wydarzenia z „Więcej" i ponowne dodanie kodem.
 
-### B. Zrzuty ekranu (BLOKUJE oba sklepy)
-Obecne `tools/shots/store/shot-*.png` to makiety z canvasu, nie prawdziwa apka
-(inne dolne menu, ekran „Witaj w Eskulapp", kod FND2027). Apple i Google wymagają
-zrzutów odpowiadających aplikacji.
-- [ ] Android: 4-8 zrzutów z telefonu (kod TEST01): wejście kodem, lista wydarzeń, ekran eventu, agenda, prelekcja, prelegenci, partnerzy, mapa. Wysłać mi, dopcham do formatu Play.
-- [ ] iOS: zrzuty 6,9" (1320x2868) z iPhone'a Pro Max lub symulatora. Opcja: dorobię automat `fastlane snapshot` na CI (bez telefonu).
+### B. Zrzuty ekranu: GOTOWE (z prawdziwej apki, 2026-09-17)
+Robione automatem na CI (workflow `screenshots.yml`: emulator Android + symulator iPhone 6,9"),
+dane z kodów TEST01-03, pasek statusu 9:41. Ponowne zrobienie: `gh workflow run screenshots.yml`.
+- [x] Android (8 szt., 1080x1920): `tools/shots/store/android/`
+- [x] iOS (9 szt., 1320x2868, 6,9"): `tools/shots/store/ios/`
+- Drive: folder `Eskulapp/Store-1.2.0` (zrzuty, ikona, grafika 1024x500, ten dokument).
+- Stare makiety z canvasu przeniesione do `tools/shots/store/_makiety/` (NIE wysyłać do sklepów).
 
 ### C. Google Play Console (Eskulapp, pl.eskulapp.mobile)
 - [ ] Wydanie 1.2.0 na Internal testing (robię automatem: `tools/play/release.sh internal`).

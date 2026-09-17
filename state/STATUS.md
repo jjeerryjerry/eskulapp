@@ -672,4 +672,13 @@ Zadanie Todoist „Eskulapp iOS dopracować opis i opublikować i Android przete
 - **UWAGA theme WP**: `deploy-web.sh` nadpisał na chwilę landing wersją z repo, bo zmiany SEO
   z 2026-08-19 (agent seo, `~/agents/seo/clients/eskulapp/deploy/golive.sh`) nie były w repo.
   Przywrócone i WCIĄGNIĘTE do repo (theme v1.3 + og-image.png). Zweryfikowane na live.
-- **BLOKUJE publikację**: prawdziwe zrzuty ekranu (obecne to makiety z canvasu).
+- **Zrzuty do sklepów GOTOWE** (prawdziwa apka, CI `screenshots.yml`: emulator Android API 34
+  pixel_2 + symulator iPhone Pro Max 6,9" przez XCUITest `app/iosApp/UITests`). Pliki
+  `tools/shots/store/{android,ios}/`, Drive `Eskulapp/Store-1.2.0`.
+- **TestFlight**: grupa wewnętrzna „Jerry" nie ma auto dystrybucji (API nie pozwala jej włączyć),
+  więc nowe buildy nie docierały do testerów. Job `testflight-assign` w `ios.yml` czeka na
+  przetworzenie buildu z danego runu i przypisuje go do grupy (`tools/asc/status.py --fix --wait`).
+  Ręcznie: `gh workflow run asc-status.yml -f fix=true`.
+- **iOS logo naprawione**: SF Symbol „staff.of.asclepius" nie istnieje (puste koło), znak rysowany
+  w SwiftUI (`BrandMark`, geometria jak logo).
+- Dane partnerów: polskie znaki (seedy + DB, backup `esk_backup/partners-2026-09-17.sql`).
