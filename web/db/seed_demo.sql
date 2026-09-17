@@ -46,16 +46,16 @@ WHERE (t.title='Sesja inauguracyjna' AND s.last_name IN ('Kowalska','Nowak'))
    OR (t.title='Warsztat USG nerek' AND s.last_name='Wiśniewski');
 
 INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort) VALUES
- (@eid,'NefroMed Polska','Dializa i terapie nerkozastepcze','strategiczny','Stoisko A1','nefromed.pl',0),
+ (@eid,'NefroMed Polska','Dializa i terapie nerkozastępcze','strategiczny','Stoisko A1','nefromed.pl',0),
  (@eid,'MedTech Sp. z o.o.','Aparatura USG i diagnostyka','partner','Stoisko A2','medtech.pl',1),
  (@eid,'RenalCare','Systemy dializy otrzewnowej','strategiczny','Stoisko A3','renalcare.pl',2),
  (@eid,'PediaLab','Diagnostyka laboratoryjna dzieci','partner','Stoisko A4','pedialab.pl',3),
- (@eid,'UroSystems','Urzadzenia urologiczne','partner','Stoisko A5','urosystems.pl',4),
- (@eid,'BioFiltr','Filtry i dreny medyczne','wspierajacy','Stoisko A6','biofiltr.pl',5),
+ (@eid,'UroSystems','Urządzenia urologiczne','partner','Stoisko A5','urosystems.pl',4),
+ (@eid,'BioFiltr','Filtry i dreny medyczne','wspierający','Stoisko A6','biofiltr.pl',5),
  (@eid,'VitaPharma','Leki nefrologiczne','strategiczny','Stoisko A7','vitapharma.pl',6),
  (@eid,'Diagnostyka Plus','Testy moczu i krwi','partner','Stoisko A8','diagnostykaplus.pl',7),
- (@eid,'KidneyTech','Monitoring nerek','wspierajacy','Stoisko A9','kidneytech.pl',8),
- (@eid,'EduMed','Materialy edukacyjne dla rodzicow','wspierajacy','Stoisko A10','edumed.pl',9);
+ (@eid,'KidneyTech','Monitoring nerek','wspierający','Stoisko A9','kidneytech.pl',8),
+ (@eid,'EduMed','Materiały edukacyjne dla rodziców','wspierający','Stoisko A10','edumed.pl',9);
 
 INSERT INTO contacts (event_id, label, name, phone, email, note, sort) VALUES
  (@eid, 'Biuro kongresu', 'Pol. Tow. Nefrologiczne', '+48 22 123 45 67', 'biuro@fnd2027.pl', 'pon-pt 9-17', 0);

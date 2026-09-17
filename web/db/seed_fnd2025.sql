@@ -80,9 +80,9 @@ INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort
  (@e,'Medtronic','Pompy insulinowe','partner','Stoisko G5','medtronic.pl',4),
  (@e,'Abbott','System FreeStyle Libre','strategiczny','Stoisko G6','abbott.pl',5),
  (@e,'Bioton','Insuliny krajowe','partner','Stoisko G7','bioton.pl',6),
- (@e,'Polfa','Leki generyczne','wspierajacy','Stoisko G8','polfa.pl',7),
- (@e,'DiabetesPL','Portal edukacyjny','wspierajacy','Stoisko G9','diabetes.pl',8),
- (@e,'NutriMed','Dietetyka kliniczna','wspierajacy','Stoisko G10','nutrimed.pl',9);
+ (@e,'Polfa','Leki generyczne','wspierający','Stoisko G8','polfa.pl',7),
+ (@e,'DiabetesPL','Portal edukacyjny','wspierający','Stoisko G9','diabetes.pl',8),
+ (@e,'NutriMed','Dietetyka kliniczna','wspierający','Stoisko G10','nutrimed.pl',9);
 
 -- kontakt organizacyjny
 INSERT INTO contacts (event_id,label,name,phone,email,sort) VALUES

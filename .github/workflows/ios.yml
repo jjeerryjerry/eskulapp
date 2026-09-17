@@ -77,4 +77,5 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          EXPECT_BUILD: ${{ github.run_number }}
         run: python3 tools/asc/status.py --fix --wait

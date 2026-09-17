@@ -47,11 +47,14 @@ for d in g["data"]:
 # --wait: najpierw czekaj (max 45 min), az najnowszy build skonczy przetwarzanie u Apple.
 if "--fix" in sys.argv:
     if "--wait" in sys.argv:
+        # EXPECT_BUILD = numer buildu z tego runu CI (GITHUB_RUN_NUMBER): czekamy az Apple go zarejestruje
+        want = os.environ.get("EXPECT_BUILD")
         for _ in range(90):
             latest = get(f"/v1/builds?filter[app]={APP_ID}&sort=-uploadedDate&limit=1")["data"]
+            ver = latest[0]["attributes"]["version"] if latest else None
             st = latest[0]["attributes"]["processingState"] if latest else None
-            print("najnowszy build:", latest[0]["attributes"]["version"] if latest else None, st, flush=True)
-            if st in ("VALID", "FAILED", "INVALID"): break
+            print("najnowszy build:", ver, st, "oczekiwany:", want, flush=True)
+            if (not want or ver == want) and st in ("VALID", "FAILED", "INVALID"): break
             time.sleep(30)
         b = get(f"/v1/builds?filter[app]={APP_ID}&sort=-uploadedDate&limit=6")
     ready = [d for d in b["data"] if d["attributes"]["processingState"] == "VALID" and not d["attributes"]["expired"]]

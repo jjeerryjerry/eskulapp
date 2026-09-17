@@ -50,10 +50,10 @@ INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort
  (@e,'EKG Systems','Holtery i systemy EKG','partner','Stoisko K3','ekgsystems.pl',2),
  (@e,'StentMed','Stenty i cewniki','strategiczny','Stoisko K4','stentmed.pl',3),
  (@e,'RytmControl','Kardiowertery i rozruszniki','partner','Stoisko K5','rytmcontrol.pl',4),
- (@e,'VascularCare','Diagnostyka naczyniowa','wspierajacy','Stoisko K6','vascularcare.pl',5),
+ (@e,'VascularCare','Diagnostyka naczyniowa','wspierający','Stoisko K6','vascularcare.pl',5),
  (@e,'EchoDiag','Echokardiografia','partner','Stoisko K7','echodiag.pl',6),
- (@e,'LipidLab','Diagnostyka lipidowa','wspierajacy','Stoisko K8','lipidlab.pl',7),
- (@e,'HeartEdu','Edukacja pacjenta kardiologicznego','wspierajacy','Stoisko K9','heartedu.pl',8),
+ (@e,'LipidLab','Diagnostyka lipidowa','wspierający','Stoisko K8','lipidlab.pl',7),
+ (@e,'HeartEdu','Edukacja pacjenta kardiologicznego','wspierający','Stoisko K9','heartedu.pl',8),
  (@e,'TeleKardio','Telemonitoring serca','strategiczny','Stoisko K10','telekardio.pl',9);
 
 INSERT INTO contacts (event_id,label,name,phone,email,note,sort) VALUES
@@ -105,12 +105,12 @@ WHERE (t.title='Inauguracja kongresu' AND s.last_name='Kamińska')
 INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort) VALUES
  (@f,'DiabCare Systems','Systemy ciągłego monitorowania glikemii','strategiczny','Stoisko D1','diabcare.pl',0),
  (@f,'InsulinaPlus','Pompy insulinowe i akcesoria','partner','Stoisko D2','insulinaplus.pl',1),
- (@f,'MediEdu','Platforma edukacyjna dla pacjentów','wspierajacy','Stoisko D3','mediedu.pl',2),
+ (@f,'MediEdu','Platforma edukacyjna dla pacjentów','wspierający','Stoisko D3','mediedu.pl',2),
  (@f,'GlukoTest','Glukometry i paski testowe','partner','Stoisko D4','glukotest.pl',3),
  (@f,'PharmaDiab','Leki przeciwcukrzycowe','strategiczny','Stoisko D5','pharmadiab.pl',4),
  (@f,'SensorMed','Sensory glikemii','partner','Stoisko D6','sensormed.pl',5),
- (@f,'NutriCare','Zywienie w cukrzycy','wspierajacy','Stoisko D7','nutricare.pl',6),
- (@f,'FootCare Clinic','Profilaktyka stopy cukrzycowej','wspierajacy','Stoisko D8','footcare.pl',7),
+ (@f,'NutriCare','Żywienie w cukrzycy','wspierający','Stoisko D7','nutricare.pl',6),
+ (@f,'FootCare Clinic','Profilaktyka stopy cukrzycowej','wspierający','Stoisko D8','footcare.pl',7),
  (@f,'TeleDiab','Telemedycyna diabetologiczna','partner','Stoisko D9','telediab.pl',8),
  (@f,'VisionLab','Diagnostyka retinopatii','strategiczny','Stoisko D10','visionlab.pl',9);
 
