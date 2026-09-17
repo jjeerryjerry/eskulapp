@@ -57,17 +57,20 @@ struct EventContainerView: View {
             }
             .tabItem { Label("Partnerzy", systemImage: "bag.fill") }.tag(2)
 
-            NavigationStack {
-                MapView(eventId: eventId, highlight: nil)
-                    .navigationDestination(for: Route.self) { routeView($0, eventId: eventId) }
+            // Event bez mapki (wylaczona w CMS): zakladka Mapa znika z menu
+            if store.event(eventId)?.bundle.event.mapOn ?? true {
+                NavigationStack {
+                    MapView(eventId: eventId, highlight: nil)
+                        .navigationDestination(for: Route.self) { routeView($0, eventId: eventId) }
+                }
+                .tabItem { Label("Mapa", systemImage: "mappin.and.ellipse") }.tag(3)
             }
-            .tabItem { Label("Mapa", systemImage: "mappin.and.ellipse") }.tag(3)
 
             NavigationStack {
                 MoreView(eventId: eventId)
                     .navigationDestination(for: Route.self) { routeView($0, eventId: eventId) }
             }
-            .tabItem { Label("Wiecej", systemImage: "ellipsis") }.tag(4)
+            .tabItem { Label("Więcej", systemImage: "ellipsis") }.tag(4)
         }
         .tint(C.petrol)
     }
@@ -92,7 +95,7 @@ struct EventHomeView: View {
                         newsBanner(stored: stored, unread: unread)
                         Spacer().frame(height: 16)
                     }
-                    grid()
+                    grid(mapOn: ev.mapOn)
                 }
                 .padding(20)
                 .frame(maxHeight: .infinity)
@@ -165,12 +168,12 @@ struct EventHomeView: View {
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     if unread > 0 {
-                        Text(latest?.title ?? "Aktualnosci").font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
+                        Text(latest?.title ?? "Aktualności").font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
                             .lineLimit(1)
-                        Text("Aktualnosci \u{00B7} \(unread) nieprzeczytane").font(.system(size: 12)).foregroundColor(C.coralDark)
+                        Text("Aktualności \u{00B7} \(unread) nieprzeczytane").font(.system(size: 12)).foregroundColor(C.coralDark)
                     } else {
-                        Text("Aktualnosci").font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
-                        Text("brak powiadomien").font(.system(size: 12)).foregroundColor(C.muted)
+                        Text("Aktualności").font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
+                        Text("brak powiadomień").font(.system(size: 12)).foregroundColor(C.muted)
                     }
                 }
                 Spacer()
@@ -184,15 +187,17 @@ struct EventHomeView: View {
     }
 
     @ViewBuilder
-    private func grid() -> some View {
+    private func grid(mapOn: Bool) -> some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
                 tile("calendar", "Agenda", "Program i sale") { tab = 1 }
-                tile("person.2.fill", "Prelegenci", "Kto wystepuje") { path.append(.speakers) }
+                tile("person.2.fill", "Prelegenci", "Kto występuje") { path.append(.speakers) }
             }
             HStack(spacing: 12) {
                 tile("bag.fill", "Partnerzy", "Stoiska") { tab = 2 }
-                tile("mappin.and.ellipse", "Mapa", "Plan przestrzeni") { tab = 3 }
+                if mapOn {
+                    tile("mappin.and.ellipse", "Mapa", "Plan przestrzeni") { tab = 3 }
+                }
             }
         }
         .frame(maxHeight: .infinity)

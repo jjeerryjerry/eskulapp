@@ -136,7 +136,8 @@ class MainActivity : ComponentActivity() {
                       // Dolny pasek STATYCZNY: poza AnimatedContent - przy kazdym przejsciu
                       // przesuwa sie tylko tresc powyzej, a pasek stoi w miejscu.
                       if (tabEventId != null) {
-                          BottomBar(current, eventTabs(tabEventId)) { sc, fwd -> nav.sectionWithDir(sc, fwd) }
+                          val tabEvent by vm.repo.dao.event(tabEventId).collectAsStateWithLifecycle(null)
+                          BottomBar(current, eventTabs(tabEventId, tabEvent?.mapEnabled ?: true)) { sc, fwd -> nav.sectionWithDir(sc, fwd) }
                       }
                     }
                 }

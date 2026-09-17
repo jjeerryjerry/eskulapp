@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS events (
   organizer_id BIGINT UNSIGNED NULL,
   slug        VARCHAR(120) NOT NULL,
   name        VARCHAR(190) NOT NULL,
-  access_code VARCHAR(32) NOT NULL,               -- np. FND2027
+  access_code VARCHAR(32) NOT NULL,               -- np. TEST01
   is_closed   TINYINT(1) NOT NULL DEFAULT 1,
   starts_at   DATETIME NULL,
   ends_at     DATETIME NULL,
@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS events (
   city        VARCHAR(120) NULL,
   map_image_url VARCHAR(255) NULL,
   map_embed   TEXT NULL,
+  map_enabled TINYINT(1) NOT NULL DEFAULT 1,       -- 0 = apka ukrywa Mape
   push_topic  VARCHAR(64) NULL,                    -- event_<id>
   status      ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
   created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

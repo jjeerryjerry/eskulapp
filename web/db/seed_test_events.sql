@@ -1,17 +1,17 @@
 -- Eskulapp - dwa dodatkowe wydarzenia testowe do listy eventow w apce:
---   KARD26 - wydarzenie w PRZESZLOSCI (archiwalne, wyszarzone na dole listy)
---   DIAB26 - wydarzenie ZA ~2 MIESIACE (aktywne, u gory listy)
+--   TEST03 - wydarzenie w PRZESZLOSCI (archiwalne, wyszarzone na dole listy)
+--   TEST02 - wydarzenie ZA ~2 MIESIACE (aktywne, u gory listy)
 -- Idempotentne po kodzie. Uzycie: mysql ... < seed_test_events.sql
 SET NAMES utf8mb4;
 
 -- =====================================================================
 -- 1) WYDARZENIE PRZESZLE (archiwalne): Sympozjum Kardiologiczne 2026
 -- =====================================================================
-DELETE FROM events WHERE access_code = 'KARD26';
+DELETE FROM events WHERE access_code = 'TEST03';
 
-INSERT INTO events (slug,name,access_code,is_closed,starts_at,ends_at,venue_name,city,push_topic,status)
-VALUES ('symp-kard-2026','Sympozjum Kardiologiczne 2026','KARD26',1,
-        '2026-05-16 09:00:00','2026-05-17 15:00:00','ICE Kraków','Kraków','event_kard26','archived');
+INSERT INTO events (slug,name,access_code,is_closed,starts_at,ends_at,venue_name,city,push_topic,status,map_enabled)
+VALUES ('symp-kard-2026','Sympozjum Kardiologiczne 2026','TEST03',1,
+        '2026-05-16 09:00:00','2026-05-17 15:00:00','ICE Kraków','Kraków','event_kard26','archived',0);
 SET @e = LAST_INSERT_ID();
 
 INSERT INTO event_days (event_id,date,label,sort) VALUES
@@ -65,10 +65,10 @@ INSERT INTO news (event_id,type,title,body,pinned,published_at) VALUES
 -- =====================================================================
 -- 2) WYDARZENIE ZA ~2 MIESIACE (aktywne): Kongres Diabetologii Klinicznej 2026
 -- =====================================================================
-DELETE FROM events WHERE access_code = 'DIAB26';
+DELETE FROM events WHERE access_code = 'TEST02';
 
 INSERT INTO events (slug,name,access_code,is_closed,starts_at,ends_at,venue_name,city,push_topic,status)
-VALUES ('kongres-diab-2026','Kongres Diabetologii Klinicznej 2026','DIAB26',1,
+VALUES ('kongres-diab-2026','Kongres Diabetologii Klinicznej 2026','TEST02',1,
         '2026-10-20 09:00:00','2026-10-21 16:00:00','AmberExpo','Gdańsk','event_diab26','published');
 SET @f = LAST_INSERT_ID();
 

@@ -66,6 +66,7 @@ class Repo(context: Context) {
                     startsAt = b.event.startsAt, endsAt = b.event.endsAt,
                     venueName = b.event.venueName, city = b.event.city,
                     mapImageUrl = b.event.mapImageUrl, mapEmbed = b.event.mapEmbed,
+                    mapEnabled = b.event.mapEnabled,
                     pushTopic = b.event.pushTopic, status = b.event.status,
                     updatedAt = b.event.updatedAt,
                     addedAt = existingAddedAt ?: System.currentTimeMillis(),

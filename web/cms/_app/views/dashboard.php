@@ -20,7 +20,7 @@ require APP_DIR . '/views/_head.php';
       Nowy event
     </a>
   </div>
-  <p style="color:#5B6B72;margin-top:8px;max-width:640px">Eventy tworzy admin lub agent i nadaje im kod dostępu (np. FND2027). Organizatorzy nie zakładają eventów sami, zgłoszenia z formularza to zapytania sprzedażowe.</p>
+  <p style="color:#5B6B72;margin-top:8px;max-width:640px">Eventy tworzy admin lub agent i nadaje im kod dostępu (np. KONG2027). Organizatorzy nie zakładają eventów sami, zgłoszenia z formularza to zapytania sprzedażowe.</p>
 
   <?php if (!$events): ?>
     <div class="panel-card" style="margin-top:22px">

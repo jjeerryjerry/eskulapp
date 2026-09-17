@@ -38,7 +38,7 @@ struct AgendaView: View {
                         ForEach(days) { d in
                             let sel = d.id == dayId
                             VStack(spacing: 0) {
-                                Text((d.label ?? "Dzien") + "  " + dayShort(d.date))
+                                Text((d.label ?? "Dzień") + "  " + dayShort(d.date))
                                     .font(.system(size: 15, weight: sel ? .semibold : .medium))
                                     .foregroundColor(sel ? C.petrol : C.faint)
                                     .padding(.bottom, 12)
@@ -69,7 +69,7 @@ struct AgendaView: View {
             }
 
             if shown.isEmpty {
-                Text(onlyFollowed ? "Nie obserwujesz jeszcze zadnej prelekcji." : "Brak prelekcji w tym widoku.")
+                Text(onlyFollowed ? "Nie obserwujesz jeszcze żadnej prelekcji." : "Brak prelekcji w tym widoku.")
                     .foregroundColor(C.muted)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {

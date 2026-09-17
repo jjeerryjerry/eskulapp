@@ -3,8 +3,8 @@
 -- Uzycie: mysql ... < seed_partners.sql
 SET NAMES utf8mb4;
 
--- ============ FND2027 (nefrologia dziecieca), stoiska A1..A10 ============
-SET @e = (SELECT id FROM events WHERE access_code='FND2027');
+-- ============ TEST01 (nefrologia dziecieca), stoiska A1..A10 ============
+SET @e = (SELECT id FROM events WHERE access_code='TEST01');
 DELETE FROM partners WHERE event_id=@e;
 INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort) VALUES
  (@e,'NefroMed Polska','Dializa i terapie nerkozastepcze','strategiczny','Stoisko A1','nefromed.pl',0),
@@ -18,8 +18,8 @@ INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort
  (@e,'KidneyTech','Monitoring nerek','wspierajacy','Stoisko A9','kidneytech.pl',8),
  (@e,'EduMed','Materialy edukacyjne dla rodzicow','wspierajacy','Stoisko A10','edumed.pl',9);
 
--- ============ DIAB26 (diabetologia), stoiska D1..D10 ============
-SET @e = (SELECT id FROM events WHERE access_code='DIAB26');
+-- ============ TEST02 (diabetologia), stoiska D1..D10 ============
+SET @e = (SELECT id FROM events WHERE access_code='TEST02');
 DELETE FROM partners WHERE event_id=@e;
 INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort) VALUES
  (@e,'DiabCare Systems','Systemy ciaglego monitorowania glikemii','strategiczny','Stoisko D1','diabcare.pl',0),
@@ -33,8 +33,8 @@ INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort
  (@e,'TeleDiab','Telemedycyna diabetologiczna','partner','Stoisko D9','telediab.pl',8),
  (@e,'VisionLab','Diagnostyka retinopatii','strategiczny','Stoisko D10','visionlab.pl',9);
 
--- ============ KARD26 (kardiologia), stoiska K1..K10 ============
-SET @e = (SELECT id FROM events WHERE access_code='KARD26');
+-- ============ TEST03 (kardiologia), stoiska K1..K10 ============
+SET @e = (SELECT id FROM events WHERE access_code='TEST03');
 DELETE FROM partners WHERE event_id=@e;
 INSERT INTO partners (event_id,name,description,tier,booth_location,website,sort) VALUES
  (@e,'CardioTech Polska','Aparatura kardiologiczna i monitoring','strategiczny','Stoisko K1','cardiotech.pl',0),

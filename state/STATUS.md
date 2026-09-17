@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-08-18 (Faza C — komplet ekranów apki)_
+_Ostatnia aktualizacja: 2026-09-17 (przygotowanie publikacji 1.2.0, kody TEST01-03, przełącznik mapy)_
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -652,3 +652,24 @@ Run https://github.com/jjeerryjerry/eskulapp/actions/runs/34577402612 , SUCCESS
 - **Deployment target iOS 16** (NavigationStack). AppIcon jak wczesniej.
 - **Znane odstepstwo do poprawy**: statyczne etykiety UI bez polskich ogonkow
   (transliteracja ASCII); tresc z API ma pelna polszczyzne. Do podmiany na ep/ac.
+
+## PRZYGOTOWANIE PUBLIKACJI 1.2.0 (2026-09-17)
+Zadanie Todoist „Eskulapp iOS dopracować opis i opublikować i Android przetestować i opublikować".
+- **Lista publikacji + teksty obu sklepów**: `docs/PUBLIKACJA.md` (Play: krótki/pełny opis,
+  co nowego; App Store: podtytuł, promo, słowa kluczowe, kategoria, notatka dla recenzenta;
+  checklisty Play Console / App Store Connect). `tools/shots/store/LISTING-PL.md` = kopia Play.
+- **Kody testowe**: FND2027 na TEST01 (id 6), DIAB26 na TEST02 (id 8), KARD26 na TEST03 (id 7).
+  Żywa DB (backup tabeli events: `~/domains/eskulapp.pl/esk_backup/events-2026-09-17.sql`),
+  seedy, bake-bundle ALL_CODES. CDN: upieczone TEST01-03 + FND2025, stare prefiksy usunięte z R2.
+- **Przełącznik mapy**: kolumna `events.map_enabled` (domyślnie 1), w bundlu `map_enabled`,
+  checkbox w CMS („Mapa w aplikacji"). Android (Room v4, MIGRATION_3_4) i iOS (`mapOn`):
+  gdy wyłączona, znika zakładka Mapa w dolnym menu, kafel Mapa, pinezka przy partnerze i
+  „Zobacz na mapie". TEST03 ma mapę wyłączoną (do testu).
+- **Ekran startowy**: placeholder „Kod wydarzenia" zamiast „np. FND2027" (Android + iOS).
+- **iOS**: etykiety UI z polskimi znakami (35 zamian), MARKETING_VERSION 1.2.0,
+  `ITSAppUsesNonExemptEncryption=NO`.
+- **Android 1.2.0 (versionCode 19)** na Play Internal testing (automat).
+- **UWAGA theme WP**: `deploy-web.sh` nadpisał na chwilę landing wersją z repo, bo zmiany SEO
+  z 2026-08-19 (agent seo, `~/agents/seo/clients/eskulapp/deploy/golive.sh`) nie były w repo.
+  Przywrócone i WCIĄGNIĘTE do repo (theme v1.3 + og-image.png). Zweryfikowane na live.
+- **BLOKUJE publikację**: prawdziwe zrzuty ekranu (obecne to makiety z canvasu).

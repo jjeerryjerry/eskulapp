@@ -1,45 +1,47 @@
-# Eskulapp, teksty do Google Play (PL), do wklejenia
+# Eskulapp, teksty do Google Play (PL)
 
-## Nazwa aplikacji (max 30 znakow)
-Eskulapp
+Kopia z docs/PUBLIKACJA.md (tam pełna lista publikacji i teksty App Store).
 
-## Krotki opis (max 80 znakow)
-Twoj przewodnik po konferencji medycznej: agenda, prelegenci, mapa, partnerzy.
+**Nazwa aplikacji** (30): `Eskulapp`
 
-## Pelny opis (max 4000 znakow)
-Eskulapp to aplikacja dla uczestnikow konferencji i eventow medycznych. Wszystko,
-czego potrzebujesz na wydarzeniu, masz w jednym miejscu, take offline.
+**Krótki opis** (80, jest 75):
+```
+Agenda, prelegenci, partnerzy i mapa konferencji medycznej. Działa offline.
+```
 
-Jak zaczac: wpisz kod wydarzenia otrzymany od organizatora (na przyklad FND2027),
-a aplikacja pobierze caly program. Nie musisz zakladac konta.
+**Pełny opis** (4000):
+```
+Eskulapp to aplikacja dla uczestników konferencji, kongresów i szkoleń medycznych. Program wydarzenia, prelegenci, partnerzy i plan stoisk są w jednym miejscu, także bez internetu.
 
-Co znajdziesz w srodku:
-- Agenda: program podzielony na dni, filtr sal i lokalne przypomnienia o wybranych
-  prelekcjach.
-- Prelegenci: sylwetki, biogramy i lista wystapien.
-- Partnerzy: wystawcy z podzialem na poziomy i lokalizacja stoiska.
-- Mapa: czytelny plan strefy wystawcow z pinami stoisk.
-- Kontakt: szybki dostep do organizatora (telefon, mail, strona, adres).
-- Aktualnosci: biezace ogloszenia i zmiany w programie.
+Jak zacząć
+Wpisz kod wydarzenia, który otrzymasz od organizatora. Aplikacja pobierze cały program na telefon. Nie zakładasz konta i nie podajesz żadnych danych.
 
-Dziala offline: po pobraniu programu korzystasz z aplikacji bez internetu, na sali,
-w podziemiach centrum kongresowego, wszedzie.
+Co znajdziesz w środku
+• Agenda: program podzielony na dni, filtr sal, lista obserwowanych prelekcji i przypomnienie przed ich startem.
+• Prelegenci: sylwetki, afiliacje i lista wystąpień każdej osoby.
+• Partnerzy: wystawcy z opisem, stroną www i numerem stoiska.
+• Mapa: plan strefy wystawców z zaznaczonymi stoiskami (gdy organizator udostępnia plan).
+• Aktualności: zmiany sal, przesunięcia i ogłoszenia organizatora.
+• Kontakt: telefon i e-mail do biura wydarzenia jednym dotknięciem.
 
-Prywatnosc: aplikacja nie wymaga konta i nie sledzi Ciebie. Dane wydarzenia
-przechowywane sa lokalnie na Twoim telefonie.
+Działa offline
+Po pobraniu programu korzystasz z aplikacji bez zasięgu: na sali wykładowej, w hali wystawienniczej, w podziemiach centrum kongresowego.
 
-Masz kod wydarzenia? Wpisz go i zacznij.
+Wiele wydarzeń w jednym miejscu
+Dodawaj kolejne wydarzenia kodami. Trwające i nadchodzące są na górze listy, zakończone zostają w archiwum.
 
-## Kategoria
-Aplikacja, kategoria: Wydarzenia (Events)
+Prywatność
+Aplikacja nie wymaga konta, nie wyświetla reklam i nie śledzi użytkownika. Dane wydarzenia są zapisywane lokalnie na Twoim telefonie.
 
-## E-mail kontaktowy (wymagany)
-kontakt@eskulapp.pl
+Jesteś organizatorem i chcesz mieć swoje wydarzenie w Eskulapp? Napisz: kontakt@eskulapp.pl
+```
 
-## Polityka prywatnosci (URL)
-https://eskulapp.pl/polityka-prywatnosci/
+**Co nowego w 1.2.0** (500):
+```
+• Moduł Mapa pojawia się tylko wtedy, gdy organizator udostępnia plan wydarzenia.
+• Szybsze pobieranie programu wydarzenia.
+• Drobne poprawki wyglądu i tekstów.
+```
 
-## Assety w tym folderze
-- icon-512.png (ikona 512x512)
-- feature-1024x500.png (grafika promocyjna)
-- shot-01..12 (zrzuty 1080x1920, portret)
+**Kategoria:** Wydarzenia • **E-mail:** kontakt@eskulapp.pl • **WWW:** https://eskulapp.pl •
+**Polityka prywatności:** https://eskulapp.pl/polityka-prywatnosci/

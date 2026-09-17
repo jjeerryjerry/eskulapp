@@ -13,7 +13,7 @@
 # Manifest trzyma sciezke wzgledna (bundle_path), wiec przelaczenie r2.dev -> cdn.eskulapp.pl
 # NIE wymaga ponownego pieczenia.
 #
-# Uzycie:  scripts/bake-bundle.sh FND2025 FND2027 KARD26 DIAB26
+# Uzycie:  scripts/bake-bundle.sh FND2025 TEST01 TEST03 TEST02
 #          scripts/bake-bundle.sh --all      (upiecze wszystkie znane kody)
 #
 # Wymaga: .env z R2_* i R2_PUBLIC_BASE; narzedzia jq, curl, rclone.
@@ -38,7 +38,7 @@ RCLONE="rclone --bind 0.0.0.0"
 CC_IMMUTABLE="Cache-Control: public, max-age=31536000, immutable"
 CC_MANIFEST="Cache-Control: public, max-age=30, must-revalidate"
 
-ALL_CODES=(FND2025 FND2027 KARD26 DIAB26)
+ALL_CODES=(FND2025 TEST01 TEST03 TEST02)
 if [[ "${1:-}" == "--all" ]]; then set -- "${ALL_CODES[@]}"; fi
 if [[ $# -lt 1 ]]; then echo "Uzycie: $0 KOD [KOD...]  |  $0 --all" >&2; exit 2; fi
 

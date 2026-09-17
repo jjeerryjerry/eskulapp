@@ -70,7 +70,7 @@ struct MapView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 18))
                         .padding(.horizontal, 20)
 
-                    Text("Uszczypnij zeby przyblizyc. Przeciagnij aby przesunac.")
+                    Text("Uszczypnij żeby przybliżyć. Przeciągnij aby przesunąć.")
                         .font(.system(size: 10)).foregroundColor(C.faint).lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20).padding(.vertical, 8)
@@ -114,20 +114,20 @@ struct MapView: View {
             ZStack {
                 // scena + wejscie + piny (skalowane/przesuwane razem)
                 ZStack {
-                    Text("SCENA GLOWNA")
+                    Text("SCENA GŁÓWNA")
                         .font(.system(size: 11, weight: .bold)).foregroundColor(.white)
                         .frame(width: geo.size.width * 0.6, height: 30)
                         .background(C.petrol).clipShape(RoundedRectangle(cornerRadius: 9))
                         .position(x: geo.size.width / 2, y: 27)
 
-                    Text("WEJSCIE GLOWNE")
+                    Text("WEJŚCIE GŁÓWNE")
                         .font(.system(size: 10, weight: .semibold)).foregroundColor(C.muted)
                         .frame(width: geo.size.width * 0.5, height: 26)
                         .background(C.grey).clipShape(RoundedRectangle(cornerRadius: 9))
                         .position(x: geo.size.width / 2, y: geo.size.height - 25)
 
                     if booths.isEmpty {
-                        Text("Rozmieszczenie stoisk pojawi sie wkrotce.")
+                        Text("Rozmieszczenie stoisk pojawi się wkrótce.")
                             .font(.system(size: 13)).foregroundColor(C.muted)
                             .position(x: geo.size.width / 2, y: geo.size.height / 2)
                     } else {

@@ -77,6 +77,8 @@ fun SpeakersScreen(vm: AppViewModel, id: Long) {
 @Composable
 fun PartnersScreen(vm: AppViewModel, id: Long) {
     val partners by vm.repo.dao.partners(id).collectAsStateWithLifecycle(emptyList())
+    val event by vm.repo.dao.event(id).collectAsStateWithLifecycle(null)
+    val mapEnabled = event?.mapEnabled ?: true
     Column(Modifier.fillMaxSize().background(Bg)) {
         BackTopBar("Partnerzy", onBack = { vm.nav.pop() })
         if (partners.isEmpty()) EmptyHint("Partnerzy pojawią się wkrótce.")
@@ -102,7 +104,7 @@ fun PartnersScreen(vm: AppViewModel, id: Long) {
                             }
                     }
                     // Skrot na mape z wyroznionym stoiskiem tego partnera (osobny click)
-                    if (!p.boothLocation.isNullOrBlank())
+                    if (mapEnabled && !p.boothLocation.isNullOrBlank())
                         Box(
                             Modifier.size(38.dp).clip(RoundedCornerShape(11.dp)).background(CoralTint)
                                 .clickable { vm.nav.push(Screen.MapS(id, p.id)) },
@@ -406,6 +408,8 @@ private fun ColumnScope.EmptyHint(text: String) {
 @Composable
 fun PartnerDetailScreen(vm: AppViewModel, partnerId: Long, eventId: Long) {
     val partner by vm.repo.dao.partner(partnerId).collectAsStateWithLifecycle(null)
+    val event by vm.repo.dao.event(eventId).collectAsStateWithLifecycle(null)
+    val mapEnabled = event?.mapEnabled ?: true
     val ctx = LocalContext.current
     val p = partner ?: return
     Column(Modifier.fillMaxSize().background(Bg)) {
@@ -441,8 +445,9 @@ fun PartnerDetailScreen(vm: AppViewModel, partnerId: Long, eventId: Long) {
                         Text("Stoisko", fontSize = 12.sp, color = Faint)
                         Text(p.boothLocation!!, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Ink)
                     }
-                    Text("Zobacz na mapie", color = Petrol, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable { vm.nav.push(Screen.MapS(eventId, partnerId)) })
+                    if (mapEnabled)
+                        Text("Zobacz na mapie", color = Petrol, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.clickable { vm.nav.push(Screen.MapS(eventId, partnerId)) })
                 }
             }
             if (!p.website.isNullOrBlank()) {

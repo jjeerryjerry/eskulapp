@@ -6,7 +6,7 @@ declare(strict_types=1);
  * GET /public/events/{code}/bundle -> jeden JSON: event + days + rooms + talks +
  * speakers + partners + map + contacts + news, z updated_at (delta ?since=).
  *
- * Gdy jest DB -> składamy z bazy. Gdy brak DB -> zwracamy demo (FND2027),
+ * Gdy jest DB -> składamy z bazy. Gdy brak DB -> zwracamy demo (TEST01),
  * żeby aplikacja Android miała działający endpoint już teraz (offline-first dev).
  */
 final class Bundle
@@ -50,6 +50,7 @@ final class Bundle
                 'starts_at' => $ev['starts_at'], 'ends_at' => $ev['ends_at'],
                 'venue_name' => $ev['venue_name'], 'city' => $ev['city'],
                 'map_image_url' => $ev['map_image_url'], 'map_embed' => $ev['map_embed'],
+                'map_enabled' => (bool)($ev['map_enabled'] ?? 1),
                 'push_topic' => $ev['push_topic'], 'status' => $ev['status'],
                 'updated_at' => $ev['updated_at'],
             ],
@@ -60,17 +61,17 @@ final class Bundle
         ];
     }
 
-    /** Demo bundle (bez DB), kod FND2027. */
+    /** Demo bundle (bez DB), kod TEST01. */
     private static function demo(string $code): ?array
     {
-        if ($code !== 'FND2027') return null;
+        if ($code !== 'TEST01') return null;
         return [
             'event' => [
                 'id' => 1, 'slug' => 'fnd-2027', 'name' => 'Forum Nefrologii Dziecięcej 2027',
-                'access_code' => 'FND2027', 'is_closed' => true,
+                'access_code' => 'TEST01', 'is_closed' => true,
                 'starts_at' => '2027-03-14 09:00:00', 'ends_at' => '2027-03-15 16:00:00',
                 'venue_name' => 'Hala Expo', 'city' => 'Warszawa',
-                'map_image_url' => null, 'map_embed' => null,
+                'map_image_url' => null, 'map_embed' => null, 'map_enabled' => true,
                 'push_topic' => 'event_1', 'status' => 'published',
                 'updated_at' => '2027-03-14 08:00:00',
             ],

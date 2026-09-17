@@ -5,6 +5,8 @@ struct PartnersView: View {
     @Binding var path: [Route]
     @EnvironmentObject var store: AppStore
 
+    private var mapOn: Bool { store.event(eventId)?.bundle.event.mapOn ?? true }
+
     var body: some View {
         let partners = store.event(eventId)?.bundle.sortedPartners ?? []
         VStack(spacing: 0) {
@@ -16,7 +18,7 @@ struct PartnersView: View {
             .frame(maxWidth: .infinity).background(C.surface)
 
             if partners.isEmpty {
-                EmptyHint(text: "Partnerzy pojawia sie wkrotce.")
+                EmptyHint(text: "Partnerzy pojawią się wkrótce.")
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -53,7 +55,7 @@ struct PartnersView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            if hasBooth {
+            if hasBooth && mapOn {
                 Button { path.append(.map(p.id)) } label: {
                     icon("mappin.and.ellipse", C.coral, 18)
                         .frame(width: 38, height: 38).background(C.coralTint).clipShape(RoundedRectangle(cornerRadius: 11))
@@ -108,8 +110,10 @@ struct PartnerDetailView: View {
                                     Text(booth).font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
                                 }
                                 Spacer()
-                                NavigationLink(value: Route.map(partnerId)) {
-                                    Text("Zobacz na mapie").font(.system(size: 13, weight: .semibold)).foregroundColor(C.petrol)
+                                if store.event(eventId)?.bundle.event.mapOn ?? true {
+                                    NavigationLink(value: Route.map(partnerId)) {
+                                        Text("Zobacz na mapie").font(.system(size: 13, weight: .semibold)).foregroundColor(C.petrol)
+                                    }
                                 }
                             }
                             .padding(14)

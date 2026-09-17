@@ -10,7 +10,7 @@ struct ContactView: View {
         VStack(spacing: 0) {
             BackHeader("Kontakt")
             if contacts.isEmpty {
-                EmptyHint(text: "Dane kontaktowe pojawia sie wkrotce.")
+                EmptyHint(text: "Dane kontaktowe pojawią się wkrótce.")
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -79,9 +79,9 @@ struct NewsView: View {
     var body: some View {
         let news = store.event(eventId)?.bundle.sortedNews ?? []
         VStack(spacing: 0) {
-            BackHeader("Aktualnosci")
+            BackHeader("Aktualności")
             if news.isEmpty {
-                EmptyHint(text: "Brak aktualnosci. Wrocimy tu ze zmianami i ogloszeniami.")
+                EmptyHint(text: "Brak aktualności. Wrócimy tu ze zmianami i ogłoszeniami.")
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -124,7 +124,7 @@ struct MoreView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Wiecej").font(.system(size: 22, weight: .heavy)).foregroundColor(C.ink)
+                Text("Więcej").font(.system(size: 22, weight: .heavy)).foregroundColor(C.ink)
                 Spacer()
             }
             .padding(.horizontal, 20).padding(.top, 14).padding(.bottom, 16)
@@ -136,13 +136,13 @@ struct MoreView: View {
                 }.buttonStyle(.plain)
 
                 Button { store.top = .events } label: {
-                    moreRow("calendar", "Lista wydarzen", danger: false, chevron: true)
+                    moreRow("calendar", "Lista wydarzeń", danger: false, chevron: true)
                 }.buttonStyle(.plain)
 
                 Spacer().frame(height: 8)
 
                 Button { confirmDelete = true } label: {
-                    moreRow("trash", "Usun to wydarzenie", danger: true, chevron: false)
+                    moreRow("trash", "Usuń to wydarzenie", danger: true, chevron: false)
                 }.buttonStyle(.plain)
 
                 Spacer()
@@ -151,14 +151,14 @@ struct MoreView: View {
         }
         .background(C.bg.ignoresSafeArea())
         .navigationBarHidden(true)
-        .alert("Usunac wydarzenie?", isPresented: $confirmDelete) {
-            Button("Usun", role: .destructive) {
+        .alert("Usunąć wydarzenie?", isPresented: $confirmDelete) {
+            Button("Usuń", role: .destructive) {
                 store.deleteEvent(eventId)
                 store.top = .events
             }
             Button("Anuluj", role: .cancel) {}
         } message: {
-            Text("Wydarzenie zniknie z listy. Mozesz dodac je ponownie kodem od organizatora.")
+            Text("Wydarzenie zniknie z listy. Możesz dodać je ponownie kodem od organizatora.")
         }
     }
 

@@ -35,7 +35,7 @@ fun EntryScreen(
         Text("Dołącz do wydarzenia", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Ink)
         Spacer(Modifier.height(10.dp))
         Text(
-            "Wpisz kod od organizatora, a pobierzemy cala agende na telefon. Dziala tez offline.",
+            "Wpisz kod od organizatora, a pobierzemy całą agendę na telefon. Działa też offline.",
             fontSize = 14.sp, color = Muted, textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 300.dp)
         )
@@ -44,7 +44,7 @@ fun EntryScreen(
             value = code,
             onValueChange = { code = it.uppercase().filter { c -> c.isLetterOrDigit() }.take(32) },
             singleLine = true,
-            placeholder = { Text("np. FND2027") },
+            placeholder = { Text("Kod wydarzenia") },
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters, imeAction = ImeAction.Go),
             textStyle = LocalTextStyle.current.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold, letterSpacing = 3.sp),
             colors = OutlinedTextFieldDefaults.colors(

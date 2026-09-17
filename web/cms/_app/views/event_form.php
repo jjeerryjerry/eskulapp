@@ -31,7 +31,7 @@ require APP_DIR . '/views/_head.php';
     <div class="ev-2col">
       <div class="field">
         <label>Kod dostępu <span style="color:var(--faint)">(puste = wygenerujemy)</span></label>
-        <input name="access_code" value="<?= $val('access_code') ?>" placeholder="np. FND2027" style="text-transform:uppercase;font-family:Sora,sans-serif;letter-spacing:.08em">
+        <input name="access_code" value="<?= $val('access_code') ?>" placeholder="np. KONG2027" style="text-transform:uppercase;font-family:Sora,sans-serif;letter-spacing:.08em">
         <?php if (isset($errors['access_code'])): ?><div class="ferr"><?= e($errors['access_code']) ?></div><?php endif; ?>
       </div>
       <div class="field">
@@ -58,6 +58,13 @@ require APP_DIR . '/views/_head.php';
       <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
         <input type="checkbox" name="is_closed" value="1" <?= !isset($ev['is_closed'])||$ev['is_closed']?'checked':'' ?> style="width:auto">
         Zamknięte (wymaga kodu dostępu)
+      </label>
+    </div>
+
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+        <input type="checkbox" name="map_enabled" value="1" <?= !isset($ev['map_enabled'])||$ev['map_enabled']?'checked':'' ?> style="width:auto">
+        Mapa w aplikacji (odznacz, gdy event nie ma mapki: przycisk Mapa zniknie z menu)
       </label>
     </div>
 

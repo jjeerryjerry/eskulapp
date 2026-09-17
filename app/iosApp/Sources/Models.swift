@@ -16,6 +16,7 @@ struct EventDTO: Codable {
     let city: String?
     let mapImageUrl: String?
     let mapEmbed: String?
+    let mapEnabled: Bool?
     let pushTopic: String?
     let status: String?
     let updatedAt: String?
@@ -29,12 +30,15 @@ struct EventDTO: Codable {
         case venueName = "venue_name"
         case mapImageUrl = "map_image_url"
         case mapEmbed = "map_embed"
+        case mapEnabled = "map_enabled"
         case pushTopic = "push_topic"
         case status
         case updatedAt = "updated_at"
     }
 
     var statusOrDefault: String { status ?? "published" }
+    // Brak pola (starszy bundel) = mapa wlaczona
+    var mapOn: Bool { mapEnabled ?? true }
 }
 
 struct Day: Codable, Identifiable {

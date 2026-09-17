@@ -1,11 +1,11 @@
--- Eskulapp - demo event FND2027 (zeby API /bundle mialo realne dane).
--- Idempotentne: czysci event o kodzie FND2027 i wstawia od nowa.
+-- Eskulapp - demo event TEST01 (zeby API /bundle mialo realne dane).
+-- Idempotentne: czysci event o kodzie TEST01 i wstawia od nowa.
 SET NAMES utf8mb4;
 
-DELETE FROM events WHERE access_code = 'FND2027';
+DELETE FROM events WHERE access_code = 'TEST01';
 
 INSERT INTO events (slug, name, access_code, is_closed, starts_at, ends_at, venue_name, city, push_topic, status)
-VALUES ('fnd-2027', 'Forum Nefrologii Dziecięcej 2027', 'FND2027', 1,
+VALUES ('fnd-2027', 'Forum Nefrologii Dziecięcej 2027', 'TEST01', 1,
         '2026-08-20 09:00:00', '2026-08-21 16:00:00', 'Hala Expo', 'Warszawa', 'event_1', 'published');
 
 SET @eid = LAST_INSERT_ID();

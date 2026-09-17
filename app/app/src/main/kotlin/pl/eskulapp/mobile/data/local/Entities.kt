@@ -16,6 +16,7 @@ data class EventEntity(
     val city: String?,
     val mapImageUrl: String?,
     val mapEmbed: String?,
+    val mapEnabled: Boolean = true,
     val pushTopic: String?,
     val status: String,
     val updatedAt: String?,

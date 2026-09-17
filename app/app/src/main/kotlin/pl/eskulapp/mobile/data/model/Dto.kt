@@ -29,6 +29,7 @@ data class EventDto(
     val city: String? = null,
     @SerialName("map_image_url") val mapImageUrl: String? = null,
     @SerialName("map_embed") val mapEmbed: String? = null,
+    @SerialName("map_enabled") val mapEnabled: Boolean = true,
     @SerialName("push_topic") val pushTopic: String? = null,
     val status: String = "published",
     @SerialName("updated_at") val updatedAt: String? = null,

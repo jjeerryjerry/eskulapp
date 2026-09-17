@@ -8,10 +8,10 @@ struct SpeakersView: View {
         let speakers = store.event(eventId)?.bundle.sortedSpeakers ?? []
         VStack(spacing: 0) {
             BackHeader(title: "Prelegenci", trailing: {
-                Text("\(speakers.count) osob").font(.system(size: 13)).foregroundColor(C.muted)
+                Text("\(speakers.count) osób").font(.system(size: 13)).foregroundColor(C.muted)
             })
             if speakers.isEmpty {
-                EmptyHint(text: "Lista prelegentow pojawi sie wkrotce.")
+                EmptyHint(text: "Lista prelegentów pojawi się wkrótce.")
             } else {
                 ScrollView {
                     LazyVStack(spacing: 10) {
@@ -78,7 +78,7 @@ struct SpeakerDetailView: View {
                         }
                         if !talks.isEmpty {
                             Spacer().frame(height: 20)
-                            Text("Wystapienia").font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
+                            Text("Wystąpienia").font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
                             Spacer().frame(height: 8)
                             ForEach(talks) { t in
                                 let room = bundle?.room(t.roomId)

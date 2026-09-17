@@ -33,6 +33,7 @@ final class Events
 
         $status = in_array($in['status'] ?? '', ['draft','published','archived'], true) ? $in['status'] : 'draft';
         $isClosed = !empty($in['is_closed']) ? 1 : 0;
+        $mapEnabled = !empty($in['map_enabled']) ? 1 : 0;
         $starts = self::dt($in['starts_at'] ?? '');
         $ends   = self::dt($in['ends_at'] ?? '');
         $city   = trim($in['city'] ?? '') ?: null;
@@ -41,13 +42,13 @@ final class Events
         if ($errors) return [$errors, null];
 
         if ($id) {
-            $st = $pdo->prepare("UPDATE events SET name=?,access_code=?,slug=?,status=?,is_closed=?,starts_at=?,ends_at=?,city=?,venue_name=? WHERE id=?");
-            $st->execute([$name,$code,$slug,$status,$isClosed,$starts,$ends,$city,$venue,$id]);
+            $st = $pdo->prepare("UPDATE events SET name=?,access_code=?,slug=?,status=?,is_closed=?,map_enabled=?,starts_at=?,ends_at=?,city=?,venue_name=? WHERE id=?");
+            $st->execute([$name,$code,$slug,$status,$isClosed,$mapEnabled,$starts,$ends,$city,$venue,$id]);
             return [[], $id];
         }
-        $st = $pdo->prepare("INSERT INTO events (name,access_code,slug,status,is_closed,starts_at,ends_at,city,venue_name,push_topic)
-                             VALUES (?,?,?,?,?,?,?,?,?,'')");
-        $st->execute([$name,$code,$slug,$status,$isClosed,$starts,$ends,$city,$venue]);
+        $st = $pdo->prepare("INSERT INTO events (name,access_code,slug,status,is_closed,map_enabled,starts_at,ends_at,city,venue_name,push_topic)
+                             VALUES (?,?,?,?,?,?,?,?,?,?,'')");
+        $st->execute([$name,$code,$slug,$status,$isClosed,$mapEnabled,$starts,$ends,$city,$venue]);
         $newId = (int)$pdo->lastInsertId();
         $pdo->prepare("UPDATE events SET push_topic=? WHERE id=?")->execute(['event_' . $newId, $newId]);
         return [[], $newId];

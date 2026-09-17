@@ -8,8 +8,8 @@ enum APIError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notFound: return "Nie znaleziono wydarzenia o tym kodzie."
-        case .server(let c): return "Blad serwera (\(c))."
-        case .network: return "Brak polaczenia. Sprawdz internet i sprobuj ponownie."
+        case .server(let c): return "Błąd serwera (\(c))."
+        case .network: return "Brak połączenia. Sprawdź internet i spróbuj ponownie."
         }
     }
 }
@@ -231,7 +231,7 @@ final class AppStore: ObservableObject {
         guard delay > 0 else { return } // minelo: stan zapamietany, ale nie budzimy
         let content = UNMutableNotificationContent()
         content.title = title
-        content.body = (subtitle?.isEmpty == false ? subtitle! : "Prelekcja wkrotce")
+        content.body = (subtitle?.isEmpty == false ? subtitle! : "Prelekcja wkrótce")
         content.sound = .default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
         let req = UNNotificationRequest(identifier: "talk_\(talkId)", content: content, trigger: trigger)

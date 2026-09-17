@@ -114,7 +114,9 @@ fun EventScreen(vm: AppViewModel, id: Long) {
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     tile(Modifier.weight(1f).fillMaxHeight(), R.drawable.ic_store, "Partnerzy", "Stoiska", Screen.Partners(id))
-                    tile(Modifier.weight(1f).fillMaxHeight(), R.drawable.ic_pin, "Mapa", "Plan przestrzeni", Screen.MapS(id))
+                    // Bez mapki: Partnerzy zajmuja caly rzad
+                    if (ev.mapEnabled)
+                        tile(Modifier.weight(1f).fillMaxHeight(), R.drawable.ic_pin, "Mapa", "Plan przestrzeni", Screen.MapS(id))
                 }
             }
         }

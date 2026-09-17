@@ -12,9 +12,10 @@
     <?php include get_template_directory() . '/parts/logo.php'; ?>Eskulapp
   </a>
   <div class="nav-links">
-    <a href="#dla-uczestnika">Dla uczestnika</a>
     <a href="#funkcje">Funkcje</a>
+    <a href="#jak-to-dziala">Jak to działa</a>
+    <a href="#faq">FAQ</a>
     <a href="#kontakt">Dla organizatora</a>
-    <a class="btn btn-primary" href="#kontakt">Zapytaj o ofertę</a>
+    <a class="btn btn-primary" href="#kontakt">Umów prezentację</a>
   </div>
 </div></nav>

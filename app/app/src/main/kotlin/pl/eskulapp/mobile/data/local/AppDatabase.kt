@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ContactEntity::class, NewsEntity::class, ReminderEntity::class,
         EventNotifyEntity::class, NewsReadEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -41,6 +41,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // v3 -> v4: flaga mapy per event (organizator moze wylaczyc Mape)
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `events` ADD COLUMN `mapEnabled` INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -49,7 +56,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     // PRAWDZIWE migracje: aktualizacja apki NIE kasuje lokalnych danych
                     // (dodane eventy, dzwonki/powiadomienia, przeczytane aktualnosci).
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build().also { INSTANCE = it }
             }
     }

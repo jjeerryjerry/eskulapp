@@ -15,16 +15,16 @@ struct EntryView: View {
                 Spacer().frame(height: 20)
                 Seal(size: 72)
                 Spacer().frame(height: 22)
-                Text("Dolacz do wydarzenia")
+                Text("Dołącz do wydarzenia")
                     .font(.system(size: 24, weight: .bold)).foregroundColor(C.ink)
                 Spacer().frame(height: 10)
-                Text("Wpisz kod od organizatora, a pobierzemy cala agende na telefon. Dziala tez offline.")
+                Text("Wpisz kod od organizatora, a pobierzemy całą agendę na telefon. Działa też offline.")
                     .font(.system(size: 14)).foregroundColor(C.muted)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 300)
                 Spacer().frame(height: 26)
 
-                TextField("np. FND2027", text: $code)
+                TextField("Kod wydarzenia", text: $code)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled(true)
                     .font(.system(size: 22, weight: .bold))
@@ -74,7 +74,7 @@ struct EntryView: View {
                 store.openEvent(id)
             } catch let e {
                 loading = false
-                error = (e as? APIError)?.errorDescription ?? "Cos poszlo nie tak."
+                error = (e as? APIError)?.errorDescription ?? "Coś poszło nie tak."
             }
         }
     }
@@ -111,7 +111,7 @@ struct EventsView: View {
                         icon("calendar", C.petrol, 56)
                     }
                     Spacer().frame(height: 20)
-                    Text("Nie masz jeszcze wydarzen").font(.system(size: 20, weight: .bold)).foregroundColor(C.ink)
+                    Text("Nie masz jeszcze wydarzeń").font(.system(size: 20, weight: .bold)).foregroundColor(C.ink)
                     Spacer().frame(height: 8)
                     Text("Dodaj wydarzenie kodem od organizatora.")
                         .font(.system(size: 14)).foregroundColor(C.muted).multilineTextAlignment(.center)
@@ -172,7 +172,7 @@ private struct EventCard: View {
                 }
                 .buttonStyle(.plain)
             }
-            Text(notify ? "Powiadomienia wlaczone" : "Powiadomienia wylaczone")
+            Text(notify ? "Powiadomienia włączone" : "Powiadomienia wyłączone")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(notify ? C.coralDark : C.faint)
                 .padding(.top, 6)
@@ -197,7 +197,7 @@ private struct EventCard: View {
     private func statusBadge(_ ev: EventDTO, archived: Bool) -> some View {
         let (bg, fg, lbl): (Color, Color, String) = {
             if archived { return (C.grey, C.faint, "ARCHIWALNY") }
-            if isUpcoming(ev.startsAt) { return (C.coralTint, C.coralDark, "NADCHODZACE") }
+            if isUpcoming(ev.startsAt) { return (C.coralTint, C.coralDark, "NADCHODZĄCE") }
             return (C.tint, C.petrol, "AKTYWNY")
         }()
         Text(lbl).font(.system(size: 11, weight: .semibold)).foregroundColor(fg)
