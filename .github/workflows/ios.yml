@@ -63,3 +63,18 @@ jobs:
         run: |
           gem install fastlane --no-document
           fastlane beta
+
+  # Po wysylce: poczekaj az Apple przetworzy build i przypisz go do wewnetrznej grupy
+  # testerow (bez tego TestFlight dalej pokazuje stary build). Linux = tanie minuty.
+  testflight-assign:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install "pyjwt[crypto]"
+      - env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: python3 tools/asc/status.py --fix --wait

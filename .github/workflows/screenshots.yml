@@ -1,0 +1,81 @@
+name: Zrzuty do sklepow (Android + iOS)
+
+# Zrzuty PRAWDZIWEJ apki: Android na emulatorze (1080x1920, format Play),
+# iOS na symulatorze iPhone 6,9" (1320x2868, wymog App Store). Dane: kody TEST01-03 z CDN.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: local.properties
+        working-directory: app
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      - name: Build debug APK
+        working-directory: app
+        run: ./gradlew :app:assembleDebug --no-daemon
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Emulator + zrzuty
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash tools/shots/ci/android-shots.sh app/app/build/outputs/apk/debug/app-debug.apk shots-android
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: shots-android, path: shots-android }
+
+  ios:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: Framework Shared (wymagany przez projekt)
+        working-directory: app
+        run: ./gradlew :shared:assembleSharedReleaseXCFramework --no-daemon
+      - name: XcodeGen
+        working-directory: app/iosApp
+        run: brew install xcodegen && xcodegen generate
+      - name: Symulator 6,9" + czysty pasek statusu
+        run: |
+          xcrun simctl list devices available
+          DEV=$(xcrun simctl list devices available | grep -Eo 'iPhone 1[6-9] Pro Max \(([0-9A-F-]+)\)' | tail -1 | grep -Eo '[0-9A-F-]{36}')
+          echo "DEV=$DEV" >> $GITHUB_ENV
+          xcrun simctl boot "$DEV" || true
+          xcrun simctl bootstatus "$DEV" -b
+          xcrun simctl status_bar "$DEV" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
+      - name: UI test = zrzuty
+        working-directory: app/iosApp
+        env:
+          TEST_RUNNER_SHOTS_DIR: ${{ github.workspace }}/shots-ios
+        run: |
+          set -o pipefail
+          xcodebuild test -project Eskulapp.xcodeproj -scheme Eskulapp \
+            -destination "id=$DEV" -only-testing:EskulappUITests \
+            -resultBundlePath "$GITHUB_WORKSPACE/ios-shots.xcresult" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="" \
+            | tail -80
+      - name: Zalaczniki z xcresult (zapas)
+        if: always()
+        run: |
+          mkdir -p shots-ios/xcresult
+          xcrun xcresulttool export attachments --path ios-shots.xcresult --output-path shots-ios/xcresult || true
+          ls -la shots-ios shots-ios/xcresult || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: shots-ios, path: shots-ios }

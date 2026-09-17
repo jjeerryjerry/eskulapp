@@ -6,10 +6,13 @@ import jwt
 
 APP_ID = os.environ.get("ASC_APP_ID", "6810647099")
 key = base64.b64decode(os.environ["ASC_KEY_P8_BASE64"]).decode()
-tok = jwt.encode({"iss": os.environ["ASC_ISSUER_ID"], "exp": int(time.time()) + 600, "aud": "appstoreconnect-v1"},
-                 key, algorithm="ES256", headers={"kid": os.environ["ASC_KEY_ID"], "typ": "JWT"})
+
+def token():
+    return jwt.encode({"iss": os.environ["ASC_ISSUER_ID"], "exp": int(time.time()) + 600, "aud": "appstoreconnect-v1"},
+                      key, algorithm="ES256", headers={"kid": os.environ["ASC_KEY_ID"], "typ": "JWT"})
 
 def get(path, method="GET", body=None):
+    tok = token()
     r = urllib.request.Request("https://api.appstoreconnect.apple.com" + path, method=method,
                                data=json.dumps(body).encode() if body is not None else None,
                                headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
@@ -40,19 +43,23 @@ for d in g["data"]:
     print(f"{a['name']}: internal={a['isInternalGroup']} auto_dystrybucja={a.get('hasAccessToAllBuilds')}"
           f" testerow={len(t['data'])} buildow_w_grupie={len(bl['data'])}")
 
-# --fix: najnowszy gotowy build do grup wewnetrznych + automatyczna dystrybucja kolejnych buildow
+# --fix: najnowszy gotowy build do grup wewnetrznych (API nie pozwala wlaczyc auto dystrybucji).
+# --wait: najpierw czekaj (max 45 min), az najnowszy build skonczy przetwarzanie u Apple.
 if "--fix" in sys.argv:
+    if "--wait" in sys.argv:
+        for _ in range(90):
+            latest = get(f"/v1/builds?filter[app]={APP_ID}&sort=-uploadedDate&limit=1")["data"]
+            st = latest[0]["attributes"]["processingState"] if latest else None
+            print("najnowszy build:", latest[0]["attributes"]["version"] if latest else None, st, flush=True)
+            if st in ("VALID", "FAILED", "INVALID"): break
+            time.sleep(30)
+        b = get(f"/v1/builds?filter[app]={APP_ID}&sort=-uploadedDate&limit=6")
     ready = [d for d in b["data"] if d["attributes"]["processingState"] == "VALID" and not d["attributes"]["expired"]]
     for d in g["data"]:
-        if not d["attributes"]["isInternalGroup"]: continue
-        if not d["attributes"].get("hasAccessToAllBuilds"):
-            get(f"/v1/betaGroups/{d['id']}", "PATCH", {"data": {"type": "betaGroups", "id": d["id"], "attributes": {"hasAccessToAllBuilds": True}}})
-            print(f"{d['attributes']['name']}: wlaczona automatyczna dystrybucja")
-        if ready:
-            get(f"/v1/betaGroups/{d['id']}/relationships/builds", "POST", {"data": [{"type": "builds", "id": ready[0]["id"]}]})
-            print(f"{d['attributes']['name']}: dodany build {ready[0]['attributes']['version']}")
+        if not d["attributes"]["isInternalGroup"] or not ready: continue
+        get(f"/v1/betaGroups/{d['id']}/relationships/builds", "POST", {"data": [{"type": "builds", "id": ready[0]["id"]}]})
+        print(f"{d['attributes']['name']}: dodany build {ready[0]['attributes']['version']}")
     print("== PO ZMIANIE ==")
     for d in get(f"/v1/apps/{APP_ID}/betaGroups?limit=50")["data"]:
         bl = get(f"/v1/betaGroups/{d['id']}/builds?limit=10")
-        print(d["attributes"]["name"], "auto_dystrybucja=", d["attributes"].get("hasAccessToAllBuilds"),
-              "buildy:", [x["attributes"]["version"] for x in bl["data"]])
+        print(d["attributes"]["name"], "buildy:", [x["attributes"]["version"] for x in bl["data"]])

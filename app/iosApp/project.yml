@@ -21,6 +21,9 @@ targets:
   Eskulapp:
     type: application
     platform: iOS
+    scheme:
+      testTargets:
+        - EskulappUITests
     sources:
       - path: Sources
     settings:
@@ -40,3 +43,18 @@ targets:
       - framework: ../shared/build/XCFrameworks/release/Shared.xcframework
         embed: false
         link: true
+
+  # Testy UI tylko do zrzutow ekranu do sklepu (CI: screenshots.yml), nie wchodza do archiwum.
+  EskulappUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.eskulapp.mobile.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
+        TEST_TARGET_NAME: Eskulapp
+        CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - target: Eskulapp
