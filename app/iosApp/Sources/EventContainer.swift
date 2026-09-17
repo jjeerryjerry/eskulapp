@@ -195,8 +195,11 @@ struct EventHomeView: View {
             }
             HStack(spacing: 12) {
                 tile("bag.fill", "Partnerzy", "Stoiska") { tab = 2 }
+                // Bez mapki: w miejscu kafla Mapa zostaje puste miejsce (Partnerzy bez zmian)
                 if mapOn {
                     tile("mappin.and.ellipse", "Mapa", "Plan przestrzeni") { tab = 3 }
+                } else {
+                    Color.clear.frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
         }

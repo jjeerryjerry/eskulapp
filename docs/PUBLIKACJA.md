@@ -1,6 +1,6 @@
 # Eskulapp, publikacja w sklepach (Google Play + App Store)
 
-_Stan: 2026-09-17. Wersja do wydania: Android 1.2.0 (versionCode 19), iOS 1.2.0._
+_Stan: 2026-09-17. Wersja do wydania: Android 1.2.0 (versionCode 20), iOS 1.2.0._
 
 Kody testowe (także dla recenzentów Google i Apple):
 
@@ -112,7 +112,7 @@ Login wymagany: **NIE** (odznaczyć „Sign-in required").
 - [ ] iOS: zainstalować najnowszy build z TestFlight (1.2.0 build 13 lub nowszy; CI sam przypisuje nowe buildy do grupy „Jerry").
 - [ ] Na obu: ekran startowy bez przykładu FND2027, pole pokazuje „Kod wydarzenia".
 - [ ] Dodać **TEST01**: kafle Agenda/Prelegenci/Partnerzy/Mapa, dolne menu z Mapą.
-- [ ] Dodać **TEST03**: brak kafla Mapa, brak zakładki Mapa w dolnym menu, brak pinezki przy partnerze i „Zobacz na mapie".
+- [ ] Dodać **TEST03**: w miejscu kafla Mapa puste miejsce (Partnerzy na pół szerokości), brak zakładki Mapa w dolnym menu, brak pinezki przy partnerze i „Zobacz na mapie".
 - [ ] Dodać **TEST02**: status NADCHODZĄCE, dzwonek na liście, przypomnienie prelekcji.
 - [ ] Tryb samolotowy: wydarzenia dalej się otwierają (offline).
 - [ ] iOS: polskie znaki w etykietach (Więcej, Aktualności, Dołącz...).
