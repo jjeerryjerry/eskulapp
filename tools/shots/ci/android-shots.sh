@@ -74,7 +74,10 @@ tap_match "^Wydarzenie$"; tap_match "^Prelegenci$" 0; shot prelegenci
 tap_match "^Partnerzy$" -1 || true; shot partnerzy
 tap_match "^Mapa$" -1; sleep 1; shot mapa
 tap_match "^Wydarzenie$"; tap_match "Aktualności" 0; shot aktualnosci
-adb shell input keyevent 4; sleep 2
-adb shell input keyevent 4; sleep 3
+# Wstecz az do listy wydarzen (stos sekcji pamieta odwiedzone zakladki)
+for _ in 1 2 3 4 5 6 7 8; do
+  dump | grep -q 'text="Dodaj wydarzenie kodem"' && break
+  adb shell input keyevent 4; sleep 2
+done
 shot moje-wydarzenia
 ls -la "$OUT"

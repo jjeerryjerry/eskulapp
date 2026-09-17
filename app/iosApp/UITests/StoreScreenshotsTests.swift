@@ -43,12 +43,10 @@ final class StoreScreenshotsTests: XCTestCase {
     func addCode(_ code: String, shotEntry: Bool = false) {
         let field = app.textFields.firstMatch
         tap(field)
-        field.typeText(code)
-        if shotEntry {
-            // klawiatura zaslania pol ekranu: schowaj przed zrzutem
-            app.staticTexts["Dołącz do wydarzenia"].tap(); sleep(1)
-            shot("wejscie-kodem")
-        }
+        // "\n" = Return konczy edycje i chowa klawiature (zaslania pol ekranu)
+        field.typeText(code + "\n")
+        sleep(1)
+        if shotEntry { shot("wejscie-kodem") }
         tap(btn("Pobierz wydarzenie"))
         sleep(5)
     }

@@ -84,11 +84,30 @@ struct Seal: View {
     var body: some View {
         ZStack {
             Circle().fill(C.petrol)
-            Image(systemName: "staff.of.asclepius")
-                .font(.system(size: size * 0.55, weight: .bold))
-                .foregroundColor(.white)
+            BrandMark().frame(width: size * 0.42, height: size * 0.504)
         }
         .frame(width: size, height: size)
+    }
+}
+
+// Znak marki (biala laska + coralowy waz w ksztalcie E), geometria 1:1 z logo (viewBox 40x48).
+struct BrandMark: View {
+    var body: some View {
+        GeometryReader { g in
+            let k = min(g.size.width / 40, g.size.height / 48)
+            let p = { (x: CGFloat, y: CGFloat) in CGPoint(x: x * k, y: y * k) }
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 3 * k).fill(Color.white)
+                    .frame(width: 6 * k, height: 34 * k).offset(x: 9 * k, y: 7 * k)
+                Path { path in
+                    path.move(to: p(31, 9)); path.addLine(to: p(18, 9))
+                    path.addLine(to: p(18, 39)); path.addLine(to: p(31, 39))
+                    path.move(to: p(18, 24)); path.addLine(to: p(28, 24))
+                }
+                .stroke(C.coral, style: StrokeStyle(lineWidth: 6 * k, lineCap: .round, lineJoin: .round))
+                Circle().fill(C.coral).frame(width: 6.4 * k, height: 6.4 * k).offset(x: (31 - 3.2) * k, y: (9 - 3.2) * k)
+            }
+        }
     }
 }
 
