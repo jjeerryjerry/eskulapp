@@ -4,12 +4,12 @@ _Stan: 2026-09-17. Wersja do wydania: Android 1.2.0 (versionCode 20), iOS 1.2.0.
 
 Kody testowe (także dla recenzentów Google i Apple):
 
-| Kod | Wydarzenie | Status w apce | Mapa |
-|---|---|---|---|
-| **TEST01** | Forum Nefrologii Dziecięcej 2027 (dane demo) | archiwalny (daty 20-21.08.2026) | włączona |
-| **TEST02** | Kongres Diabetologii Klinicznej 2026 | nadchodzące (20-21.10.2026) | włączona |
-| **TEST03** | Sympozjum Kardiologiczne 2026 | archiwalny | **wyłączona** (test ukrywania Mapy) |
-| FND2025 | 7. Forum Nowoczesnej Diabetologii (realny program) | archiwalny | włączona |
+| Kod | Wydarzenie | Status w apce | Mapa | Oceny prelekcji |
+|---|---|---|---|---|
+| **TEST01** | Forum Nefrologii Dziecięcej 2027 (dane demo) | archiwalny (daty 20-21.08.2026) | włączona | okno standardowe (zamknięte) |
+| **TEST02** | Kongres Diabetologii Klinicznej 2026 | nadchodzące (20-21.10.2026) | włączona | **bez limitu czasu** (demo dla klientów) |
+| **TEST03** | Sympozjum Kardiologiczne 2026 | archiwalny | **wyłączona** (test ukrywania Mapy) | okno standardowe (zamknięte) |
+| FND2025 | 7. Forum Nowoczesnej Diabetologii (realny program) | archiwalny | włączona | okno standardowe (zamknięte) |
 
 Stare kody FND2027, DIAB26, KARD26 już nie działają (usunięte z bazy i z CDN).
 

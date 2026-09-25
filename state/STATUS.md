@@ -717,3 +717,17 @@ Po merge PR #1 (oceny) do main. Wersja **1.3.0** (Android versionCode 21, iOS MA
   ma na sztywno `--offline`.
 - **Uwaga prywatność**: polityka prywatności twierdzi, że nic nie wraca na serwer; oceny wysyłają ocenę + losowy install_id.
   Przed publicznym wydaniem z ocenami: poprawić politykę, Data safety (Play) i App Privacy (Apple).
+
+## BACKEND OCEN WDROŻONY + TEST02 OCENY BEZ LIMITU (2026-09-25)
+Na polecenie Jarka (demo ocen dla klientów).
+- Backup przed: `~/domains/eskulapp.pl/esk_backup/eskulapp-przed-ocenami-2026-09-25.sql` (tabele Eskulapp, bez wp_*),
+  `.env` aplikacji: `esk_backup/app-env-2026-09-25.bak`.
+- `RATING_SALT` dopisany do `_app/.env` na serwerze. Migracja `2026_09_ratings.sql` wykonana (talk_ratings, rating_rate_hits,
+  kolumny ocen w events, wszystkie eventy ratings_enabled=1, okno 10/30). `deploy-web.sh` (przed deployem sprawdzone: serwer = repo sprzed merge'a).
+- **TEST02**: `ratings_open_after_start_min=-1000000`, `ratings_close_after_end_min=1000000` (ok. 1,9 roku w obie strony =
+  praktycznie bez limitu). Ustawione SQL-em, bo CMS ma min=0: **zapis TEST02 w CMS nie przejdzie walidacji** (wartość ujemna);
+  żeby wrócić do normy: UPDATE na 10/30 albo poprawka walidacji.
+- Mapa: TEST01 map_enabled=1, TEST03 map_enabled=0 (bez zmian, potwierdzone).
+- `bake-bundle.sh --all`: FND2025, TEST01, TEST02, TEST03 na CDN (OK=4). TEST02 bundel 0d3bafe76629.
+- Test e2e: POST oceny do TEST02 = 200, `ratings/mine` zwraca głos; TEST01 = 409 window_closed. Testowy głos usunięty (0 ocen w DB).
+- Apki 1.3.0 w testach sklepowych obsługują to bez nowego buildu (okno liczone z minut w bundlu).
