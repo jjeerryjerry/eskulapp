@@ -27,6 +27,10 @@
 | venue_name, city | VARCHAR | |
 | map_image_url | VARCHAR | mapa (plik z CMS) |
 | map_embed | TEXT NULL | alternatywa |
+| map_enabled | TINYINT | 0 = apka ukrywa Mapę |
+| ratings_enabled | TINYINT DEFAULT 1 | oceny prelekcji włączone (SPEC-OCENY) |
+| ratings_open_after_start_min | INT DEFAULT 10 | okno ocen od `starts_at` + N min |
+| ratings_close_after_end_min | INT DEFAULT 30 | okno ocen do `ends_at` + N min |
 | push_topic | VARCHAR | FCM topic, np. `event_<id>` |
 | status | ENUM(draft,published,archived) | |
 | updated_at | DATETIME | do delta-sync `?since=` |
@@ -82,6 +86,29 @@
 > Powiadomienie może być powiązane z wpisem **news** (opcjonalnie) — publikacja
 > Aktualności może od razu utworzyć zaplanowany/natychmiastowy push.
 
+## NOWE — Oceny prelekcji 1–10 (anonimowe, `docs/SPEC-OCENY.md`)
+
+Migracja: `web/db/migrations/2026_09_ratings.sql` (idempotentna). Bez kont: tożsamość
+głosującego = losowy `install_id` z telefonu, na serwerze tylko hash.
+
+**talk_ratings** — jeden głos na urządzenie na prelekcję (upsert po `uq_talk_voter`)
+| kolumna | typ | uwagi |
+|---|---|---|
+| id | BIGINT PK | |
+| event_id | FK events (CASCADE) | |
+| talk_id | FK talks (CASCADE) | UNIQUE (talk_id, voter_hash) |
+| voter_hash | CHAR(64) | `sha256(install_id + RATING_SALT)`, surowego UUID nie ma |
+| score | TINYINT UNSIGNED | 1..10 (walidacja w PHP) |
+| created_at, updated_at | DATETIME | czas lokalny Europe/Warsaw (zegar serwera) |
+| ip_hash | CHAR(64) NULL | hash IP do analizy nadużyć, nie surowe IP |
+
+**rating_rate_hits** — rate-limit publicznego API ocen (okno przesuwne 10 min, UTC)
+`id, scope ('ip'|'voter'), key_hash CHAR(64), created_at` — stare wpisy (> 1 doba)
+sprząta samo API.
+
+Okno oceniania liczy serwer (`Ratings::window()`), apki tylko dla UI. Wyniki (średnia,
+mediana, rozkład, ranking prelegentów, CSV) widzi wyłącznie panel CMS.
+
 ## Kontakt / formularz WWW
 
 **leads** — zgłoszenia z formularza „dla organizatora” na landingu
@@ -93,5 +120,8 @@
 
 `GET /public/events/{code}/bundle` → jeden JSON: event + days + rooms + talks +
 speakers + partners + map + contacts + **news**, z `updated_at` (delta `?since=`).
+Event w bundlu niesie też `ratings_enabled`, `ratings_open_after_start_min`,
+`ratings_close_after_end_min` (głos idzie na `POST /api/public/events/{code}/talks/{id}/rating`,
+nie na CDN).
 Powiadomienia (**notifications**) NIE idą w bundlu — lecą przez FCM push; ich
 „trwały ślad” w apce to zwykle odpowiadający wpis **news**.

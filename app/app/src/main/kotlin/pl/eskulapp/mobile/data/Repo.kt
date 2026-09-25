@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.withTransaction
 import pl.eskulapp.mobile.data.local.*
 import pl.eskulapp.mobile.data.model.BundleDto
+import pl.eskulapp.mobile.ratings.InstallId
+import pl.eskulapp.mobile.ratings.RatingStatus
+import pl.eskulapp.mobile.ratings.RatingSyncWorker
 
 class Repo(context: Context) {
     private val db = AppDatabase.get(context)
@@ -67,6 +70,9 @@ class Repo(context: Context) {
                     venueName = b.event.venueName, city = b.event.city,
                     mapImageUrl = b.event.mapImageUrl, mapEmbed = b.event.mapEmbed,
                     mapEnabled = b.event.mapEnabled,
+                    ratingsEnabled = b.event.ratingsEnabled,
+                    ratingsOpenMin = b.event.ratingsOpenAfterStartMin,
+                    ratingsCloseMin = b.event.ratingsCloseAfterEndMin,
                     pushTopic = b.event.pushTopic, status = b.event.status,
                     updatedAt = b.event.updatedAt,
                     addedAt = existingAddedAt ?: System.currentTimeMillis(),
@@ -87,6 +93,40 @@ class Repo(context: Context) {
     }
 
     suspend fun deleteEvent(id: Long) = db.dao().deleteEvent(id)
+
+    // ---- Oceny prelekcji (SPEC-OCENY §5): najpierw lokalnie, wysylka przez WorkManager ----
+
+    /** Zapisuje glos lokalnie jako "pending" i zleca wysylke (od razu albo po odzyskaniu sieci). */
+    suspend fun rate(eventId: Long, eventCode: String, talkId: Long, score: Int) {
+        val prev = dao.ratingOnce(talkId)
+        // wersja musi sie zmienic przy kazdej zmianie oceny (setRatingStatus porownuje updatedAt)
+        val version = maxOf(System.currentTimeMillis(), (prev?.updatedAt ?: 0L) + 1)
+        dao.putRating(TalkRatingEntity(talkId, eventId, eventCode.uppercase(), score, RatingStatus.PENDING, null, version))
+        RatingSyncWorker.enqueue(appContext)
+    }
+
+    /** Dosyla zalegle glosy (np. po restarcie apki). */
+    suspend fun syncPendingRatings() {
+        if (dao.pendingRatings().isNotEmpty()) RatingSyncWorker.enqueue(appContext)
+    }
+
+    /**
+     * Odtwarza oceny tego urzadzenia z serwera (GET .../ratings/mine), np. po ponownym
+     * dodaniu eventu. Glosow "pending" nie nadpisujemy: poleca na serwer i tak.
+     */
+    suspend fun restoreMyRatings(eventId: Long, code: String) {
+        val mine = ApiClient.fetchMyRatings(code, InstallId.get(appContext))
+        db.withTransaction {
+            for (m in mine) {
+                val local = dao.ratingOnce(m.talkId)
+                if (local != null && local.status == RatingStatus.PENDING) continue
+                if (local != null && local.status == RatingStatus.SYNCED && local.score == m.score) continue
+                dao.putRating(
+                    TalkRatingEntity(m.talkId, eventId, code.uppercase(), m.score, RatingStatus.SYNCED, null, System.currentTimeMillis())
+                )
+            }
+        }
+    }
 
     companion object {
         @Volatile private var I: Repo? = null

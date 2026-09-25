@@ -17,6 +17,10 @@ struct EventDTO: Codable {
     let mapImageUrl: String?
     let mapEmbed: String?
     let mapEnabled: Bool?
+    // Oceny prelekcji (SPEC-OCENY)
+    let ratingsEnabled: Bool?
+    let ratingsOpenAfterStartMin: Int?
+    let ratingsCloseAfterEndMin: Int?
     let pushTopic: String?
     let status: String?
     let updatedAt: String?
@@ -31,6 +35,9 @@ struct EventDTO: Codable {
         case mapImageUrl = "map_image_url"
         case mapEmbed = "map_embed"
         case mapEnabled = "map_enabled"
+        case ratingsEnabled = "ratings_enabled"
+        case ratingsOpenAfterStartMin = "ratings_open_after_start_min"
+        case ratingsCloseAfterEndMin = "ratings_close_after_end_min"
         case pushTopic = "push_topic"
         case status
         case updatedAt = "updated_at"
@@ -39,6 +46,10 @@ struct EventDTO: Codable {
     var statusOrDefault: String { status ?? "published" }
     // Brak pola (starszy bundel) = mapa wlaczona
     var mapOn: Bool { mapEnabled ?? true }
+    // Brak pol (bundel sprzed modulu ocen) = oceny ukryte
+    var ratingsOn: Bool { ratingsEnabled ?? false }
+    var ratingsOpenMin: Int { ratingsOpenAfterStartMin ?? RatingTime.defaultOpenMin }
+    var ratingsCloseMin: Int { ratingsCloseAfterEndMin ?? RatingTime.defaultCloseMin }
 }
 
 struct Day: Codable, Identifiable {

@@ -34,6 +34,13 @@ final class Events
         $status = in_array($in['status'] ?? '', ['draft','published','archived'], true) ? $in['status'] : 'draft';
         $isClosed = !empty($in['is_closed']) ? 1 : 0;
         $mapEnabled = !empty($in['map_enabled']) ? 1 : 0;
+        // Oceny prelekcji: formularz zawsze wysyla ratings_enabled (hidden 0 + checkbox 1).
+        $ratingsEnabled = !empty($in['ratings_enabled']) ? 1 : 0;
+        $openMin = self::minutes($in['ratings_open_after_start_min'] ?? '', Ratings::DEFAULT_OPEN_MIN);
+        $closeMin = self::minutes($in['ratings_close_after_end_min'] ?? '', Ratings::DEFAULT_CLOSE_MIN);
+        $minErr = 'Podaj liczbę minut od 0 do ' . Ratings::MAX_WINDOW_MIN . '.';
+        if ($openMin === null) $errors['ratings_open_after_start_min'] = $minErr;
+        if ($closeMin === null) $errors['ratings_close_after_end_min'] = $minErr;
         $starts = self::dt($in['starts_at'] ?? '');
         $ends   = self::dt($in['ends_at'] ?? '');
         $city   = trim($in['city'] ?? '') ?: null;
@@ -42,13 +49,19 @@ final class Events
         if ($errors) return [$errors, null];
 
         if ($id) {
-            $st = $pdo->prepare("UPDATE events SET name=?,access_code=?,slug=?,status=?,is_closed=?,map_enabled=?,starts_at=?,ends_at=?,city=?,venue_name=? WHERE id=?");
-            $st->execute([$name,$code,$slug,$status,$isClosed,$mapEnabled,$starts,$ends,$city,$venue,$id]);
+            $st = $pdo->prepare("UPDATE events SET name=?,access_code=?,slug=?,status=?,is_closed=?,map_enabled=?,
+                                 ratings_enabled=?,ratings_open_after_start_min=?,ratings_close_after_end_min=?,
+                                 starts_at=?,ends_at=?,city=?,venue_name=? WHERE id=?");
+            $st->execute([$name,$code,$slug,$status,$isClosed,$mapEnabled,$ratingsEnabled,$openMin,$closeMin,
+                          $starts,$ends,$city,$venue,$id]);
             return [[], $id];
         }
-        $st = $pdo->prepare("INSERT INTO events (name,access_code,slug,status,is_closed,map_enabled,starts_at,ends_at,city,venue_name,push_topic)
-                             VALUES (?,?,?,?,?,?,?,?,?,?,'')");
-        $st->execute([$name,$code,$slug,$status,$isClosed,$mapEnabled,$starts,$ends,$city,$venue]);
+        $st = $pdo->prepare("INSERT INTO events (name,access_code,slug,status,is_closed,map_enabled,
+                               ratings_enabled,ratings_open_after_start_min,ratings_close_after_end_min,
+                               starts_at,ends_at,city,venue_name,push_topic)
+                             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,'')");
+        $st->execute([$name,$code,$slug,$status,$isClosed,$mapEnabled,$ratingsEnabled,$openMin,$closeMin,
+                      $starts,$ends,$city,$venue]);
         $newId = (int)$pdo->lastInsertId();
         $pdo->prepare("UPDATE events SET push_topic=? WHERE id=?")->execute(['event_' . $newId, $newId]);
         return [[], $newId];
@@ -92,6 +105,15 @@ final class Events
         $map = ['ą'=>'a','ć'=>'c','ę'=>'e','ł'=>'l','ń'=>'n','ó'=>'o','ś'=>'s','ż'=>'z','ź'=>'z',
                 'Ą'=>'A','Ć'=>'C','Ę'=>'E','Ł'=>'L','Ń'=>'N','Ó'=>'O','Ś'=>'S','Ż'=>'Z','Ź'=>'Z'];
         return strtr($s, $map);
+    }
+
+    /** Liczba minut 0..MAX_WINDOW_MIN z formularza; puste = domyslna, bledne = null. */
+    private static function minutes(mixed $v, int $default): ?int {
+        if (!is_scalar($v)) return null;
+        $v = trim((string)$v);
+        if ($v === '') return $default;
+        if (!preg_match('/^\d{1,4}$/', $v) || (int)$v > Ratings::MAX_WINDOW_MIN) return null;
+        return (int)$v;
     }
 
     /** datetime-local (YYYY-MM-DDTHH:MM) -> MySQL DATETIME lub null. */

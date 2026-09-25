@@ -18,6 +18,9 @@ interface EskDao {
     @Query("SELECT * FROM events WHERE accessCode = :code LIMIT 1")
     suspend fun eventByCode(code: String): EventEntity?
 
+    @Query("SELECT * FROM events WHERE id = :id LIMIT 1")
+    suspend fun eventOnce(id: Long): EventEntity?
+
     @Query("SELECT COUNT(*) FROM events")
     suspend fun eventCount(): Int
 
@@ -36,6 +39,9 @@ interface EskDao {
 
     @Query("SELECT * FROM talks WHERE id = :id LIMIT 1")
     fun talk(id: Long): Flow<TalkEntity?>
+
+    @Query("SELECT * FROM talks WHERE id = :id LIMIT 1")
+    suspend fun talkOnce(id: Long): TalkEntity?
 
     @Query("SELECT * FROM speakers WHERE eventId = :e ORDER BY sort, lastName")
     fun speakers(e: Long): Flow<List<SpeakerEntity>>
@@ -96,6 +102,23 @@ interface EskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun markNewsRead(x: List<NewsReadEntity>)
+
+    // oceny prelekcji (stan lokalny, przetrwa odswiezenie bundle; SPEC-OCENY §5)
+    @Query("SELECT * FROM talk_ratings WHERE talkId = :talkId LIMIT 1")
+    fun rating(talkId: Long): Flow<TalkRatingEntity?>
+
+    @Query("SELECT * FROM talk_ratings WHERE talkId = :talkId LIMIT 1")
+    suspend fun ratingOnce(talkId: Long): TalkRatingEntity?
+
+    @Query("SELECT * FROM talk_ratings WHERE status = 'pending' ORDER BY updatedAt")
+    suspend fun pendingRatings(): List<TalkRatingEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun putRating(r: TalkRatingEntity)
+
+    /** Zmiana statusu tylko gdy glos nie zmienil sie od wyslania (ta sama wersja). */
+    @Query("UPDATE talk_ratings SET status = :status, error = :error WHERE talkId = :talkId AND updatedAt = :updatedAt")
+    suspend fun setRatingStatus(talkId: Long, updatedAt: Long, status: String, error: String?)
 
     // upserts
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putEvent(e: EventEntity)

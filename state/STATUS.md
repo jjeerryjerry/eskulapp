@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-09-17 (przygotowanie publikacji 1.2.0, kody TEST01-03, przełącznik mapy)_
+_Ostatnia aktualizacja: 2026-09-25 (moduł ocen prelekcji 1-10 na gałęzi feature/oceny, PR do main, NIEWDROŻONY)_
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -682,3 +682,27 @@ Zadanie Todoist „Eskulapp iOS dopracować opis i opublikować i Android przete
 - **iOS logo naprawione**: SF Symbol „staff.of.asclepius" nie istnieje (puste koło), znak rysowany
   w SwiftUI (`BrandMark`, geometria jak logo).
 - Dane partnerów: polskie znaki (seedy + DB, backup `esk_backup/partners-2026-09-17.sql`).
+
+## OCENY PRELEKCJI 1-10 (2026-09-25) , KOD GOTOWY, CZEKA NA WDROŻENIE
+Spec: `docs/SPEC-OCENY.md`. Gałąź `feature/oceny` (sesja chmurowa), PR do `main`.
+**Nic nie wdrożone** (migracja, RATING_SALT, deploy, bake, buildy = §9, lokalnie po akceptacji Jarka).
+- **Web/PHP**: migracja `web/db/migrations/2026_09_ratings.sql` (idempotentna MySQL+MariaDB)
+  + `schema.sql`; `lib/Ratings.php` (okno w Europe/Warsaw jako czysta funkcja, jawna obsługa
+  zmiany czasu, upsert, rate-limit w tabeli `rating_rate_hits`); API `POST .../talks/{id}/rating`
+  i `GET .../ratings/mine` (bez CORS, 503 bez `RATING_SALT`); pola ocen w bundlu.
+- **CMS**: przełącznik + minuty w formularzu eventu; widok `/panel/events/{id}/oceny`
+  (tabela z histogramem, mała próba < 5, sortowanie), ranking prelegentów (średnia ważona),
+  eksport CSV (BOM, `;`, przecinek dziesiętny). Link „Oceny” na liście eventów.
+- **Android**: Room v5 (`MIGRATION_4_5`), `talk_ratings` pending/synced/rejected,
+  `RatingSyncWorker` (WorkManager, sieć + backoff), sekcja „Oceń wykład” w `TalkScreen`,
+  install_id w SharedPreferences (wykluczony z backupu), przypomnienie „Oceń wykład” dla
+  obserwowanych prelekcji.
+- **iOS**: `Ratings.swift` (czysta logika 1:1), `Store.swift` (ratings.json, sync + NWPathMonitor,
+  `mine`), sekcja w `TalkView` (`Agenda.swift`).
+- **Testy**: `php web/tests/ratings_test.php` (28 ok z bazą testową), JVM `RatingLogicTest`
+  (13 ok), iOS `app/iosApp/RatingTests/main.swift` (CI). Nowe workflowy PR bez sekretów:
+  `pr-checks.yml` (PHP na MySQL 8 + Android assembleDebug), `pr-ios.yml` (kompilacja bez podpisu).
+- **Limity**: per urządzenie 30 / 10 min, per IP **600** / 10 min (nie 60: cała sala za NAT
+  Wi-Fi obiektu). Zmiana w `_app/.env`: `RATING_RL_IP_MAX`, `RATING_RL_VOTER_MAX`.
+- **UWAGA**: merge do `main` odpali istniejący `ios.yml` (upload na TestFlight).
+

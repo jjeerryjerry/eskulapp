@@ -6,14 +6,18 @@ declare(strict_types=1);
  * ('/panel' albo '/api') i wola ten plik.
  *
  * /api:    GET  /public/events/{code}/bundle | GET /health | POST /lead
+ *          POST /public/events/{code}/talks/{talkId}/rating      (oceny, SPEC-OCENY §4)
+ *          GET  /public/events/{code}/ratings/mine?install_id=...
  * /panel:  panel ADMINA (event dodaje admin/agent, nie organizator).
  *          GET / , GET /logowanie , POST /logowanie , GET /dashboard , GET /wyloguj
+ *          GET /events/{id}/oceny[.csv]?widok=prelekcje|prelegenci  (wyniki ocen)
  */
 
 require __DIR__ . '/config.php';
 require __DIR__ . '/security.php';
 require __DIR__ . '/lib/Bundle.php';
 require __DIR__ . '/lib/Events.php';
+require __DIR__ . '/lib/Ratings.php';
 
 if (!defined('BASE')) define('BASE', '');
 define('ASSET_BASE', BASE . '/assets');
@@ -30,12 +34,46 @@ function view(string $name, array $data = []): void {
     extract($data, EXTR_SKIP);
     require APP_DIR . '/views/' . $name . '.php';
 }
-function json_out($data, int $status = 200): void {
+function json_out($data, int $status = 200, bool $cors = true): void {
     security_headers(false);
     http_response_code($status);
     header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: *');
+    if ($cors) header('Access-Control-Allow-Origin: *');
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+/**
+ * Wspolna obsluga API ocen: bez CORS (klient to apka natywna), bez cache,
+ * wymagane DB i RATING_SALT (bez soli nie hashujemy install_id, fail closed).
+ * $fn(PDO, salt) zwraca [status HTTP, cialo].
+ */
+function ratings_api(callable $fn): void {
+    header('Cache-Control: no-store');
+    $pdo = db();
+    $salt = (string)env('RATING_SALT', '');
+    if ($pdo === null || strlen($salt) < 16) {
+        error_log('Eskulapp ratings: brak DB albo RATING_SALT (min. 16 znakow) w _app/.env');
+        json_out(['error' => 'unavailable'], 503, false);
+    }
+    try {
+        [$status, $body] = $fn($pdo, $salt);
+    } catch (Throwable $e) {
+        error_log('Eskulapp ratings: ' . $e->getMessage());
+        json_out(['error' => 'server_error'], 500, false);
+    }
+    if ($status === 429) header('Retry-After: 60');
+    json_out($body, $status, false);
+}
+/** CSV dla Excela PL: UTF-8 z BOM, separator ';', CRLF. */
+function csv_out(string $filename, array $rows): void {
+    security_headers(false);
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: no-store');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");
+    foreach ($rows as $r) fputcsv($out, $r, ';', '"', '', "\r\n");
+    fclose($out);
     exit;
 }
 function e(?string $s): string { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
@@ -46,6 +84,17 @@ if (BASE === '/api') {
         $b = Bundle::forCode($m[1]);
         if ($b === null) json_out(['error' => 'not_found', 'code' => strtoupper($m[1])], 404);
         json_out($b);
+    }
+    // Oceny prelekcji (SPEC-OCENY §4). Zapis idzie tu, nie na CDN.
+    if (preg_match('#^/public/events/([A-Za-z0-9_-]{1,32})/talks/(\d{1,18})/rating$#', $path, $m)) {
+        if ($method !== 'POST') { header('Allow: POST'); json_out(['error' => 'method_not_allowed'], 405, false); }
+        ratings_api(fn(PDO $pdo, string $salt) => Ratings::submit(
+            $pdo, $m[1], (int)$m[2], Ratings::readJsonBody(), client_ip(), $salt, Ratings::now()));
+    }
+    if (preg_match('#^/public/events/([A-Za-z0-9_-]{1,32})/ratings/mine$#', $path, $m)) {
+        if ($method !== 'GET') { header('Allow: GET'); json_out(['error' => 'method_not_allowed'], 405, false); }
+        ratings_api(fn(PDO $pdo, string $salt) => Ratings::mine(
+            $pdo, $m[1], $_GET['install_id'] ?? null, client_ip(), $salt, Ratings::now()));
     }
     if ($path === '/health') {
         json_out(['ok' => true, 'service' => 'eskulapp-api', 'db' => db() !== null, 'ts' => gmdate('c')]);
@@ -135,6 +184,25 @@ if ($path === '/events' && $method === 'POST') {
     [$errors, $newId] = Events::save($pdo, $_POST, null);
     if ($errors) { view('event_form', ['isNew' => true, 'ev' => $_POST, 'errors' => $errors, 'csrf' => csrf_token()]); exit; }
     header('Location: ' . BASE . '/dashboard'); exit;
+}
+
+// oceny prelekcji: tabela prelekcji, ranking prelegentow, eksport CSV (tylko odczyt)
+if (preg_match('#^/events/(\d+)/oceny(\.csv)?$#', $path, $m) && $method === 'GET') {
+    $ev = $pdo ? Events::get($pdo, (int)$m[1]) : null;
+    if (!$ev) { http_response_code(404); view('404', []); exit; }
+    $tab = ($_GET['widok'] ?? '') === 'prelegenci' ? 'prelegenci' : 'prelekcje';
+    $sort = in_array($_GET['sort'] ?? '', ['avg', 'votes', 'time'], true) ? $_GET['sort'] : 'avg';
+    $dirIn = $_GET['dir'] ?? '';
+    $dir = in_array($dirIn, ['asc', 'desc'], true) ? $dirIn : ($sort === 'time' ? 'asc' : 'desc');
+    $report = Ratings::report($pdo, (int)$ev['id']);
+    $report['talks'] = Ratings::sortTalks($report['talks'], $sort, $dir);
+    if (!empty($m[2])) {
+        $code = preg_replace('/[^A-Z0-9]/', '', strtoupper((string)$ev['access_code'])) ?: 'EVENT';
+        csv_out("oceny-{$code}-{$tab}.csv",
+            $tab === 'prelegenci' ? Ratings::csvSpeakers($report['speakers']) : Ratings::csvTalks($report['talks']));
+    }
+    view('ratings', ['ev' => $ev, 'report' => $report, 'tab' => $tab, 'sort' => $sort, 'dir' => $dir]);
+    exit;
 }
 
 // edycja / update / delete po id

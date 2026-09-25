@@ -1,0 +1,53 @@
+name: PR check iOS (kompilacja bez podpisu)
+
+# Tylko kompilacja na symulator (CODE_SIGNING_ALLOWED=NO) + testy czystej logiki ocen
+# (swiftc, poza projektem Xcode). Bez match/fastlane, bez sekretow, bez TestFlight
+# (to robi ios.yml po pushu na main).
+on:
+  pull_request:
+    paths:
+      - 'app/iosApp/**'
+      - 'app/shared/**'
+      - '.github/workflows/pr-ios.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Testy logiki ocen (SPEC-OCENY §7)
+        run: |
+          swiftc app/iosApp/Sources/Ratings.swift app/iosApp/RatingTests/main.swift -o "$RUNNER_TEMP/ratingcheck"
+          "$RUNNER_TEMP/ratingcheck"
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+
+      - name: Framework Shared (wymagany przez projekt)
+        working-directory: app
+        run: ./gradlew :shared:assembleSharedReleaseXCFramework --no-daemon
+
+      - name: XcodeGen
+        working-directory: app/iosApp
+        run: brew install xcodegen && xcodegen generate
+
+      - name: Kompilacja (symulator, bez podpisu)
+        working-directory: app/iosApp
+        run: |
+          set -o pipefail
+          xcodebuild build -project Eskulapp.xcodeproj -scheme Eskulapp \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="" \
+            | tee "$RUNNER_TEMP/xcodebuild.log" | grep -E "error:|warning: .*(Rating|Store|Agenda|Models)|BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/xcodebuild.log"

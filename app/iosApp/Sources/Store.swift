@@ -1,4 +1,5 @@
 import Foundation
+import Network
 import UserNotifications
 
 enum APIError: Error, LocalizedError {
@@ -31,21 +32,38 @@ final class AppStore: ObservableObject {
     @Published private(set) var notifyIds: Set<Int64> = []
     @Published private(set) var reminderIds: Set<Int64> = []
     @Published private(set) var readNewsIds: Set<Int64> = []
+    /// Glosy tego urzadzenia (oceny prelekcji), klucz = talkId. Trwale w ratings.json.
+    @Published private(set) var ratings: [Int64: LocalRating] = [:]
 
     private let fileURL: URL = {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         return dir.appendingPathComponent("events.json")
     }()
+    private let ratingsURL: URL = {
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return dir.appendingPathComponent("ratings.json")
+    }()
+    private let pathMonitor = NWPathMonitor()
+    private var ratingSyncRunning = false
+    private var ratingSyncAgain = false
+    private var ratingRetryScheduled = false
 
     init() {
         load()
         notifyIds = Self.loadIds("notifyIds")
         reminderIds = Self.loadIds("reminderIds")
         readNewsIds = Self.loadIds("readNewsIds")
+        loadRatings()
         top = storedEvents.isEmpty ? .entry : .events
         Task { _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) }
         // Odswiez dane z CDN w tle (manifest -> bundel tylko gdy wersja nowsza).
         if !storedEvents.isEmpty { Task { await refreshAll() } }
+        // Zalegle glosy (oddane offline) wysylamy, gdy tylko jest siec (tez od razu po starcie).
+        pathMonitor.pathUpdateHandler = { [weak self] path in
+            guard path.status == .satisfied else { return }
+            Task { @MainActor in await self?.syncPendingRatings() }
+        }
+        pathMonitor.start(queue: DispatchQueue(label: "pl.eskulapp.net"))
     }
 
     // MARK: dostep
@@ -152,6 +170,11 @@ final class AppStore: ObservableObject {
     func addEvent(_ code: String) async throws -> Int64 {
         let bundle = try await fetchSmart(code)
         upsert(bundle)
+        // W tle: odtworz oceny tego urzadzenia (np. event usuniety i dodany ponownie).
+        if bundle.event.ratingsOn {
+            let ev = bundle.event
+            Task { await restoreMyRatings(eventId: ev.id, code: ev.accessCode) }
+        }
         return bundle.event.id
     }
 
@@ -217,9 +240,11 @@ final class AppStore: ObservableObject {
         if on {
             reminderIds.insert(talkId)
             scheduleReminder(talkId: talkId, title: title, subtitle: subtitle, startsAt: startsAt)
+            scheduleRateReminder(talkId: talkId, title: title)
         } else {
             reminderIds.remove(talkId)
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["talk_\(talkId)"])
+            UNUserNotificationCenter.current().removePendingNotificationRequests(
+                withIdentifiers: ["talk_\(talkId)", "rate_\(talkId)"])
         }
         Self.saveIds("reminderIds", reminderIds)
     }
@@ -236,6 +261,144 @@ final class AppStore: ObservableObject {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
         let req = UNNotificationRequest(identifier: "talk_\(talkId)", content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(req)
+    }
+
+    /// Przypomnienie "Oceń wykład" przy otwarciu okna ocen, tylko dla obserwowanych prelekcji.
+    /// Bez nowej zgody: ta sama zgoda na powiadomienia co przypomnienia o prelekcjach.
+    private func scheduleRateReminder(talkId: Int64, title: String) {
+        guard let ev = storedEvents.first(where: { se in se.bundle.talks.contains { $0.id == talkId } }),
+              ev.bundle.event.ratingsOn,
+              let talk = ev.bundle.talks.first(where: { $0.id == talkId }) else { return }
+        let w = RatingTime.window(startsAt: talk.startsAt, endsAt: talk.endsAt,
+                                  openAfterStartMin: ev.bundle.event.ratingsOpenMin,
+                                  closeAfterEndMin: ev.bundle.event.ratingsCloseMin, now: Date())
+        guard w.phase == .notOpen, let opens = w.opensAt else { return }
+        let delay = opens.timeIntervalSinceNow
+        guard delay > 0 else { return }
+        let content = UNMutableNotificationContent()
+        content.title = "Oceń wykład: \(title)"
+        content.body = "Ocenianie jest już otwarte. Wybierz ocenę od 1 do 10."
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "rate_\(talkId)", content: content, trigger: trigger))
+    }
+
+    // MARK: oceny prelekcji (SPEC-OCENY §5): najpierw lokalnie, potem serwer
+
+    /// Anonimowy identyfikator instalacji: losowy UUID v4 w UserDefaults (nie Keychain,
+    /// wiec znika z odinstalowaniem). Serwer zapisuje tylko sha256(install_id + sol).
+    static var installId: String {
+        let key = "ratingInstallId"
+        if let v = UserDefaults.standard.string(forKey: key) { return v }
+        let v = UUID().uuidString.lowercased()
+        UserDefaults.standard.set(v, forKey: key)
+        return v
+    }
+
+    /// Ocena 1..10: zapis lokalny jako "pending" i wysylka od razu (albo gdy wroci siec).
+    func rate(eventId: Int64, talkId: Int64, score: Int) {
+        guard (1...10).contains(score), let ev = event(eventId) else { return }
+        let version = max(Date().timeIntervalSince1970, (ratings[talkId]?.updatedAt ?? 0) + 0.001)
+        ratings[talkId] = LocalRating(talkId: talkId, eventId: eventId,
+                                      eventCode: ev.bundle.event.accessCode.uppercased(), score: score,
+                                      status: RatingStatus.pending, error: nil, updatedAt: version)
+        saveRatings()
+        Task { await syncPendingRatings() }
+    }
+
+    /// Wysyla wszystkie glosy "pending". 409 po zamknieciu okna = "rejected" (UI pokazuje
+    /// "Nie udało się zapisać, okno oceniania zamknięte."); siec/429/5xx = zostaje "pending".
+    func syncPendingRatings() async {
+        if ratingSyncRunning { ratingSyncAgain = true; return }
+        ratingSyncRunning = true
+        defer { ratingSyncRunning = false }
+        var anyRetry = false
+        repeat {
+            ratingSyncAgain = false
+            let pending = ratings.values.filter { $0.status == RatingStatus.pending }.sorted { $0.updatedAt < $1.updatedAt }
+            for r in pending {
+                let res = await postRating(r)
+                // glos zmieniony w trakcie wysylki: nowa wersja zostaje "pending" (kolejny obieg)
+                guard var cur = ratings[r.talkId], cur.updatedAt == r.updatedAt else { continue }
+                switch res {
+                case .saved:
+                    cur.status = RatingStatus.synced
+                    cur.error = nil
+                case .rejected(let err):
+                    cur.status = RatingStatus.rejected
+                    cur.error = err
+                case .retry:
+                    anyRetry = true
+                    continue
+                }
+                ratings[r.talkId] = cur
+                saveRatings()
+            }
+        } while ratingSyncAgain
+        if anyRetry { scheduleRatingRetry() }
+    }
+
+    /// Ponowienie po chwilowym bledzie przy dzialajacej sieci (np. 429, 5xx).
+    private func scheduleRatingRetry() {
+        guard !ratingRetryScheduled else { return }
+        ratingRetryScheduled = true
+        Task {
+            try? await Task.sleep(nanoseconds: 60_000_000_000)
+            ratingRetryScheduled = false
+            await syncPendingRatings()
+        }
+    }
+
+    private func postRating(_ r: LocalRating) async -> RatingResult {
+        let code = r.eventCode.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? r.eventCode
+        guard let url = URL(string: "\(Self.apiBase)/public/events/\(code)/talks/\(r.talkId)/rating") else {
+            return .retry
+        }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        req.setValue("application/json", forHTTPHeaderField: "Accept")
+        req.timeoutInterval = 15
+        let payload: [String: Any] = ["install_id": Self.installId, "score": r.score]
+        req.httpBody = try? JSONSerialization.data(withJSONObject: payload)
+        do {
+            let (data, resp) = try await URLSession.shared.data(for: req)
+            return ratingResult(httpCode: (resp as? HTTPURLResponse)?.statusCode ?? 0, body: data, score: r.score)
+        } catch {
+            return .retry
+        }
+    }
+
+    /// GET .../ratings/mine: odtworzenie ocen tego urzadzenia. Glosow "pending" nie nadpisujemy.
+    private func restoreMyRatings(eventId: Int64, code: String) async {
+        let c = code.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? code
+        let id = Self.installId.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        guard let data = try? await httpGet("\(Self.apiBase)/public/events/\(c)/ratings/mine?install_id=\(id)"),
+              let mine = try? JSONDecoder().decode([MyRatingDTO].self, from: data) else { return }
+        var changed = false
+        for m in mine {
+            if let local = ratings[m.talkId] {
+                if local.status == RatingStatus.pending { continue }
+                if local.status == RatingStatus.synced && local.score == m.score { continue }
+            }
+            ratings[m.talkId] = LocalRating(talkId: m.talkId, eventId: eventId, eventCode: code.uppercased(),
+                                            score: m.score, status: RatingStatus.synced, error: nil,
+                                            updatedAt: Date().timeIntervalSince1970)
+            changed = true
+        }
+        if changed { saveRatings() }
+    }
+
+    private func loadRatings() {
+        guard let data = try? Data(contentsOf: ratingsURL),
+              let list = try? JSONDecoder().decode([LocalRating].self, from: data) else { return }
+        ratings = Dictionary(list.map { ($0.talkId, $0) }, uniquingKeysWith: { a, b in a.updatedAt >= b.updatedAt ? a : b })
+    }
+
+    private func saveRatings() {
+        if let data = try? JSONEncoder().encode(Array(ratings.values)) {
+            try? data.write(to: ratingsURL, options: .atomic)
+        }
     }
 
     // MARK: trwalosc

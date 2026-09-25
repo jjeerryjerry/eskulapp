@@ -12,9 +12,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         EventEntity::class, DayEntity::class, RoomEntity::class, TalkEntity::class,
         SpeakerEntity::class, TalkSpeakerEntity::class, PartnerEntity::class,
         ContactEntity::class, NewsEntity::class, ReminderEntity::class,
-        EventNotifyEntity::class, NewsReadEntity::class,
+        EventNotifyEntity::class, NewsReadEntity::class, TalkRatingEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -48,6 +48,21 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // v4 -> v5: oceny prelekcji (SPEC-OCENY): ustawienia ocen per event + lokalne glosy.
+        // Istniejace eventy dostaja ratingsEnabled=0 do najblizszego odswiezenia bundla.
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `events` ADD COLUMN `ratingsEnabled` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `events` ADD COLUMN `ratingsOpenMin` INTEGER NOT NULL DEFAULT 10")
+                db.execSQL("ALTER TABLE `events` ADD COLUMN `ratingsCloseMin` INTEGER NOT NULL DEFAULT 30")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `talk_ratings` (`talkId` INTEGER NOT NULL, " +
+                        "`eventId` INTEGER NOT NULL, `eventCode` TEXT NOT NULL, `score` INTEGER NOT NULL, " +
+                        "`status` TEXT NOT NULL, `error` TEXT, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`talkId`))"
+                )
+            }
+        }
+
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -56,7 +71,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     // PRAWDZIWE migracje: aktualizacja apki NIE kasuje lokalnych danych
                     // (dodane eventy, dzwonki/powiadomienia, przeczytane aktualnosci).
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build().also { INSTANCE = it }
             }
     }

@@ -63,6 +63,7 @@ android {
         buildConfig = true
     }
     sourceSets["main"].java.srcDir("src/main/kotlin")
+    sourceSets["test"].java.srcDir("src/test/kotlin")
 }
 
 dependencies {
@@ -80,4 +81,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime.ktx)
     debugImplementation(libs.compose.ui.tooling)
+    // testy JVM logiki ocen (okno czasu, stany sekcji): ./gradlew :app:testDebugUnitTest
+    testImplementation(libs.junit)
 }
