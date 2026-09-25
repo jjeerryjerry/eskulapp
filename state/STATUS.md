@@ -706,3 +706,14 @@ Spec: `docs/SPEC-OCENY.md`. Gałąź `feature/oceny` (sesja chmurowa), PR do `ma
   Wi-Fi obiektu). Zmiana w `_app/.env`: `RATING_RL_IP_MAX`, `RATING_RL_VOTER_MAX`.
 - **UWAGA**: merge do `main` odpali istniejący `ios.yml` (upload na TestFlight).
 
+
+## WERSJE TESTOWE 1.3.0 W SKLEPACH (2026-09-25)
+Po merge PR #1 (oceny) do main. Wersja **1.3.0** (Android versionCode 21, iOS MARKETING_VERSION 1.3.0), commit c8fa7dd.
+- **Google Play**: versionCode 21 na **internal** (completed) oraz **alpha / testy zamknięte** (completed, zastąpił vc 17).
+- **iOS 1.3.0**: run ios.yml 36119494257 SUCCESS (build + TestFlight + przypisanie do grupy „Jerry”). Poprzedni run 1.2.0 (36119285543) anulowany.
+- **Backend ocen NIEWDROŻONY** (migracja, RATING_SALT, deploy-web, bake). Bez tego w apkach sekcja ocen jest ukryta
+  (bundle bez `ratings_enabled`). Czeka na akceptację Jarka (SPEC-OCENY §9).
+- Build Androida: cache Gradle był wyczyszczony (brak AGP), `--offline` padał; zbudowane ONLINE (sieć jest). `tools/play/release.sh`
+  ma na sztywno `--offline`.
+- **Uwaga prywatność**: polityka prywatności twierdzi, że nic nie wraca na serwer; oceny wysyłają ocenę + losowy install_id.
+  Przed publicznym wydaniem z ocenami: poprawić politykę, Data safety (Play) i App Privacy (Apple).
