@@ -30,12 +30,15 @@ require APP_DIR . '/views/_head.php';
   <?php else: ?>
     <div class="ev-table" style="margin-top:22px">
       <?php foreach ($events as $ev): ?>
-        <a class="ev-row" href="<?= BASE ?>/events/<?= (int)$ev['id'] ?>">
-          <div class="ev-name"><?= e($ev['name']) ?><span class="ev-meta"><?= e($ev['city'] ?? 'miasto do ustalenia') ?> · <?= e($ev['starts_at'] ?? 'termin do ustalenia') ?></span></div>
-          <span class="ev-code"><?= e($ev['access_code']) ?></span>
-          <span class="ev-status ev-<?= e($ev['status']) ?>"><?= e($ev['status']) ?></span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C7D0D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </a>
+        <div class="ev-row ev-row-split">
+          <a class="ev-main" href="<?= BASE ?>/events/<?= (int)$ev['id'] ?>">
+            <div class="ev-name"><?= e($ev['name']) ?><span class="ev-meta"><?= e($ev['city'] ?? 'miasto do ustalenia') ?> · <?= e($ev['starts_at'] ?? 'termin do ustalenia') ?></span></div>
+            <span class="ev-code"><?= e($ev['access_code']) ?></span>
+            <span class="ev-status ev-<?= e($ev['status']) ?>"><?= e($ev['status']) ?></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C7D0D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </a>
+          <a class="ev-rate" href="<?= BASE ?>/events/<?= (int)$ev['id'] ?>/oceny">Oceny</a>
+        </div>
       <?php endforeach; ?>
     </div>
   <?php endif; ?>

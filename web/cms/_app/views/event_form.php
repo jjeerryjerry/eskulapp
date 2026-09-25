@@ -7,12 +7,17 @@ $isNew = $isNew ?? true;
 $val = fn(string $k, $d = '') => e((string)($ev[$k] ?? $d));
 $dtval = function (?string $v) { if (!$v) return ''; return e(substr(str_replace(' ', 'T', $v), 0, 16)); };
 $title = $isNew ? 'Nowy event' : 'Edycja eventu';
+// Oceny: brak klucza (nowy event) = wlaczone; z bazy 0/1, po bledzie z POST '0'/'1'.
+$ratingsOn = !array_key_exists('ratings_enabled', $ev) || !empty($ev['ratings_enabled']);
 require APP_DIR . '/views/_head.php';
 ?>
 <div class="panel-top"><div class="wrap">
   <?php require APP_DIR . '/views/_logo.php'; ?>
   <strong style="font-family:Sora,sans-serif;font-size:18px">Eskulapp · Panel</strong>
-  <a class="btn btn-ghost" style="margin-left:auto;padding:8px 16px" href="<?= BASE ?>/dashboard">Wróć</a>
+  <?php if (!$isNew): ?>
+    <a class="btn btn-coral" style="margin-left:auto;padding:8px 16px" href="<?= BASE ?>/events/<?= (int)$ev['id'] ?>/oceny">Oceny prelekcji</a>
+  <?php endif; ?>
+  <a class="btn btn-ghost" style="<?= $isNew ? 'margin-left:auto;' : '' ?>padding:8px 16px" href="<?= BASE ?>/dashboard">Wróć</a>
 </div></div>
 
 <div class="wrap" style="padding:32px 24px;max-width:720px">
@@ -66,6 +71,29 @@ require APP_DIR . '/views/_head.php';
         <input type="checkbox" name="map_enabled" value="1" <?= !isset($ev['map_enabled'])||$ev['map_enabled']?'checked':'' ?> style="width:auto">
         Mapa w aplikacji (odznacz, gdy event nie ma mapki: przycisk Mapa zniknie z menu)
       </label>
+    </div>
+
+    <div class="field" style="margin-top:6px">
+      <input type="hidden" name="ratings_enabled" value="0">
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+        <input type="checkbox" name="ratings_enabled" value="1" <?= $ratingsOn ? 'checked' : '' ?> style="width:auto">
+        Oceny prelekcji (uczestnicy oceniają wykłady w skali od 1 do 10, anonimowo; wyniki widzi tylko panel)
+      </label>
+    </div>
+
+    <div class="ev-2col">
+      <div class="field">
+        <label>Ocenianie od (minut po starcie prelekcji)</label>
+        <input type="number" name="ratings_open_after_start_min" min="0" max="<?= Ratings::MAX_WINDOW_MIN ?>" step="1" required
+               value="<?= $val('ratings_open_after_start_min', Ratings::DEFAULT_OPEN_MIN) ?>">
+        <?php if (isset($errors['ratings_open_after_start_min'])): ?><div class="ferr"><?= e($errors['ratings_open_after_start_min']) ?></div><?php endif; ?>
+      </div>
+      <div class="field">
+        <label>Ocenianie do (minut po końcu prelekcji)</label>
+        <input type="number" name="ratings_close_after_end_min" min="0" max="<?= Ratings::MAX_WINDOW_MIN ?>" step="1" required
+               value="<?= $val('ratings_close_after_end_min', Ratings::DEFAULT_CLOSE_MIN) ?>">
+        <?php if (isset($errors['ratings_close_after_end_min'])): ?><div class="ferr"><?= e($errors['ratings_close_after_end_min']) ?></div><?php endif; ?>
+      </div>
     </div>
 
     <div style="display:flex;gap:12px;align-items:center;margin-top:22px">

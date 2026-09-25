@@ -61,6 +61,14 @@ bake_one() {
   local norm="$TMP/$code.norm.json"
   jq -S 'del(.generated_at, ._demo)' "$raw" > "$norm"
 
+  # 2b) pola ocen prelekcji (SPEC-OCENY): bake nie mapuje pol jawnie, bierze bundel 1:1
+  #     z API. Brak pol = API sprzed wdrozenia ocen (apka wtedy ukrywa oceny), czyli
+  #     zla kolejnosc krokow: najpierw migracja + deploy-web.sh, potem pieczenie.
+  if ! jq -e '.event | has("ratings_enabled") and has("ratings_open_after_start_min") and has("ratings_close_after_end_min")' \
+       "$norm" >/dev/null; then
+    echo "  UWAGA: bundel bez pol ratings_* (API bez modulu ocen?), apka nie pokaze ocen"
+  fi
+
   # 3) wersja = sha256 tresci (12 znakow)
   local version eid updated_at
   version=$(sha256sum "$norm" | cut -c1-12)
