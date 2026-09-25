@@ -178,6 +178,7 @@ struct TalkView: View {
                                 .padding(.vertical, 6)
                             }
                         }
+                        TalkRatingBlock(eventId: eventId, talk: t)
                     }
                     .padding(20).frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -199,5 +200,92 @@ struct TalkView: View {
         }
         .background(C.bg.ignoresSafeArea())
         .navigationBarHidden(true)
+    }
+}
+
+// MARK: oceny prelekcji (SPEC-OCENY §5)
+
+/// Sekcja "Oceń wykład" pod opisem prelekcji. Stan okna przeliczany co 15 s.
+private struct TalkRatingBlock: View {
+    let eventId: Int64
+    let talk: Talk
+    @EnvironmentObject var store: AppStore
+
+    var body: some View {
+        TimelineView(.periodic(from: Date(), by: 15)) { ctx in
+            if let panel = makePanel(now: ctx.date) {
+                RatingSectionView(panel: panel) { score in
+                    store.rate(eventId: eventId, talkId: talk.id, score: score)
+                }
+                .padding(.top, 24)
+            }
+        }
+    }
+
+    private func makePanel(now: Date) -> RatingPanel? {
+        guard let ev = store.event(eventId)?.bundle.event else { return nil }
+        let window = RatingTime.window(startsAt: talk.startsAt, endsAt: talk.endsAt,
+                                       openAfterStartMin: ev.ratingsOpenMin,
+                                       closeAfterEndMin: ev.ratingsCloseMin, now: now)
+        let local = store.ratings[talk.id]
+        return ratingPanel(ratingsEnabled: ev.ratingsOn, window: window, score: local?.score,
+                           status: local?.status, error: local?.error, now: now)
+    }
+}
+
+/// 10 kropli 1..10 (petrol aktywne, coral wybrane), bez srednich.
+struct RatingSectionView: View {
+    let panel: RatingPanel
+    let onRate: (Int) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Oceń wykład").font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
+            Spacer().frame(height: 4)
+            Text(panel.message)
+                .font(.system(size: 13))
+                .foregroundColor(panel.warning ? C.coralDark : C.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer().frame(height: 14)
+            VStack(spacing: 10) {
+                ForEach([Array(1...5), Array(6...10)], id: \.self) { row in
+                    HStack(spacing: 10) {
+                        ForEach(row, id: \.self) { n in
+                            ScoreDrop(n: n, selected: panel.selected == n, enabled: panel.enabled) { onRate(n) }
+                        }
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(C.surface)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(C.line, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+private struct ScoreDrop: View {
+    let n: Int
+    let selected: Bool
+    let enabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        // Kontrast wg marki: na coralu tekst ink; aktywne petrol na jasnym petrolu; nieaktywne wygaszone.
+        let bg: Color = selected ? (enabled ? C.coral : C.coralTint) : (enabled ? C.tint : C.grey)
+        let fg: Color = selected ? C.ink : (enabled ? C.petrol : C.faint)
+        Button(action: action) {
+            Text("\(n)")
+                .font(.system(size: 17, weight: .bold))
+                .foregroundColor(fg)
+                .frame(maxWidth: .infinity)
+                .aspectRatio(1, contentMode: .fit)
+                .background(Circle().fill(bg))
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .accessibilityLabel("Ocena \(n)")
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

@@ -1,0 +1,73 @@
+name: PR checks (web + Android)
+
+# Kontrola PR BEZ podpisu i BEZ publikacji: testy PHP na MySQL 8 (SPEC-OCENY §7),
+# testy JVM i debug APK Androida. Nie uzywa sekretow, niczego nie wysyla (serwer, sklepy).
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'app/app/**'
+      - 'app/gradle/**'
+      - 'app/*.gradle.kts'
+      - 'app/gradle.properties'
+      - '.github/workflows/pr-checks.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: esk_test
+          MYSQL_USER: esk
+          MYSQL_PASSWORD: esk
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'   # jak na cyber-folks
+          extensions: pdo_mysql
+          coverage: none
+      - name: Lint PHP
+        run: find web/cms web/tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Testy ocen (czyste + MySQL 8)
+        env:
+          ESK_TEST_DB_DSN: 'mysql:host=127.0.0.1;port=3306;dbname=esk_test;charset=utf8mb4'
+          ESK_TEST_DB_USER: esk
+          ESK_TEST_DB_PASS: esk
+        run: php web/tests/ratings_test.php
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: local.properties
+        working-directory: app
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      - name: Testy JVM + debug APK (bez keystore.properties = bez podpisu release)
+        working-directory: app
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: android-test-reports
+          path: app/app/build/reports/tests/
+          if-no-files-found: ignore
