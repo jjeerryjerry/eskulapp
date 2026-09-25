@@ -23,8 +23,8 @@ android {
         applicationId = "pl.eskulapp.mobile"
         minSdk = 26
         targetSdk = 36
-        versionCode = 20
-        versionName = "1.2.0"
+        versionCode = 21
+        versionName = "1.3.0"
         buildConfigField("String", "API_BASE", "\"https://eskulapp.pl/api\"")
         // Static bundle na CDN (architektura B), produkcyjny custom domain R2.
         buildConfigField("String", "CDN_BASE", "\"https://cdn.eskulapp.pl\"")
