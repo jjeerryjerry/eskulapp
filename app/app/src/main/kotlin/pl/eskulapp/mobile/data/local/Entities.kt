@@ -17,6 +17,9 @@ data class EventEntity(
     val mapImageUrl: String?,
     val mapEmbed: String?,
     val mapEnabled: Boolean = true,
+    val ratingsEnabled: Boolean = false,
+    val ratingsOpenMin: Int = 10,
+    val ratingsCloseMin: Int = 30,
     val pushTopic: String?,
     val status: String,
     val updatedAt: String?,
@@ -128,4 +131,21 @@ data class EventNotifyEntity(
 data class NewsReadEntity(
     @PrimaryKey val newsId: Long,
     val eventId: Long,
+)
+
+/**
+ * Lokalny glos na prelekcje (offline-first, SPEC-OCENY §5). Jeden na prelekcje.
+ * status: pending | synced | rejected (RatingStatus); error = kod z serwera przy rejected.
+ * updatedAt = lokalna wersja glosu (do bezpiecznej zmiany statusu po wysylce), NIE jest
+ * wysylany: serwer liczy okno wylacznie wedlug wlasnego zegara.
+ */
+@Entity(tableName = "talk_ratings")
+data class TalkRatingEntity(
+    @PrimaryKey val talkId: Long,
+    val eventId: Long,
+    val eventCode: String,
+    val score: Int,
+    val status: String,
+    val error: String?,
+    val updatedAt: Long,
 )

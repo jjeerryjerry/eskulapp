@@ -41,7 +41,21 @@ object Reminders {
         WorkManager.getInstance(ctx).enqueueUniqueWork("reminder_$talkId", ExistingWorkPolicy.REPLACE, req)
     }
 
+    /** Przypomnienie "Oceń wykład" w chwili otwarcia okna ocen (SPEC-OCENY §5, opcja). */
+    fun scheduleRate(ctx: Context, talkId: Long, title: String, triggerAt: Long) {
+        val delay = triggerAt - System.currentTimeMillis()
+        if (delay <= 0) return
+        val req = OneTimeWorkRequestBuilder<ReminderWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf("title" to title, "headline" to "Oceń wykład: $title",
+                "subtitle" to "Ocenianie jest już otwarte. Wybierz ocenę od 1 do 10."))
+            .addTag("reminder")
+            .build()
+        WorkManager.getInstance(ctx).enqueueUniqueWork("rate_$talkId", ExistingWorkPolicy.REPLACE, req)
+    }
+
     fun cancel(ctx: Context, talkId: Long) {
         WorkManager.getInstance(ctx).cancelUniqueWork("reminder_$talkId")
+        WorkManager.getInstance(ctx).cancelUniqueWork("rate_$talkId")
     }
 }

@@ -18,13 +18,15 @@ class ReminderWorker(private val ctx: Context, params: WorkerParameters) : Worke
         Reminders.ensureChannel(ctx)
         val title = inputData.getString("title") ?: "Prelekcja wkrótce"
         val subtitle = inputData.getString("subtitle").orEmpty()
+        // domyslnie przypomnienie o prelekcji; "headline" nadpisuje (np. "Oceń wykład: ...")
+        val headline = inputData.getString("headline") ?: "Za 10 minut: $title"
         val pi = PendingIntent.getActivity(
             ctx, 0, Intent(ctx, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val n = NotificationCompat.Builder(ctx, Reminders.CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_bell)
-            .setContentTitle("Za 10 minut: $title")
+            .setContentTitle(headline)
             .setContentText(subtitle)
             .setAutoCancel(true)
             .setContentIntent(pi)

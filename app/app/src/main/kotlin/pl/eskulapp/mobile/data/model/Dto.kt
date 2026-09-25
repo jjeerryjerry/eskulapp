@@ -30,6 +30,10 @@ data class EventDto(
     @SerialName("map_image_url") val mapImageUrl: String? = null,
     @SerialName("map_embed") val mapEmbed: String? = null,
     @SerialName("map_enabled") val mapEnabled: Boolean = true,
+    // Oceny prelekcji (SPEC-OCENY). Brak pol = bundel sprzed modulu ocen = oceny ukryte.
+    @SerialName("ratings_enabled") val ratingsEnabled: Boolean = false,
+    @SerialName("ratings_open_after_start_min") val ratingsOpenAfterStartMin: Int = 10,
+    @SerialName("ratings_close_after_end_min") val ratingsCloseAfterEndMin: Int = 30,
     @SerialName("push_topic") val pushTopic: String? = null,
     val status: String = "published",
     @SerialName("updated_at") val updatedAt: String? = null,
@@ -103,4 +107,18 @@ data class NewsDto(
     @SerialName("link_ref") val linkRef: String? = null,
     val pinned: Int = 0,
     @SerialName("published_at") val publishedAt: String? = null,
+)
+
+/** POST /api/public/events/{code}/talks/{talkId}/rating */
+@Serializable
+data class RatingRequestDto(
+    @SerialName("install_id") val installId: String,
+    val score: Int,
+)
+
+/** Element GET /api/public/events/{code}/ratings/mine */
+@Serializable
+data class MyRatingDto(
+    @SerialName("talk_id") val talkId: Long,
+    val score: Int,
 )

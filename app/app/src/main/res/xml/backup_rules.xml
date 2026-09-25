@@ -5,4 +5,5 @@
     <exclude domain="database" path="eskulapp.db" />
     <exclude domain="database" path="eskulapp.db-wal" />
     <exclude domain="database" path="eskulapp.db-shm" />
+    <exclude domain="sharedpref" path="eskulapp_install.xml" />
 </full-backup-content>
