@@ -1,12 +1,16 @@
 name: ASC prepare (App Store)
 
 # Wypelnia wersje w App Store Connect (teksty, build, zrzuty, kategorie, ocena wiekowa,
-# dostepnosc, dane dla recenzenta). NIE wysyla do recenzji. apply=false = tylko podglad.
+# dostepnosc, dane dla recenzenta). Do recenzji wysyla tylko z submit=true. apply=false = tylko podglad.
 on:
   workflow_dispatch:
     inputs:
       apply:
         description: "Zapisz zmiany (false = podglad)"
+        type: boolean
+        default: false
+      submit:
+        description: "Po zapisie wyslij wersje do recenzji Apple"
         type: boolean
         default: false
       territories:
@@ -26,4 +30,4 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
           ASC_TERRITORIES: ${{ inputs.territories }}
-        run: python3 tools/asc/prepare.py ${{ inputs.apply && '--apply' || '' }}
+        run: python3 tools/asc/prepare.py ${{ inputs.apply && '--apply' || '' }} ${{ inputs.submit && '--submit' || '' }}

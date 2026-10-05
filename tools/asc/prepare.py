@@ -191,6 +191,21 @@ def main():
                 "attributes": {"uploaded": True, "sourceFileChecksum": hashlib.md5(data).hexdigest()}}})
             print("ZAPIS  zrzut", f.name)
 
+    if "--submit" in sys.argv and APPLY:
+        # Wysylka do recenzji: reviewSubmission + item z wersja + submitted=true
+        open_subs = api(f"/v1/reviewSubmissions?filter[app]={APP_ID}&filter[platform]=IOS"
+                        f"&filter[state]=READY_FOR_REVIEW&limit=5")["data"]
+        sub = open_subs[0] if open_subs else api("/v1/reviewSubmissions", "POST", {"data": {
+            "type": "reviewSubmissions", "attributes": {"platform": "IOS"},
+            "relationships": {"app": {"data": {"type": "apps", "id": APP_ID}}}}})["data"]
+        items = api(f"/v1/reviewSubmissions/{sub['id']}/items")["data"]
+        if not items:
+            api("/v1/reviewSubmissionItems", "POST", {"data": {"type": "reviewSubmissionItems", "relationships": {
+                "reviewSubmission": {"data": {"type": "reviewSubmissions", "id": sub["id"]}},
+                "appStoreVersion": {"data": {"type": "appStoreVersions", "id": vid}}}}})
+        res = api(f"/v1/reviewSubmissions/{sub['id']}", "PATCH", {"data": {"type": "reviewSubmissions",
+                  "id": sub["id"], "attributes": {"submitted": True}}})
+        print("WYSLANE DO RECENZJI, stan:", res["data"]["attributes"].get("state"))
     print("GOTOWE." if APPLY else "Podglad zakonczony, nic nie zmieniono.")
     print("Recznie (Jarek, przegladarka): App Privacy, umowy (Business > Agreements), potem wysylka do recenzji.")
 
