@@ -137,15 +137,16 @@ def main():
 
     # Dostepnosc
     if api(f"/v1/apps/{APP_ID}/appAvailabilityV2", ok404=True) is None:
-        terr = [x["id"] for x in api("/v1/territories?limit=200")["data"]] if TERRITORIES == "ALL" \
-            else TERRITORIES.split(",")
-        write(f"dostepnosc: {TERRITORIES} ({len(terr)} krajow)", "/v2/appAvailabilities", "POST", {
+        every = [x["id"] for x in api("/v1/territories?limit=200")["data"]]
+        on = set(every) if TERRITORIES == "ALL" else set(TERRITORIES.split(","))
+        # Apple wymaga wszystkich krajow w jednym POST, kazdy z flaga available
+        write(f"dostepnosc: {TERRITORIES} ({len(on)} z {len(every)} krajow)", "/v2/appAvailabilities", "POST", {
             "data": {"type": "appAvailabilities", "attributes": {"availableInNewTerritories": TERRITORIES == "ALL"},
                      "relationships": {"app": {"data": {"type": "apps", "id": APP_ID}},
                                        "territoryAvailabilities": {"data": [
-                                           {"type": "territoryAvailabilities", "id": "${%s}" % c} for c in terr]}}},
-            "included": [{"type": "territoryAvailabilities", "id": "${%s}" % c, "attributes": {"available": True},
-                          "relationships": {"territory": {"data": {"type": "territories", "id": c}}}} for c in terr]})
+                                           {"type": "territoryAvailabilities", "id": "${%s}" % c} for c in every]}}},
+            "included": [{"type": "territoryAvailabilities", "id": "${%s}" % c, "attributes": {"available": c in on},
+                          "relationships": {"territory": {"data": {"type": "territories", "id": c}}}} for c in every]})
     else:
         print("dostepnosc: juz ustawiona, pomijam")
 
