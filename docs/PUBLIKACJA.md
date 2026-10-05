@@ -130,25 +130,27 @@ dane z kodów TEST01-03, pasek statusu 9:41. Ponowne zrobienie: `gh workflow run
 - Stare makiety z canvasu przeniesione do `tools/shots/store/_makiety/` (NIE wysyłać do sklepów).
 
 ### C. Google Play Console (Eskulapp, pl.eskulapp.mobile)
-- [ ] Wydanie 1.2.0 na Internal testing (robię automatem: `tools/play/release.sh internal`).
-- [ ] Główna strona sklepu: wkleić teksty z §1, ikona 512, grafika 1024x500, nowe zrzuty.
-- [ ] Zawartość aplikacji > **Dostęp do aplikacji**: „Część funkcji jest ograniczona", instrukcja: kod TEST01 wpisany na ekranie startowym (bez loginu i hasła).
-- [ ] **Bezpieczeństwo danych**: nie zbiera i nie udostępnia danych; szyfrowanie w tranzycie TAK; brak możliwości usunięcia konta (brak kont).
-- [ ] **Aplikacje zdrowotne** (deklaracja): brak funkcji zdrowotnych (przewodnik po wydarzeniu).
-- [ ] Reklamy: NIE • Grupa docelowa: 18+ • Kwestionariusz oceny treści (IARC): brak wrażliwych treści.
-- [ ] Kraje: Polska (min.).
-- [ ] Promocja Internal testing na **Produkcję** (mogę automatem: `tools/play/release.sh production` z rolloutem np. 20%, potem 100%).
+- [x] 1.3.0 (vc 21) na Internal + Alpha (2026-09-25).
+- [x] Karta sklepu: teksty z §1, ikona 512, grafika 1024x500, 8 zrzutów (2026-10-05, `tools/play/listing.py --commit`).
+- [ ] **Bezpieczeństwo danych: DO POPRAWY (oceny od 1.3.0).** Zbierane: „Aktywność w aplikacji: inne treści
+  generowane przez użytkownika” (ocena) oraz „Identyfikatory urządzenia lub inne” (losowy ID instalacji).
+  Nieudostępniane, opcjonalne, cel: funkcje aplikacji (i analityka dla organizatora), szyfrowanie w tranzycie TAK,
+  brak możliwości żądania usunięcia (dane anonimowe, brak kont).
+- [ ] Sprawdzić w Panelu, czy pozostałe deklaracje są zielone (dostęp do aplikacji z kodem TEST01, reklamy NIE,
+  grupa docelowa 18+, IARC, aplikacje zdrowotne: brak), kraje: Polska.
+- [ ] Produkcja: promocja vc 21 z testów (agent przez API, po zgodzie Jarka; rollout np. 20% potem 100%).
 
 ### D. App Store Connect (app id 6810647099)
-- [ ] Umowa **Paid/Free Apps Agreement** aktywna (Business > Agreements), dane podatkowe i bankowe nie są wymagane dla darmowej apki, ale umowa tak.
-- [ ] Informacje o aplikacji: podtytuł, kategoria (Biznes / Edukacja), prawa do treści: „nie zawiera treści stron trzecich" (program wydarzeń dostarcza organizator na zlecenie).
-- [ ] **Ocena wiekowa**: kwestionariusz, wszystko „Brak", wynik 4+.
-- [ ] **Prywatność aplikacji**: „Data Not Collected", URL polityki prywatności.
-- [ ] Ceny i dostępność: Darmowa, Polska (lub wszystkie kraje).
-- [ ] Wersja 1.2.0: teksty z §2, zrzuty 6,9", wybór buildu z TestFlight.
-- [ ] Szyfrowanie eksportowe: tylko standardowe HTTPS (od tego buildu ustawione w Info.plist, pytanie nie powinno się pojawiać).
-- [ ] App Review Information: imię, telefon, e-mail kontaktowy + notatka z §2 (kody TEST01-TEST03), „Sign-in required" odznaczone.
-- [ ] Wysłać do recenzji, wydanie: ręczne po akceptacji (bezpieczniej przy pierwszym wydaniu).
+- [x] Wersja 1.3.0, build 17, copyright, wydanie RĘCZNE po akceptacji (2026-10-05, `asc-prepare.yml`).
+- [x] Opis, słowa kluczowe, promo, URL wsparcia/marketingowy, podtytuł, URL polityki, kategorie Biznes/Edukacja.
+- [x] Ocena wiekowa 4+ (wszystko brak), prawa do treści: bez treści stron trzecich, cena: darmowa, dostępność: Polska.
+- [x] App Review Information (kontakt, notatka z kodami TEST01-03 i oceną na TEST02, bez logowania).
+- [x] 9 zrzutów 6,9".
+- [ ] **App Privacy (tylko przeglądarka, brak API)**: zbierane „Identifiers: Device ID” (losowy ID instalacji) i
+  „User Content: Other User Content” (ocena). Oba: NIE powiązane z tożsamością, NIE śledzenie, cel App Functionality
+  (opcjonalnie Analytics). Potem „Publish”.
+- [ ] Business > Agreements: brak zaległych umów do akceptacji.
+- [ ] Wysyłka do recenzji (agent przez API albo przycisk „Add for Review”), po zgodzie Jarka.
 
 ### E. Po publikacji (agent)
 - [ ] Linki do sklepów na eskulapp.pl (sekcja pobierania apki).

@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-09-25 (moduł ocen prelekcji 1-10 na gałęzi feature/oceny, PR do main, NIEWDROŻONY)_
+_Ostatnia aktualizacja: 2026-10-05 (publikacja 1.3.0: Play i App Store przygotowane, czekają na deklaracje prywatności Jarka)_
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -731,3 +731,15 @@ Na polecenie Jarka (demo ocen dla klientów).
 - `bake-bundle.sh --all`: FND2025, TEST01, TEST02, TEST03 na CDN (OK=4). TEST02 bundel 0d3bafe76629.
 - Test e2e: POST oceny do TEST02 = 200, `ratings/mine` zwraca głos; TEST01 = 409 window_closed. Testowy głos usunięty (0 ocen w DB).
 - Apki 1.3.0 w testach sklepowych obsługują to bez nowego buildu (okno liczone z minut w bundlu).
+
+## PUBLIKACJA 1.3.0 , PRZYGOTOWANE PO STRONIE AGENTA (2026-10-05)
+- **Polityka prywatności** zaktualizowana (sekcja „Anonimowe oceny prelekcji”, CDN, bez długich myślników), live:
+  https://eskulapp.pl/polityka-prywatnosci/ . Backup: `esk_backup/polityka-prywatnosci-2026-10-05.html`,
+  źródło w repo `web/wp-pages/polityka-prywatnosci.html` (WP page ID 3).
+- **Google Play**: karta pl-PL zaktualizowana przez API (`tools/play/listing.py`): nowe opisy z ocenami (stary opis
+  zawierał martwy kod FND2027), 8 prawdziwych zrzutów, ikona, grafika. Produkcja pusta, vc 21 na internal+alpha.
+- **App Store**: rekord wypełniony przez API (`tools/asc/prepare.py`, workflow `asc-prepare.yml`, ubuntu):
+  wersja 1.3.0 + build 17, teksty, podtytuł, polityka, kategorie, 4+, prawa do treści, Polska, review info, 9 zrzutów.
+  Weryfikacja `asc-status.yml` (rozszerzony o stan wersji App Store). NIE wysłane do recenzji.
+- **Czeka na Jarka**: Data safety w Play (oceny), App Privacy w ASC, przejrzenie umów; potem zgoda na produkcję/recenzję.
+  Szczegóły: `docs/PUBLIKACJA.md` §3 C/D.
