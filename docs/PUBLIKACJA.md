@@ -1,6 +1,6 @@
 # Eskulapp, publikacja w sklepach (Google Play + App Store)
 
-_Stan: 2026-09-17. Wersja do wydania: Android 1.2.0 (versionCode 20), iOS 1.2.0._
+_Stan: 2026-10-05. Wersja do wydania: Android 1.3.0 (versionCode 21), iOS 1.3.0 (build 17)._
 
 Kody testowe (także dla recenzentów Google i Apple):
 
@@ -38,6 +38,7 @@ Co znajdziesz w środku
 • Mapa: plan strefy wystawców z zaznaczonymi stoiskami (gdy organizator udostępnia plan).
 • Aktualności: zmiany sal, przesunięcia i ogłoszenia organizatora.
 • Kontakt: telefon i e-mail do biura wydarzenia jednym dotknięciem.
+• Oceny: anonimowa ocena prelekcji w skali od 1 do 10, gdy organizator ją włączy.
 
 Działa offline
 Po pobraniu programu korzystasz z aplikacji bez zasięgu: na sali wykładowej, w hali wystawienniczej, w podziemiach centrum kongresowego.
@@ -46,15 +47,16 @@ Wiele wydarzeń w jednym miejscu
 Dodawaj kolejne wydarzenia kodami. Trwające i nadchodzące są na górze listy, zakończone zostają w archiwum.
 
 Prywatność
-Aplikacja nie wymaga konta, nie wyświetla reklam i nie śledzi użytkownika. Dane wydarzenia są zapisywane lokalnie na Twoim telefonie.
+Aplikacja nie wymaga konta, nie wyświetla reklam i nie śledzi użytkownika. Dane wydarzenia są zapisywane lokalnie na Twoim telefonie, a oceny prelekcji są anonimowe.
 
 Jesteś organizatorem i chcesz mieć swoje wydarzenie w Eskulapp? Napisz: kontakt@eskulapp.pl
 ```
 
-**Co nowego w 1.2.0** (500):
+**Co nowego w 1.3.0** (500):
 ```
+• Nowość: anonimowa ocena prelekcji w skali od 1 do 10.
+• Przypomnienie o ocenie dla obserwowanych prelekcji.
 • Moduł Mapa pojawia się tylko wtedy, gdy organizator udostępnia plan wydarzenia.
-• Szybsze pobieranie programu wydarzenia.
 • Drobne poprawki wyglądu i tekstów.
 ```
 
@@ -100,6 +102,7 @@ TEST02 (upcoming event)
 TEST03 (past event without a venue map)
 
 Steps: open the app, type TEST01, tap "Pobierz wydarzenie". Local notifications are used only for talk reminders the user sets (bell icon in Agenda).
+Talk ratings (1-10, anonymous) can be tested with TEST02: open Agenda, pick any talk, scroll to "Oceń wykład". Ratings are sent with a random per-install ID only (no personal data).
 ```
 Login wymagany: **NIE** (odznaczyć „Sign-in required").
 
