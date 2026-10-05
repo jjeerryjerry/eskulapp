@@ -43,6 +43,36 @@ for d in g["data"]:
     print(f"{a['name']}: internal={a['isInternalGroup']} auto_dystrybucja={a.get('hasAccessToAllBuilds')}"
           f" testerow={len(t['data'])} buildow_w_grupie={len(bl['data'])}")
 
+# Stan rekordu App Store (wersje do wydania), tylko odczyt.
+print("== APP STORE ==")
+for d in get(f"/v1/apps/{APP_ID}/appStoreVersions?limit=5")["data"]:
+    a = d["attributes"]
+    print(f"wersja {a['versionString']} stan={a.get('appStoreState')} wydanie={a.get('releaseType')}")
+    bld = get(f"/v1/appStoreVersions/{d['id']}/build")["data"]
+    print("  build:", bld["attributes"]["version"] if bld else "BRAK")
+    for loc in get(f"/v1/appStoreVersions/{d['id']}/appStoreVersionLocalizations")["data"]:
+        la = loc["attributes"]
+        print(f"  [{la['locale']}] opis={bool(la.get('description'))} slowa={bool(la.get('keywords'))}"
+              f" promo={bool(la.get('promotionalText'))} wsparcie={la.get('supportUrl')}")
+        for ss in get(f"/v1/appStoreVersionLocalizations/{loc['id']}/appScreenshotSets")["data"]:
+            n = len(get(f"/v1/appScreenshotSets/{ss['id']}/appScreenshots")["data"])
+            print(f"    zrzuty {ss['attributes']['screenshotDisplayType']}: {n}")
+    rd = get(f"/v1/appStoreVersions/{d['id']}/appStoreReviewDetail")["data"]
+    print("  review detail:", "jest, demo wymagane=" + str(rd["attributes"].get("demoAccountRequired")) + " notatki=" + str(bool(rd["attributes"].get("notes"))) if rd else "BRAK")
+for ai in get(f"/v1/apps/{APP_ID}/appInfos")["data"]:
+    a = ai["attributes"]
+    print(f"appInfo stan={a.get('appStoreState') or a.get('state')} wiek={a.get('appStoreAgeRating')}")
+    for loc in get(f"/v1/appInfos/{ai['id']}/appInfoLocalizations")["data"]:
+        la = loc["attributes"]
+        print(f"  [{la['locale']}] nazwa={la.get('name')} podtytul={la.get('subtitle')} polityka={la.get('privacyPolicyUrl')}")
+    pc = get(f"/v1/appInfos/{ai['id']}/primaryCategory")["data"]
+    print("  kategoria:", pc["id"] if pc else "BRAK")
+app = get(f"/v1/apps/{APP_ID}")["data"]
+print("app:", {k: app["attributes"].get(k) for k in ("name", "primaryLocale", "contentRightsDeclaration")} if app else "?")
+pr = get(f"/v1/apps/{APP_ID}/appPricePoints?limit=1")
+print("cennik ustawiony:", bool(get(f"/v1/apps/{APP_ID}/appPriceSchedule")["data"]))
+print("dostepnosc:", bool(get(f"/v1/apps/{APP_ID}/appAvailabilityV2")["data"]))
+
 # --fix: najnowszy gotowy build do grup wewnetrznych (API nie pozwala wlaczyc auto dystrybucji).
 # --wait: najpierw czekaj (max 45 min), az najnowszy build skonczy przetwarzanie u Apple.
 if "--fix" in sys.argv:
