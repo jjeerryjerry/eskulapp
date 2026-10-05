@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-10-05 (publikacja 1.3.0: Play i App Store przygotowane, czekają na deklaracje prywatności Jarka)_
+_Ostatnia aktualizacja: 2026-10-05 (publikacja 1.3.0 wysłana: Play produkcja + App Store w recenzji)_
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -743,3 +743,7 @@ Na polecenie Jarka (demo ocen dla klientów).
   Weryfikacja `asc-status.yml` (rozszerzony o stan wersji App Store). NIE wysłane do recenzji.
 - **Czeka na Jarka**: Data safety w Play (oceny), App Privacy w ASC, przejrzenie umów; potem zgoda na produkcję/recenzję.
   Szczegóły: `docs/PUBLIKACJA.md` §3 C/D.
+- **WYSŁANE 2026-10-05**: Jarek uzupełnił Data safety i App Privacy (umowy OK, kraje: tylko Polska).
+  Play: produkcja vc 21 na 100% (pierwsze wydanie nie może być etapowe), w recenzji Google.
+  Apple: cena darmowa dopisana przez API, wersja 1.3.0 WAITING_FOR_REVIEW, wydanie RĘCZNE.
+  Po akceptacji: Jarek „Release This Version” w ASC, agent dodaje linki do sklepów na eskulapp.pl.

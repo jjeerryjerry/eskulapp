@@ -132,13 +132,13 @@ dane z kodów TEST01-03, pasek statusu 9:41. Ponowne zrobienie: `gh workflow run
 ### C. Google Play Console (Eskulapp, pl.eskulapp.mobile)
 - [x] 1.3.0 (vc 21) na Internal + Alpha (2026-09-25).
 - [x] Karta sklepu: teksty z §1, ikona 512, grafika 1024x500, 8 zrzutów (2026-10-05, `tools/play/listing.py --commit`).
-- [ ] **Bezpieczeństwo danych: DO POPRAWY (oceny od 1.3.0).** Zbierane: „Aktywność w aplikacji: inne treści
+- [x] **Bezpieczeństwo danych zaktualizowane przez Jarka 2026-10-05 (oceny od 1.3.0).** Zbierane: „Aktywność w aplikacji: inne treści
   generowane przez użytkownika” (ocena) oraz „Identyfikatory urządzenia lub inne” (losowy ID instalacji).
   Nieudostępniane, opcjonalne, cel: funkcje aplikacji (i analityka dla organizatora), szyfrowanie w tranzycie TAK,
   brak możliwości żądania usunięcia (dane anonimowe, brak kont).
-- [ ] Sprawdzić w Panelu, czy pozostałe deklaracje są zielone (dostęp do aplikacji z kodem TEST01, reklamy NIE,
+- [x] Sprawdzone w Panelu, pozostałe deklaracje zielone (dostęp do aplikacji z kodem TEST01, reklamy NIE,
   grupa docelowa 18+, IARC, aplikacje zdrowotne: brak), kraje: Polska.
-- [ ] Produkcja: promocja vc 21 z testów (agent przez API, po zgodzie Jarka; rollout np. 20% potem 100%).
+- [x] Produkcja: vc 21 wysłany 2026-10-05 (`tools/play/promote.py`), 100% (Google nie pozwala na etapowe pierwsze wydanie). Czeka na recenzję Google.
 
 ### D. App Store Connect (app id 6810647099)
 - [x] Wersja 1.3.0, build 17, copyright, wydanie RĘCZNE po akceptacji (2026-10-05, `asc-prepare.yml`).
@@ -146,11 +146,11 @@ dane z kodów TEST01-03, pasek statusu 9:41. Ponowne zrobienie: `gh workflow run
 - [x] Ocena wiekowa 4+ (wszystko brak), prawa do treści: bez treści stron trzecich, cena: darmowa, dostępność: Polska.
 - [x] App Review Information (kontakt, notatka z kodami TEST01-03 i oceną na TEST02, bez logowania).
 - [x] 9 zrzutów 6,9".
-- [ ] **App Privacy (tylko przeglądarka, brak API)**: zbierane „Identifiers: Device ID” (losowy ID instalacji) i
+- [x] **App Privacy opublikowane przez Jarka 2026-10-05**: zbierane „Identifiers: Device ID” (losowy ID instalacji) i
   „User Content: Other User Content” (ocena). Oba: NIE powiązane z tożsamością, NIE śledzenie, cel App Functionality
   (opcjonalnie Analytics). Potem „Publish”.
-- [ ] Business > Agreements: brak zaległych umów do akceptacji.
-- [ ] Wysyłka do recenzji (agent przez API albo przycisk „Add for Review”), po zgodzie Jarka.
+- [x] Business > Agreements: brak zaległych umów.
+- [x] Cena darmowa ustawiona i wersja wysłana do recenzji 2026-10-05 (WAITING_FOR_REVIEW). Po akceptacji Jarek klika „Release This Version”.
 
 ### E. Po publikacji (agent)
 - [ ] Linki do sklepów na eskulapp.pl (sekcja pobierania apki).
