@@ -121,7 +121,7 @@ def main():
     if ard and ard.get("data"):
         cur = ard["data"]["attributes"]
         skip = {"kidsAgeBand", "ageRatingOverride", "ageRatingOverrideV2", "koreaAgeRatingOverride",
-                "developerAgeRatingInfoUrl"}
+                "developerAgeRatingInfoUrl", "gracRatingClassificationNumber"}
         new = {}
         for k, v in cur.items():
             if k in skip: continue
@@ -195,7 +195,8 @@ def main():
 
 
 BOOL_KEYS = {"gambling", "unrestrictedWebAccess", "lootBox", "advertising", "ageAssurance",
-             "healthOrWellnessTopics", "messagingAndChat", "parentalControls", "userGeneratedContent", "seventeenPlus"}
+             "healthOrWellnessTopics", "messagingAndChat", "parentalControls", "userGeneratedContent", "seventeenPlus",
+             "socialMedia", "socialMediaAgeRestricted"}
 ENUM_KEYS = {"alcoholTobaccoOrDrugUseOrReferences", "contests", "gamblingSimulated", "gunsOrOtherWeapons",
              "horrorOrFearThemes", "matureOrSuggestiveThemes", "medicalOrTreatmentInformation",
              "profanityOrCrudeHumor", "sexualContentGraphicAndNudity", "sexualContentOrNudity",
