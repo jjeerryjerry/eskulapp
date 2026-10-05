@@ -150,6 +150,21 @@ def main():
     else:
         print("dostepnosc: juz ustawiona, pomijam")
 
+    # Cena: darmowa (cennik bazowy USA, cena 0 = Free we wszystkich krajach)
+    if not api(f"/v1/apps/{APP_ID}/appPriceSchedule/manualPrices?limit=1", ok404=True) or \
+            not api(f"/v1/apps/{APP_ID}/appPriceSchedule/manualPrices?limit=1")["data"]:
+        pts = api(f"/v1/apps/{APP_ID}/appPricePoints?filter[territory]=USA&limit=200")["data"]
+        free = next(p for p in pts if float(p["attributes"]["customerPrice"]) == 0)
+        write("cena: darmowa", "/v1/appPriceSchedules", "POST", {
+            "data": {"type": "appPriceSchedules", "relationships": {
+                "app": {"data": {"type": "apps", "id": APP_ID}},
+                "baseTerritory": {"data": {"type": "territories", "id": "USA"}},
+                "manualPrices": {"data": [{"type": "appPrices", "id": "${free}"}]}}},
+            "included": [{"type": "appPrices", "id": "${free}", "attributes": {"startDate": None},
+                          "relationships": {"appPricePoint": {"data": {"type": "appPricePoints", "id": free["id"]}}}}]})
+    else:
+        print("cena: juz ustawiona, pomijam")
+
     # Dane dla recenzenta
     attrs = {**REVIEW_CONTACT, "demoAccountRequired": False, "notes": t["notes"]}
     rd = api(f"/v1/appStoreVersions/{vid}/appStoreReviewDetail", ok404=True)
