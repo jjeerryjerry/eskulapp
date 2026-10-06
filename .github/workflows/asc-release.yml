@@ -1,0 +1,24 @@
+name: ASC release (App Store)
+
+# Wydanie zaakceptowanej wersji (Release This Version). Uruchamiac tylko na polecenie Jarka.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Wersja do wydania"
+        type: string
+        default: "1.3.0"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install "pyjwt[crypto]"
+      - env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_VERSION: ${{ inputs.version }}
+        run: python3 tools/asc/release.py
