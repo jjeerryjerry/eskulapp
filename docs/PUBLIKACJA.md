@@ -150,7 +150,7 @@ dane z kodów TEST01-03, pasek statusu 9:41. Ponowne zrobienie: `gh workflow run
   „User Content: Other User Content” (ocena). Oba: NIE powiązane z tożsamością, NIE śledzenie, cel App Functionality
   (opcjonalnie Analytics). Potem „Publish”.
 - [x] Business > Agreements: brak zaległych umów.
-- [x] Cena darmowa ustawiona i wersja wysłana do recenzji 2026-10-05 (WAITING_FOR_REVIEW). Po akceptacji Jarek klika „Release This Version”.
+- [x] Cena darmowa ustawiona i wersja wysłana do recenzji 2026-10-05 (WAITING_FOR_REVIEW). Zaakceptowane i wydane przez API 2026-10-06 (`asc-release.yml`), READY_FOR_SALE.
 
 ### E. Po publikacji (agent)
 - [ ] Linki do sklepów na eskulapp.pl (sekcja pobierania apki).

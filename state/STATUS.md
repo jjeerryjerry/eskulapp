@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-10-05 (publikacja 1.3.0 wysłana: Play produkcja + App Store w recenzji)_
+_Ostatnia aktualizacja: 2026-10-06 (iOS 1.3.0 WYDANY w App Store; Play produkcja w recenzji)_
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -747,3 +747,6 @@ Na polecenie Jarka (demo ocen dla klientów).
   Play: produkcja vc 21 na 100% (pierwsze wydanie nie może być etapowe), w recenzji Google.
   Apple: cena darmowa dopisana przez API, wersja 1.3.0 WAITING_FOR_REVIEW, wydanie RĘCZNE.
   Po akceptacji: Jarek „Release This Version” w ASC, agent dodaje linki do sklepów na eskulapp.pl.
+- **2026-10-06: iOS 1.3.0 WYDANY** (Apple zaakceptował, wydanie przez API `asc-release.yml`, stan READY_FOR_SALE, tylko Polska).
+  Link: https://apps.apple.com/pl/app/id6810647099 (publicznie widoczny po propagacji, do 24 h).
+  Play: produkcja vc 21 nadal w recenzji Google (strona sklepu 404). Linki na eskulapp.pl po działających stronach obu sklepów.
