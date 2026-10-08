@@ -56,7 +56,6 @@ Jesteś organizatorem i chcesz mieć swoje wydarzenie w Eskulapp? Napisz: kontak
 ```
 • Oceń wysłuchane prelekcje w skali od 1 do 10. Ocena jest anonimowa.
 • Aplikacja przypomni Ci o ocenie prelekcji, które obserwujesz.
-• Mapa wydarzenia widoczna zawsze wtedy, gdy jest dostępny plan obiektu.
 • Drobne poprawki wyglądu i tekstów.
 ```
 
