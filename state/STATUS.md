@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-10-06 (iOS 1.3.0 WYDANY w App Store; Play produkcja w recenzji)_
+_Ostatnia aktualizacja: 2026-10-08 (Play: nowe notatki „Co nowego” 1.3.0 pod uczestnika)_
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -750,3 +750,7 @@ Na polecenie Jarka (demo ocen dla klientów).
 - **2026-10-06: iOS 1.3.0 WYDANY** (Apple zaakceptował, wydanie przez API `asc-release.yml`, stan READY_FOR_SALE, tylko Polska).
   Link: https://apps.apple.com/pl/app/id6810647099 (publicznie widoczny po propagacji, do 24 h).
   Play: produkcja vc 21 nadal w recenzji Google (strona sklepu 404). Linki na eskulapp.pl po działających stronach obu sklepów.
+
+## 2026-10-08: notatki „Co nowego” 1.3.0 przepisane pod uczestnika
+- Play produkcja (vc 21, completed): releaseNotes podmienione przez `tools/play/promote.py --commit`, źródło `docs/PUBLIKACJA.md`.
+- App Store: 1.3.0 READY_FOR_SALE, „What's New” nieedytowalne. Nowy tekst wejdzie z następną wersją.
