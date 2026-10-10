@@ -103,7 +103,7 @@
     <div class="step">
       <div class="num">2</div>
       <h3>Uczestnicy dołączają kodem</h3>
-      <p>Uczestnicy pobierają bezpłatną aplikację z Google Play i wchodzą jednym kodem wydarzenia (np. EVENT2026), bez zakładania konta.</p>
+      <p>Uczestnicy pobierają bezpłatną aplikację z Google Play lub App Store i wchodzą jednym kodem wydarzenia (np. EVENT2026), bez zakładania konta.</p>
       <?php echo eskulapp_store_buttons(); ?>
     </div>
     <div class="step">
@@ -152,7 +152,7 @@
   <div class="faq">
     <details>
       <summary>Czy uczestnik musi instalować aplikację ze sklepu?</summary>
-      <p>Tak - uczestnik pobiera bezpłatną aplikację Eskulapp z Google Play, a następnie dołącza do wydarzenia jednym kodem (np. EVENT2026), bez zakładania konta. Cały program ma wtedy zawsze przy sobie, także offline.</p>
+      <p>Tak - uczestnik pobiera bezpłatną aplikację Eskulapp z Google Play lub App Store, a następnie dołącza do wydarzenia jednym kodem (np. EVENT2026), bez zakładania konta. Cały program ma wtedy zawsze przy sobie, także offline.</p>
     </details>
     <details>
       <summary>Ile trwa wdrożenie?</summary>
