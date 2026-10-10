@@ -196,3 +196,5 @@ h1,h2,h3{font-family:Sora,sans-serif;margin:0}
 .faq summary::after{content:"+";color:var(--petrol);font-size:24px;font-weight:400;line-height:1;flex:none;transition:.2s}
 .faq details[open] summary::after{transform:rotate(45deg)}
 .faq details > p{margin:0 0 16px;color:var(--muted);font-size:15px;line-height:1.6}
+.store-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.store-btn{padding:9px 14px;font-size:14px}

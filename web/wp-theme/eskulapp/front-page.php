@@ -104,6 +104,7 @@
       <div class="num">2</div>
       <h3>Uczestnicy dołączają kodem</h3>
       <p>Uczestnicy pobierają bezpłatną aplikację z Google Play i wchodzą jednym kodem wydarzenia (np. EVENT2026), bez zakładania konta.</p>
+      <?php echo eskulapp_store_buttons(); ?>
     </div>
     <div class="step">
       <div class="num">3</div>

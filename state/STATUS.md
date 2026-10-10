@@ -754,3 +754,8 @@ Na polecenie Jarka (demo ocen dla klientów).
 ## 2026-10-08: notatki „Co nowego” 1.3.0 przepisane pod uczestnika
 - Play produkcja (vc 21, completed): releaseNotes podmienione przez `tools/play/promote.py --commit`, źródło `docs/PUBLIKACJA.md`.
 - App Store: 1.3.0 READY_FOR_SALE, „What's New” nieedytowalne. Nowy tekst wejdzie z następną wersją.
+
+## 2026-10-10: linki do sklepów na eskulapp.pl
+- Motyw v1.4: przycisk „Pobierz z Google Play” w kroku 2 + link w stopce. Lista sklepów: `eskulapp_store_links()` w `functions.php`.
+- App Store dodany, ale wyłączony (`'on' => false`): po 4 dniach od READY_FOR_SALE strona sklepu daje 404, iTunes lookup 0 wyników (PL i US).
+  Podejrzenie, niepotwierdzone: brak statusu handlowca DSA w ASC (wymóg dla sklepów w UE). Do sprawdzenia przez Jarka w ASC.

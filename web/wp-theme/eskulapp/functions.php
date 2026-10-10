@@ -113,3 +113,20 @@ add_action('wp_head', function () {
         echo '<script type="application/ld+json">' . wp_json_encode($faq, $flags) . '</script>' . "\n";
     }
 }, 5);
+
+/* Linki do aplikacji w sklepach. App Store wlaczamy, gdy strona sklepu przestanie zwracac 404. */
+function eskulapp_store_links() {
+    $stores = [
+        ['name' => 'Google Play', 'url' => 'https://play.google.com/store/apps/details?id=pl.eskulapp.mobile', 'on' => true],
+        ['name' => 'App Store',   'url' => 'https://apps.apple.com/pl/app/id6810647099',                     'on' => false],
+    ];
+    return array_values(array_filter($stores, fn($s) => $s['on']));
+}
+
+function eskulapp_store_buttons($class = 'store-links') {
+    $out = '<div class="' . esc_attr($class) . '">';
+    foreach (eskulapp_store_links() as $s) {
+        $out .= '<a class="btn btn-ghost store-btn" href="' . esc_url($s['url']) . '" target="_blank" rel="noopener">Pobierz z ' . esc_html($s['name']) . '</a>';
+    }
+    return $out . '</div>';
+}
