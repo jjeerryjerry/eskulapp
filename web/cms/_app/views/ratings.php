@@ -50,7 +50,7 @@ require APP_DIR . '/views/_head.php';
     <div class="rt-tile"><b><?= (int)$report['rated_talks'] ?> z <?= count($report['talks']) ?></b><span>prelekcji z ocenami</span></div>
     <div class="rt-tile"><b><?= $openMin ?> / <?= $closeMin ?> min</b><span>okno: po starcie / po końcu</span></div>
   </div>
-  <p class="rt-note">Skala od 1 do 10, jeden głos na urządzenie (można go zmienić w oknie oceniania). Wyniki widzi tylko panel, uczestnicy nie widzą średnich. Poniżej <?= Ratings::SMALL_SAMPLE ?> głosów wynik oznaczamy jako „mała próba”.</p>
+  <p class="rt-note">Uczestnik odpowiada na 3 pytania: <?= e(implode(', ', array_map('mb_strtolower', Ratings::QUESTIONS))) ?>. „Średnia” to ocena ogólna (średnia z 3 odpowiedzi). Skala od 1 do 10, jeden głos na urządzenie (można go zmienić w oknie oceniania). Wyniki widzi tylko panel, uczestnicy nie widzą średnich. Poniżej <?= Ratings::SMALL_SAMPLE ?> głosów wynik oznaczamy jako „mała próba”.</p>
 
   <div class="rt-tabs">
     <a class="<?= $tab === 'prelekcje' ? 'on' : '' ?>" href="<?= e($base . $qs(['widok' => 'prelekcje', 'sort' => $sort, 'dir' => $dir])) ?>">Prelekcje</a>
@@ -71,7 +71,9 @@ require APP_DIR . '/views/_head.php';
         <table class="rt-table">
           <thead><tr>
             <th>Tytuł</th><th>Prelegenci</th><th>Sala</th><th>Dzień</th>
-            <th class="n">Głosy</th><th class="n">Średnia</th><th class="n">Mediana</th><th>Rozkład ocen</th>
+            <th class="n">Głosy</th><th class="n">Średnia</th><th class="n">Mediana</th>
+            <?php foreach (Ratings::QUESTIONS as $qLabel): ?><th class="n"><?= e($qLabel) ?></th><?php endforeach; ?>
+            <th>Rozkład ocen</th>
           </tr></thead>
           <tbody>
           <?php foreach ($report['talks'] as $r): $s = $r['stats']; $max = max($s['dist']) ?: 1; ?>
@@ -83,6 +85,7 @@ require APP_DIR . '/views/_head.php';
               <td class="n"><?= (int)$s['votes'] ?><?php if ($s['votes'] > 0 && $s['small']): ?><span class="rt-small">mała próba</span><?php endif; ?></td>
               <td class="n rt-avg"><?= $s['votes'] > 0 ? e($num($s['avg'])) : '<span class="rt-faint">brak</span>' ?></td>
               <td class="n"><?= $s['votes'] > 0 ? e($num($s['median'])) : '' ?></td>
+              <?php foreach ($r['questions']['avg'] as $qa): ?><td class="n"><?= $qa !== null ? e($num($qa)) : '' ?></td><?php endforeach; ?>
               <td>
                 <div class="rt-hist" role="img" aria-label="Rozkład ocen od 1 do 10">
                   <?php foreach ($s['dist'] as $score => $count): ?>

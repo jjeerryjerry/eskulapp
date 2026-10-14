@@ -244,7 +244,10 @@ CREATE TABLE IF NOT EXISTS talk_ratings (
   event_id    BIGINT UNSIGNED NOT NULL,
   talk_id     BIGINT UNSIGNED NOT NULL,
   voter_hash  CHAR(64) NOT NULL,
-  score       TINYINT UNSIGNED NOT NULL,          -- 1..10, CHECK w PHP
+  score       TINYINT UNSIGNED NOT NULL,          -- ogolna = round(avg(q1..q3)) albo stary pojedynczy glos
+  q1          TINYINT UNSIGNED NULL,              -- wartosc merytoryczna 1..10
+  q2          TINYINT UNSIGNED NULL,              -- przydatnosc w praktyce 1..10
+  q3          TINYINT UNSIGNED NULL,              -- sposob przekazania 1..10          -- 1..10, CHECK w PHP
   created_at  DATETIME NOT NULL,
   updated_at  DATETIME NOT NULL,
   ip_hash     CHAR(64) NULL,                      -- do rate-limitu/analizy naduzyc, nie surowe IP
