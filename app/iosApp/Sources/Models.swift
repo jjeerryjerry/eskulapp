@@ -69,6 +69,8 @@ struct Talk: Codable, Identifiable {
     let id: Int64
     let dayId: Int64?
     let roomId: Int64?
+    /// nil = wyklad samodzielny; inaczej podwyklad sesji
+    let sessionId: Int64?
     let title: String
     let abstract: String?
     let startsAt: String?
@@ -79,8 +81,40 @@ struct Talk: Codable, Identifiable {
         case id, title, abstract, sort
         case dayId = "day_id"
         case roomId = "room_id"
+        case sessionId = "session_id"
         case startsAt = "starts_at"
         case endsAt = "ends_at"
+    }
+}
+
+/// Sesja: blok tematyczny z moderatorami; podwyklady wskazuja ja przez talks.session_id.
+struct Session: Codable, Identifiable {
+    let id: Int64
+    let dayId: Int64?
+    let roomId: Int64?
+    let title: String
+    let description: String?
+    let startsAt: String?
+    let endsAt: String?
+    let sort: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, description, sort
+        case dayId = "day_id"
+        case roomId = "room_id"
+        case startsAt = "starts_at"
+        case endsAt = "ends_at"
+    }
+}
+
+struct SessionModerator: Codable {
+    let sessionId: Int64
+    let speakerId: Int64
+    let sort: Int?
+    enum CodingKeys: String, CodingKey {
+        case sort
+        case sessionId = "session_id"
+        case speakerId = "speaker_id"
     }
 }
 
@@ -167,13 +201,16 @@ struct EventBundle: Codable {
     var talks: [Talk]
     var speakers: [Speaker]
     var talkSpeakers: [TalkSpeaker]
+    var sessions: [Session]
+    var sessionModerators: [SessionModerator]
     var partners: [Partner]
     var contacts: [Contact]
     var news: [News]
 
     enum CodingKeys: String, CodingKey {
-        case event, days, rooms, talks, speakers, partners, contacts, news
+        case event, days, rooms, talks, speakers, partners, contacts, news, sessions
         case talkSpeakers = "talk_speakers"
+        case sessionModerators = "session_moderators"
     }
 
     init(from decoder: Decoder) throws {
@@ -184,6 +221,9 @@ struct EventBundle: Codable {
         talks = (try? c.decode([Talk].self, forKey: .talks)) ?? []
         speakers = (try? c.decode([Speaker].self, forKey: .speakers)) ?? []
         talkSpeakers = (try? c.decode([TalkSpeaker].self, forKey: .talkSpeakers)) ?? []
+        // Brak pol = bundel sprzed sesji (tez zapisany lokalnie przed aktualizacja apki).
+        sessions = (try? c.decode([Session].self, forKey: .sessions)) ?? []
+        sessionModerators = (try? c.decode([SessionModerator].self, forKey: .sessionModerators)) ?? []
         partners = (try? c.decode([Partner].self, forKey: .partners)) ?? []
         contacts = (try? c.decode([Contact].self, forKey: .contacts)) ?? []
         news = (try? c.decode([News].self, forKey: .news)) ?? []

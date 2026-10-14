@@ -38,3 +38,4 @@ dist/
 tools/shots/node_modules/
 tools/shots/out1x/
 .secrets/
+backups/

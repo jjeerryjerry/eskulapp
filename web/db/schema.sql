@@ -111,11 +111,39 @@ CREATE TABLE IF NOT EXISTS speakers (
   CONSTRAINT fk_speakers_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Sesja: blok tematyczny z moderatorami i podwykladami (talks.session_id).
+CREATE TABLE IF NOT EXISTS sessions (
+  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  event_id    BIGINT UNSIGNED NOT NULL,
+  day_id      BIGINT UNSIGNED NULL,
+  room_id     BIGINT UNSIGNED NULL,
+  title       VARCHAR(255) NOT NULL,
+  description TEXT NULL,
+  starts_at   DATETIME NULL,
+  ends_at     DATETIME NULL,
+  sort        INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  KEY idx_sessions_event (event_id),
+  CONSTRAINT fk_sessions_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sessions_day  FOREIGN KEY (day_id)  REFERENCES event_days(id) ON DELETE SET NULL,
+  CONSTRAINT fk_sessions_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS session_moderators (
+  session_id BIGINT UNSIGNED NOT NULL,
+  speaker_id BIGINT UNSIGNED NOT NULL,
+  sort       INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (session_id, speaker_id),
+  CONSTRAINT fk_sm_session FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sm_speaker FOREIGN KEY (speaker_id) REFERENCES speakers(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS talks (
   id        BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   event_id  BIGINT UNSIGNED NOT NULL,
   day_id    BIGINT UNSIGNED NULL,
   room_id   BIGINT UNSIGNED NULL,
+  session_id BIGINT UNSIGNED NULL,             -- NULL = wyklad poza sesja
   title     VARCHAR(255) NOT NULL,
   abstract  TEXT NULL,
   starts_at DATETIME NULL,
@@ -125,9 +153,11 @@ CREATE TABLE IF NOT EXISTS talks (
   KEY idx_talks_event (event_id),
   KEY idx_talks_day (day_id),
   KEY idx_talks_room (room_id),
+  KEY idx_talks_session (session_id),
   CONSTRAINT fk_talks_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
   CONSTRAINT fk_talks_day  FOREIGN KEY (day_id)  REFERENCES event_days(id) ON DELETE SET NULL,
-  CONSTRAINT fk_talks_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
+  CONSTRAINT fk_talks_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL,
+  CONSTRAINT fk_talks_session FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS talk_speakers (

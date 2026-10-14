@@ -54,6 +54,28 @@ data class TalkEntity(
     val startsAt: String?,
     val endsAt: String?,
     val sort: Int,
+    val sessionId: Long? = null,
+)
+
+@Entity(tableName = "sessions")
+data class SessionEntity(
+    @PrimaryKey val id: Long,
+    val eventId: Long,
+    val dayId: Long?,
+    val roomId: Long?,
+    val title: String,
+    val description: String?,
+    val startsAt: String?,
+    val endsAt: String?,
+    val sort: Int,
+)
+
+@Entity(tableName = "session_moderators", primaryKeys = ["sessionId", "speakerId"])
+data class SessionModeratorEntity(
+    val sessionId: Long,
+    val speakerId: Long,
+    val eventId: Long,
+    val sort: Int,
 )
 
 @Entity(tableName = "speakers")
@@ -116,6 +138,16 @@ data class NewsEntity(
 @Entity(tableName = "reminders")
 data class ReminderEntity(
     @PrimaryKey val talkId: Long,
+    val eventId: Long,
+    val title: String,
+    val subtitle: String?,
+    val triggerAt: Long,
+)
+
+/** Przypomnienie o calej sesji (osobno od przypomnien o podwykladach). */
+@Entity(tableName = "session_reminders")
+data class SessionReminderEntity(
+    @PrimaryKey val sessionId: Long,
     val eventId: Long,
     val title: String,
     val subtitle: String?,

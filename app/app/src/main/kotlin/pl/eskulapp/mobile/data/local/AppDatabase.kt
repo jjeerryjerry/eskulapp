@@ -13,8 +13,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         SpeakerEntity::class, TalkSpeakerEntity::class, PartnerEntity::class,
         ContactEntity::class, NewsEntity::class, ReminderEntity::class,
         EventNotifyEntity::class, NewsReadEntity::class, TalkRatingEntity::class,
+        SessionEntity::class, SessionModeratorEntity::class, SessionReminderEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -63,6 +64,28 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // v5 -> v6: sesje (blok z moderatorami i podwykladami) + przypomnienia o sesjach.
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `talks` ADD COLUMN `sessionId` INTEGER")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `sessions` (`id` INTEGER NOT NULL, `eventId` INTEGER NOT NULL, " +
+                        "`dayId` INTEGER, `roomId` INTEGER, `title` TEXT NOT NULL, `description` TEXT, " +
+                        "`startsAt` TEXT, `endsAt` TEXT, `sort` INTEGER NOT NULL, PRIMARY KEY(`id`))"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `session_moderators` (`sessionId` INTEGER NOT NULL, " +
+                        "`speakerId` INTEGER NOT NULL, `eventId` INTEGER NOT NULL, `sort` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`sessionId`, `speakerId`))"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `session_reminders` (`sessionId` INTEGER NOT NULL, " +
+                        "`eventId` INTEGER NOT NULL, `title` TEXT NOT NULL, `subtitle` TEXT, " +
+                        "`triggerAt` INTEGER NOT NULL, PRIMARY KEY(`sessionId`))"
+                )
+            }
+        }
+
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -71,7 +94,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     // PRAWDZIWE migracje: aktualizacja apki NIE kasuje lokalnych danych
                     // (dodane eventy, dzwonki/powiadomienia, przeczytane aktualnosci).
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build().also { INSTANCE = it }
             }
     }

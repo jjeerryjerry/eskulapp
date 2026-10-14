@@ -62,11 +62,8 @@ struct AgendaView: View {
                 .padding(.horizontal, 20).padding(.vertical, 14)
             }
 
-            let shown = talks.filter { t in
-                (dayId == nil || t.dayId == dayId) &&
-                (roomId == nil || t.roomId == roomId) &&
-                (!onlyFollowed || store.reminderIds.contains(t.id))
-            }
+            let shown = visibleItems(bundle, talks: talks)
+            let conflictKeys = bundle.map { Conflicts.keys(store.followedSlots($0)) } ?? []
 
             if shown.isEmpty {
                 Text(onlyFollowed ? "Nie obserwujesz jeszcze żadnej prelekcji." : "Brak prelekcji w tym widoku.")
@@ -75,16 +72,43 @@ struct AgendaView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
-                        ForEach(shown) { t in
-                            let roomName = bundle?.room(t.roomId)
-                            let names = bundle?.speakerNames(forTalk: t.id) ?? ""
-                            let sub = [roomName, names.isEmpty ? nil : names].compactMap { $0 }.joined(separator: " \u{00B7} ")
-                            TalkRow(
-                                time: hhmm(t.startsAt), title: t.title, subtitle: sub,
-                                reminder: store.reminderIds.contains(t.id),
-                                onBell: { store.toggleReminder(talkId: t.id, title: t.title, subtitle: roomName, startsAt: t.startsAt, on: !store.reminderIds.contains(t.id)) },
-                                onTap: { path.append(.talk(t.id)) }
-                            )
+                        ForEach(shown) { item in
+                            switch item {
+                            case .single(let t):
+                                let roomName = bundle?.room(t.roomId)
+                                let names = bundle?.speakerNames(forTalk: t.id) ?? ""
+                                let sub = [roomName, names.isEmpty ? nil : names].compactMap { $0 }.joined(separator: " \u{00B7} ")
+                                TalkRow(
+                                    time: hhmm(t.startsAt), title: t.title, subtitle: sub,
+                                    reminder: store.reminderIds.contains(t.id),
+                                    conflict: conflictKeys.contains("t\(t.id)"),
+                                    onBell: { store.toggleReminder(talkId: t.id, title: t.title, subtitle: roomName, startsAt: t.startsAt, on: !store.reminderIds.contains(t.id)) },
+                                    onTap: { path.append(.talk(t.id)) }
+                                )
+                            case .block(let x, let subTalks):
+                                let roomName = bundle?.room(x.roomId)
+                                let mods = bundle?.moderatorNames(forSession: x.id) ?? ""
+                                let sub = [roomName, mods.isEmpty ? nil : "Moderacja: \(mods)"].compactMap { $0 }.joined(separator: " \u{00B7} ")
+                                SessionCard(
+                                    time: [hhmm(x.startsAt), hhmm(x.endsAt)].filter { !$0.isEmpty }.joined(separator: " - "),
+                                    title: x.title, subtitle: sub,
+                                    reminder: store.sessionReminderIds.contains(x.id),
+                                    conflict: conflictKeys.contains("s\(x.id)"),
+                                    onBell: { store.toggleSessionReminder(x, room: roomName, on: !store.sessionReminderIds.contains(x.id)) },
+                                    onTap: { path.append(.session(x.id)) }
+                                ) {
+                                    ForEach(subTalks) { t in
+                                        SubTalkRow(
+                                            time: hhmm(t.startsAt), title: t.title,
+                                            subtitle: bundle?.speakerNames(forTalk: t.id) ?? "",
+                                            reminder: store.reminderIds.contains(t.id),
+                                            conflict: conflictKeys.contains("t\(t.id)"),
+                                            onBell: { store.toggleReminder(talkId: t.id, title: t.title, subtitle: bundle?.room(t.roomId), startsAt: t.startsAt, on: !store.reminderIds.contains(t.id)) },
+                                            onTap: { path.append(.talk(t.id)) }
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                     .padding(.horizontal, 20).padding(.vertical, 4)
@@ -95,6 +119,131 @@ struct AgendaView: View {
         .navigationBarHidden(true)
         .onAppear { if dayId == nil { dayId = days.first?.id } }
     }
+
+    /// Wyklady samodzielne + sesje z podwykladami, po filtrach dnia/sali/obserwowanych.
+    /// Obserwowane: sesja widoczna gdy obserwujesz ja albo ktorys podwyklad; przy
+    /// obserwowanej sesji widac wszystkie podwyklady, inaczej tylko obserwowane.
+    private func visibleItems(_ bundle: EventBundle?, talks: [Talk]) -> [AgendaItem] {
+        guard let bundle = bundle else { return [] }
+        let sessionIds = Set(bundle.sessions.map { $0.id })
+        func inView(_ day: Int64?, _ room: Int64?) -> Bool {
+            (dayId == nil || day == dayId) && (roomId == nil || room == roomId)
+        }
+        let singles: [AgendaItem] = talks.filter { t in
+            !(t.sessionId.map(sessionIds.contains) ?? false) && inView(t.dayId, t.roomId) &&
+                (!onlyFollowed || store.reminderIds.contains(t.id))
+        }.map { .single($0) }
+        let blocks: [AgendaItem] = bundle.sortedSessions.compactMap { x in
+            guard inView(x.dayId, x.roomId) else { return nil }
+            let sub = bundle.talks(forSession: x.id)
+            if !onlyFollowed || store.sessionReminderIds.contains(x.id) { return .block(x, sub) }
+            let followed = sub.filter { store.reminderIds.contains($0.id) }
+            return followed.isEmpty ? nil : .block(x, followed)
+        }
+        return (singles + blocks).sorted { ($0.startsAt ?? "", $0.sort) < ($1.startsAt ?? "", $1.sort) }
+    }
+}
+
+/// Pozycja listy agendy: wyklad samodzielny albo sesja z podwykladami.
+private enum AgendaItem: Identifiable {
+    case single(Talk)
+    case block(Session, [Talk])
+    var id: String {
+        switch self { case .single(let t): return "t\(t.id)"; case .block(let x, _): return "s\(x.id)" }
+    }
+    var startsAt: String? {
+        switch self { case .single(let t): return t.startsAt; case .block(let x, _): return x.startsAt }
+    }
+    var sort: Int {
+        switch self { case .single(let t): return t.sort ?? 0; case .block(let x, _): return x.sort ?? 0 }
+    }
+}
+
+/// Osobny przycisk dzwonka: tylko toggle przypomnienia, nie otwiera szczegolow.
+struct BellButton: View {
+    let on: Bool
+    var size: CGFloat = 40
+    let action: () -> Void
+    var body: some View {
+        Button(action: action) {
+            icon("bell.fill", on ? C.coral : C.faint, size >= 40 ? 20 : 17)
+                .frame(width: size, height: size)
+                .background(on ? C.coralTint : C.grey)
+                .clipShape(RoundedRectangle(cornerRadius: 11))
+        }.buttonStyle(.plain)
+    }
+}
+
+struct ConflictLabel: View {
+    var body: some View {
+        Text("Kolizja czasowa").font(.system(size: 12, weight: .semibold)).foregroundColor(C.coralDark)
+    }
+}
+
+/// Karta sesji: naglowek (czas, tytul, sala, moderacja, dzwonek sesji) + podwyklady.
+private struct SessionCard<Content: View>: View {
+    let time: String
+    let title: String
+    let subtitle: String
+    let reminder: Bool
+    let conflict: Bool
+    let onBell: () -> Void
+    let onTap: () -> Void
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 8) {
+                        Text("SESJA").font(.system(size: 11, weight: .bold)).kerning(1).foregroundColor(C.coralDark)
+                        if !time.isEmpty { Text(time).font(.system(size: 13, weight: .semibold)).foregroundColor(C.petrol) }
+                    }
+                    Text(title).font(.system(size: 16, weight: .bold)).foregroundColor(C.ink)
+                    if !subtitle.isEmpty { Text(subtitle).font(.system(size: 12)).foregroundColor(C.muted) }
+                    if conflict { ConflictLabel() }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                BellButton(on: reminder, action: onBell)
+            }
+            .padding(14)
+            .background(C.tint.opacity(0.45))
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onTap)
+            VStack(spacing: 0) { content() }
+                .padding(.leading, 14).padding(.trailing, 10).padding(.vertical, 6)
+        }
+        .background(C.surface)
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(C.tint, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct SubTalkRow: View {
+    let time: String
+    let title: String
+    let subtitle: String
+    let reminder: Bool
+    let conflict: Bool
+    let onBell: () -> Void
+    let onTap: () -> Void
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(time).font(.system(size: 13, weight: .semibold)).foregroundColor(C.petrol).frame(width: 44, alignment: .leading)
+            Rectangle().fill(C.tint).frame(width: 2, height: 34)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
+                if !subtitle.isEmpty { Text(subtitle).font(.system(size: 12)).foregroundColor(C.muted) }
+                if conflict { ConflictLabel() }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            BellButton(on: reminder, size: 34, action: onBell)
+        }
+        .padding(.vertical, 8)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onTap)
+    }
 }
 
 private struct TalkRow: View {
@@ -102,6 +251,7 @@ private struct TalkRow: View {
     let title: String
     let subtitle: String
     let reminder: Bool
+    let conflict: Bool
     let onBell: () -> Void
     let onTap: () -> Void
 
@@ -113,14 +263,10 @@ private struct TalkRow: View {
                 if !subtitle.isEmpty {
                     Text(subtitle).font(.system(size: 12)).foregroundColor(C.muted)
                 }
+                if conflict { ConflictLabel() }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            Button(action: onBell) {
-                icon("bell.fill", reminder ? C.coral : C.faint, 20)
-                    .frame(width: 40, height: 40)
-                    .background(reminder ? C.coralTint : C.grey)
-                    .clipShape(RoundedRectangle(cornerRadius: 11))
-            }.buttonStyle(.plain)
+            BellButton(on: reminder, action: onBell)
         }
         .padding(14)
         .background(C.surface)
@@ -152,6 +298,21 @@ struct TalkView: View {
                             let time = [hhmm(t.startsAt), hhmm(t.endsAt)].filter { !$0.isEmpty }.joined(separator: " - ")
                             if !time.isEmpty { Pill(text: time, bg: C.tint, fg: C.petrol) }
                             if let room = room { Pill(text: room, bg: C.grey, fg: C.muted) }
+                        }
+                        if let x = bundle?.session(t.sessionId) {
+                            NavigationLink(value: Route.session(x.id)) {
+                                HStack(spacing: 8) {
+                                    Text("SESJA").font(.system(size: 11, weight: .bold)).kerning(1).foregroundColor(C.coralDark)
+                                    Text(x.title).font(.system(size: 13, weight: .semibold)).foregroundColor(C.ink)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    icon("chevron.right", C.petrol, 14)
+                                }
+                                .padding(.horizontal, 12).padding(.vertical, 10)
+                                .background(C.tint.opacity(0.45))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 12)
                         }
                         Spacer().frame(height: 16)
                         Text(t.title).font(.system(size: 22, weight: .bold)).foregroundColor(C.ink)

@@ -2,6 +2,12 @@
 
 _Ostatnia aktualizacja: 2026-10-08 (Play: nowe notatki „Co nowego” 1.3.0 pod uczestnika)_
 
+## Backlog po spotkaniu z agencją (2026-10-14)
+Rozpisane w `docs/NOTATKA-AGENCJA-2026-10-14.md`: sesje + prelegent, konflikty czasowe,
+ocena 3 pytania, kod QR, dane organizatora, pakiet Meta Ads + animacja na miejscu.
+Decyzje z 2. rundy zapisane w notatce (sesje z moderatorem i podwykładami, przypomnienia
+oba poziomy, QR check-in odłożony, opcjonalny nagłówek eventu). Pytania oceny zatwierdzone: tylko 3 pytania o wystąpienie, eventu nie oceniamy.
+
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
 jeszcze nie zaczęty (świadomie — czekamy na decyzje „serwisowe").

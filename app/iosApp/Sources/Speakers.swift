@@ -55,6 +55,7 @@ struct SpeakerDetailView: View {
         let bundle = store.event(eventId)?.bundle
         let s = bundle?.speakers.first { $0.id == speakerId }
         let talks = bundle?.talks(forSpeaker: speakerId) ?? []
+        let moderated = bundle?.sessions(moderatedBy: speakerId) ?? []
 
         VStack(spacing: 0) {
             BackHeader("Prelegent")
@@ -76,9 +77,35 @@ struct SpeakerDetailView: View {
                             Spacer().frame(height: 18)
                             Text(bio).font(.system(size: 15)).foregroundColor(C.muted).lineSpacing(5)
                         }
+                        if !moderated.isEmpty {
+                            Spacer().frame(height: 20)
+                            Text("Moderuje").font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
+                            Spacer().frame(height: 8)
+                            ForEach(moderated) { x in
+                                let sub = [dayShort(x.startsAt), hhmm(x.startsAt), bundle?.room(x.roomId) ?? ""]
+                                    .filter { !$0.isEmpty }.joined(separator: " \u{00B7} ")
+                                NavigationLink(value: Route.session(x.id)) {
+                                    HStack(spacing: 8) {
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text("SESJA").font(.system(size: 10, weight: .bold)).kerning(1).foregroundColor(C.coralDark)
+                                            Text(x.title).font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
+                                            if !sub.isEmpty { Text(sub).font(.system(size: 12)).foregroundColor(C.muted) }
+                                        }
+                                        Spacer()
+                                        icon("chevron.right", C.line, 16)
+                                    }
+                                    .padding(12)
+                                    .background(C.surface)
+                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(C.line, lineWidth: 1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.vertical, 5)
+                            }
+                        }
                         if !talks.isEmpty {
                             Spacer().frame(height: 20)
-                            Text("Wystąpienia").font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
+                            Text(moderated.isEmpty ? "Wystąpienia" : "Wykłada").font(.system(size: 15, weight: .semibold)).foregroundColor(C.ink)
                             Spacer().frame(height: 8)
                             ForEach(talks) { t in
                                 let room = bundle?.room(t.roomId)

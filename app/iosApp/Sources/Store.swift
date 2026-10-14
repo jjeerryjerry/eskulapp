@@ -31,6 +31,10 @@ final class AppStore: ObservableObject {
     @Published private(set) var storedEvents: [StoredEvent] = []
     @Published private(set) var notifyIds: Set<Int64> = []
     @Published private(set) var reminderIds: Set<Int64> = []
+    /// Przypomnienia o calych sesjach (niezalezne od podwykladow).
+    @Published private(set) var sessionReminderIds: Set<Int64> = []
+    /// Ostrzezenie o konflikcie czasowym czekajace na decyzje uczestnika.
+    @Published var conflictPrompt: ConflictPrompt?
     @Published private(set) var readNewsIds: Set<Int64> = []
     /// Glosy tego urzadzenia (oceny prelekcji), klucz = talkId. Trwale w ratings.json.
     @Published private(set) var ratings: [Int64: LocalRating] = [:]
@@ -52,6 +56,7 @@ final class AppStore: ObservableObject {
         load()
         notifyIds = Self.loadIds("notifyIds")
         reminderIds = Self.loadIds("reminderIds")
+        sessionReminderIds = Self.loadIds("sessionReminderIds")
         readNewsIds = Self.loadIds("readNewsIds")
         loadRatings()
         top = storedEvents.isEmpty ? .entry : .events
@@ -238,15 +243,86 @@ final class AppStore: ObservableObject {
 
     func toggleReminder(talkId: Int64, title: String, subtitle: String?, startsAt: String?, on: Bool) {
         if on {
-            reminderIds.insert(talkId)
-            scheduleReminder(talkId: talkId, title: title, subtitle: subtitle, startsAt: startsAt)
-            scheduleRateReminder(talkId: talkId, title: title)
+            let talk = storedEvents.lazy.compactMap { se in se.bundle.talks.first { $0.id == talkId } }.first
+            let slot = AgendaSlot(itemId: talkId, isSession: false, title: title, room: subtitle,
+                                  startsAt: startsAt, endsAt: talk?.endsAt, sessionId: talk?.sessionId)
+            withConflictCheck(slot) { [weak self] in
+                guard let self else { return }
+                self.reminderIds.insert(talkId)
+                self.scheduleReminder(talkId: talkId, title: title, subtitle: subtitle, startsAt: startsAt)
+                self.scheduleRateReminder(talkId: talkId, title: title)
+                Self.saveIds("reminderIds", self.reminderIds)
+            }
+            return
         } else {
             reminderIds.remove(talkId)
             UNUserNotificationCenter.current().removePendingNotificationRequests(
                 withIdentifiers: ["talk_\(talkId)", "rate_\(talkId)"])
         }
         Self.saveIds("reminderIds", reminderIds)
+    }
+
+    /// Przypomnienie o calej sesji (10 min przed startem), niezalezne od podwykladow.
+    func toggleSessionReminder(_ session: Session, room: String?, on: Bool) {
+        if on {
+            let slot = AgendaSlot(itemId: session.id, isSession: true, title: session.title, room: room,
+                                  startsAt: session.startsAt, endsAt: session.endsAt)
+            withConflictCheck(slot) { [weak self] in
+                guard let self else { return }
+                self.sessionReminderIds.insert(session.id)
+                self.scheduleNotification(id: "session_\(session.id)", startsAt: session.startsAt,
+                                          title: "Za 10 minut sesja: \(session.title)", body: room ?? "Sesja wkrótce")
+                Self.saveIds("sessionReminderIds", self.sessionReminderIds)
+            }
+        } else {
+            sessionReminderIds.remove(session.id)
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["session_\(session.id)"])
+            Self.saveIds("sessionReminderIds", sessionReminderIds)
+        }
+    }
+
+    /// Brak kolizji = od razu `proceed`; kolizja = ostrzezenie, decyzja zostaje u uczestnika.
+    private func withConflictCheck(_ candidate: AgendaSlot, proceed: @escaping () -> Void) {
+        let conflicts = Conflicts.with(candidate, followedSlots(containing: candidate))
+        if conflicts.isEmpty { proceed() } else {
+            conflictPrompt = ConflictPrompt(candidate: candidate, conflicts: conflicts, proceed: proceed)
+        }
+    }
+
+    func confirmConflict() {
+        let p = conflictPrompt
+        conflictPrompt = nil
+        p?.proceed()
+    }
+
+    /// Obserwowane pozycje z eventu, do ktorego nalezy kandydat.
+    private func followedSlots(containing c: AgendaSlot) -> [AgendaSlot] {
+        guard let b = storedEvents.first(where: { se in
+            c.isSession ? se.bundle.sessions.contains { $0.id == c.itemId } : se.bundle.talks.contains { $0.id == c.itemId }
+        })?.bundle else { return [] }
+        return followedSlots(b)
+    }
+
+    func followedSlots(_ b: EventBundle) -> [AgendaSlot] {
+        b.talks.filter { reminderIds.contains($0.id) }.map {
+            AgendaSlot(itemId: $0.id, isSession: false, title: $0.title, room: b.room($0.roomId),
+                       startsAt: $0.startsAt, endsAt: $0.endsAt, sessionId: $0.sessionId)
+        } + b.sessions.filter { sessionReminderIds.contains($0.id) }.map {
+            AgendaSlot(itemId: $0.id, isSession: true, title: $0.title, room: b.room($0.roomId),
+                       startsAt: $0.startsAt, endsAt: $0.endsAt)
+        }
+    }
+
+    private func scheduleNotification(id: String, startsAt: String?, title: String, body: String) {
+        guard let start = parseLocalDate(startsAt) else { return }
+        let delay = start.addingTimeInterval(-10 * 60).timeIntervalSinceNow
+        guard delay > 0 else { return }
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
     }
 
     private func scheduleReminder(talkId: Int64, title: String, subtitle: String?, startsAt: String?) {

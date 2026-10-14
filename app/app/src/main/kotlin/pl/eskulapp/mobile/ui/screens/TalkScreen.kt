@@ -45,6 +45,7 @@ fun TalkScreen(vm: AppViewModel, talkId: Long, eventId: Long) {
         while (true) { delay(15_000); value = Instant.now() }
     }
     val t = talk ?: return
+    val session by vm.repo.dao.session(t.sessionId ?: -1).collectAsStateWithLifecycle(null)
     val room = rooms.firstOrNull { it.id == t.roomId }?.name
     val on = t.id in reminderIds
 
@@ -55,6 +56,19 @@ fun TalkScreen(vm: AppViewModel, talkId: Long, eventId: Long) {
             Row {
                 if (time.isNotBlank()) Pill(time, Tint, Petrol)
                 if (room != null) { Spacer(Modifier.width(8.dp)); Pill(room, Grey, Muted) }
+            }
+            session?.let { x ->
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Tint.copy(alpha = 0.45f))
+                        .clickable { vm.nav.push(Screen.Session(x.id, eventId)) }.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("SESJA", color = CoralDark, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Text(x.title, color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Ico(R.drawable.ic_chevron, Petrol, 16)
+                }
             }
             Spacer(Modifier.height(16.dp))
             Text(t.title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Ink, lineHeight = 28.sp)

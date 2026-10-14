@@ -30,15 +30,27 @@ object Reminders {
         } catch (e: Exception) { null }
     }
 
-    fun schedule(ctx: Context, talkId: Long, title: String, subtitle: String?, triggerAt: Long) {
+    fun schedule(ctx: Context, talkId: Long, title: String, subtitle: String?, triggerAt: Long) =
+        enqueue(ctx, "reminder_$talkId", triggerAt, workDataOf("title" to title, "subtitle" to (subtitle ?: "")))
+
+    /** Przypomnienie o calej sesji (niezalezne od przypomnien o jej podwykladach). */
+    fun scheduleSession(ctx: Context, sessionId: Long, title: String, subtitle: String?, triggerAt: Long) =
+        enqueue(ctx, "session_$sessionId", triggerAt, workDataOf(
+            "title" to title, "headline" to "Za 10 minut sesja: $title", "subtitle" to (subtitle ?: "")))
+
+    fun cancelSession(ctx: Context, sessionId: Long) {
+        WorkManager.getInstance(ctx).cancelUniqueWork("session_$sessionId")
+    }
+
+    private fun enqueue(ctx: Context, name: String, triggerAt: Long, data: Data) {
         val delay = triggerAt - System.currentTimeMillis()
-        if (delay <= 0) return // prelekcja juz minela: zapamietujemy stan, ale nie budzimy
+        if (delay <= 0) return // pozycja juz minela: zapamietujemy stan, ale nie budzimy
         val req = OneTimeWorkRequestBuilder<ReminderWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            .setInputData(workDataOf("title" to title, "subtitle" to (subtitle ?: "")))
+            .setInputData(data)
             .addTag("reminder")
             .build()
-        WorkManager.getInstance(ctx).enqueueUniqueWork("reminder_$talkId", ExistingWorkPolicy.REPLACE, req)
+        WorkManager.getInstance(ctx).enqueueUniqueWork(name, ExistingWorkPolicy.REPLACE, req)
     }
 
     /** Przypomnienie "Oceń wykład" w chwili otwarcia okna ocen (SPEC-OCENY §5, opcja). */

@@ -11,6 +11,8 @@ data class BundleDto(
     val talks: List<TalkDto> = emptyList(),
     val speakers: List<SpeakerDto> = emptyList(),
     @SerialName("talk_speakers") val talkSpeakers: List<TalkSpeakerDto> = emptyList(),
+    val sessions: List<SessionDto> = emptyList(),
+    @SerialName("session_moderators") val sessionModerators: List<SessionModeratorDto> = emptyList(),
     val partners: List<PartnerDto> = emptyList(),
     val contacts: List<ContactDto> = emptyList(),
     val news: List<NewsDto> = emptyList(),
@@ -50,10 +52,31 @@ data class TalkDto(
     val id: Long,
     @SerialName("day_id") val dayId: Long? = null,
     @SerialName("room_id") val roomId: Long? = null,
+    @SerialName("session_id") val sessionId: Long? = null,
     val title: String,
     val abstract: String? = null,
     @SerialName("starts_at") val startsAt: String? = null,
     @SerialName("ends_at") val endsAt: String? = null,
+    val sort: Int = 0,
+)
+
+/** Sesja: blok tematyczny z moderatorami; podwyklady wskazuja ja przez talks.session_id. */
+@Serializable
+data class SessionDto(
+    val id: Long,
+    @SerialName("day_id") val dayId: Long? = null,
+    @SerialName("room_id") val roomId: Long? = null,
+    val title: String,
+    val description: String? = null,
+    @SerialName("starts_at") val startsAt: String? = null,
+    @SerialName("ends_at") val endsAt: String? = null,
+    val sort: Int = 0,
+)
+
+@Serializable
+data class SessionModeratorDto(
+    @SerialName("session_id") val sessionId: Long,
+    @SerialName("speaker_id") val speakerId: Long,
     val sort: Int = 0,
 )
 

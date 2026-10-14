@@ -36,13 +36,16 @@ final class Bundle
         })($sql);
         $days     = $q("SELECT id,date,label,sort FROM event_days WHERE event_id=? ORDER BY sort,date");
         $rooms    = $q("SELECT id,name,sort FROM rooms WHERE event_id=? ORDER BY sort,name");
-        $talks    = $q("SELECT id,day_id,room_id,title,abstract,starts_at,ends_at,sort FROM talks WHERE event_id=? ORDER BY starts_at,sort");
+        $talks    = $q("SELECT id,day_id,room_id,session_id,title,abstract,starts_at,ends_at,sort FROM talks WHERE event_id=? ORDER BY starts_at,sort");
+        $sessions = $q("SELECT id,day_id,room_id,title,description,starts_at,ends_at,sort FROM sessions WHERE event_id=? ORDER BY starts_at,sort");
         $speakers = $q("SELECT id,first_name,last_name,title,photo_url,bio,sort FROM speakers WHERE event_id=? ORDER BY sort,last_name");
         $partners = $q("SELECT id,name,logo_url,description,tier,booth_location,website,sort FROM partners WHERE event_id=? ORDER BY sort,name");
         $contacts = $q("SELECT id,label,name,phone,email,note,sort FROM contacts WHERE event_id=? ORDER BY sort");
         $news     = $q("SELECT id,type,title,body,link_type,link_ref,pinned,published_at FROM news WHERE event_id=? ORDER BY pinned DESC, published_at DESC");
         $ts = $pdo->prepare("SELECT talk_id,speaker_id FROM talk_speakers ts JOIN talks t ON t.id=ts.talk_id WHERE t.event_id=?");
         $ts->execute([$eid]);
+        $sm = $pdo->prepare("SELECT session_id,speaker_id,sm.sort FROM session_moderators sm JOIN sessions x ON x.id=sm.session_id WHERE x.event_id=? ORDER BY sm.session_id,sm.sort");
+        $sm->execute([$eid]);
         return [
             'event' => [
                 'id' => $eid, 'slug' => $ev['slug'], 'name' => $ev['name'],
@@ -61,6 +64,8 @@ final class Bundle
             ],
             'days' => $days, 'rooms' => $rooms, 'talks' => $talks,
             'speakers' => $speakers, 'talk_speakers' => $ts->fetchAll(),
+            // Sesje (blok z moderatorami); podwyklady wskazuja sesje przez talks.session_id.
+            'sessions' => $sessions, 'session_moderators' => $sm->fetchAll(),
             'partners' => $partners, 'contacts' => $contacts, 'news' => $news,
             'generated_at' => gmdate('c'),
         ];

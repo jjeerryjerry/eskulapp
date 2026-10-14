@@ -9,7 +9,11 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import pl.eskulapp.mobile.data.NotFoundException
 import pl.eskulapp.mobile.data.Repo
+import pl.eskulapp.mobile.agenda.AgendaSlot
+import pl.eskulapp.mobile.agenda.Conflicts
 import pl.eskulapp.mobile.data.local.ReminderEntity
+import pl.eskulapp.mobile.data.local.SessionEntity
+import pl.eskulapp.mobile.data.local.SessionReminderEntity
 import pl.eskulapp.mobile.ratings.RatingPhase
 import pl.eskulapp.mobile.ratings.RatingWindows
 import pl.eskulapp.mobile.reminders.Reminders
@@ -81,17 +85,63 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { repo.rate(eventId, eventCode, talkId, score) }
     }
 
+    /** Ostrzezenie o konflikcie czasowym czekajace na decyzje uczestnika (null = brak). */
+    var conflictPrompt by mutableStateOf<ConflictPrompt?>(null); private set
+
+    fun confirmConflict() { val p = conflictPrompt ?: return; conflictPrompt = null; p.proceed() }
+    fun dismissConflict() { conflictPrompt = null }
+
     fun toggleReminder(talkId: Long, eventId: Long, title: String, subtitle: String?, startsAt: String?, on: Boolean) {
         viewModelScope.launch {
             if (on) {
-                val t = Reminders.triggerAt(startsAt) ?: (System.currentTimeMillis() + 5000)
-                repo.dao.addReminder(ReminderEntity(talkId, eventId, title, subtitle, t))
-                Reminders.schedule(getApplication(), talkId, title, subtitle, t)
-                scheduleRateReminder(talkId, eventId, title)
+                val talk = repo.dao.talkOnce(talkId)
+                val slot = AgendaSlot(talkId, false, title, subtitle, startsAt, talk?.endsAt, talk?.sessionId)
+                withConflictCheck(eventId, slot) {
+                    viewModelScope.launch {
+                        val t = Reminders.triggerAt(startsAt) ?: (System.currentTimeMillis() + 5000)
+                        repo.dao.addReminder(ReminderEntity(talkId, eventId, title, subtitle, t))
+                        Reminders.schedule(getApplication(), talkId, title, subtitle, t)
+                        scheduleRateReminder(talkId, eventId, title)
+                    }
+                }
             } else {
                 repo.dao.removeReminder(talkId)
                 Reminders.cancel(getApplication(), talkId)
             }
+        }
+    }
+
+    /** Przypomnienie o calej sesji (10 min przed startem), niezalezne od podwykladow. */
+    fun toggleSessionReminder(session: SessionEntity, roomName: String?, on: Boolean) {
+        viewModelScope.launch {
+            if (on) {
+                val slot = AgendaSlot(session.id, true, session.title, roomName, session.startsAt, session.endsAt)
+                withConflictCheck(session.eventId, slot) {
+                    viewModelScope.launch {
+                        val t = Reminders.triggerAt(session.startsAt) ?: (System.currentTimeMillis() + 5000)
+                        repo.dao.addSessionReminder(SessionReminderEntity(session.id, session.eventId, session.title, roomName, t))
+                        Reminders.scheduleSession(getApplication(), session.id, session.title, roomName, t)
+                    }
+                }
+            } else {
+                repo.dao.removeSessionReminder(session.id)
+                Reminders.cancelSession(getApplication(), session.id)
+            }
+        }
+    }
+
+    /** Brak kolizji = od razu [proceed]; kolizja = ostrzezenie, decyzja zostaje u uczestnika. */
+    private suspend fun withConflictCheck(eventId: Long, candidate: AgendaSlot, proceed: () -> Unit) {
+        val conflicts = Conflicts.with(candidate, followedSlots(eventId))
+        if (conflicts.isEmpty()) proceed() else conflictPrompt = ConflictPrompt(candidate, conflicts, proceed)
+    }
+
+    private suspend fun followedSlots(eventId: Long): List<AgendaSlot> {
+        val rooms = repo.dao.roomsOnce(eventId).associate { it.id to it.name }
+        return repo.dao.followedTalks(eventId).map {
+            AgendaSlot(it.id, false, it.title, rooms[it.roomId], it.startsAt, it.endsAt, it.sessionId)
+        } + repo.dao.followedSessions(eventId).map {
+            AgendaSlot(it.id, true, it.title, rooms[it.roomId], it.startsAt, it.endsAt)
         }
     }
 
@@ -109,3 +159,6 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         Reminders.scheduleRate(getApplication(), talkId, title, opensAt.toInstant().toEpochMilli())
     }
 }
+
+/** Ostrzezenie: [candidate] nachodzi na juz obserwowane [conflicts]. [proceed] ustawia mimo to. */
+class ConflictPrompt(val candidate: AgendaSlot, val conflicts: List<AgendaSlot>, val proceed: () -> Unit)

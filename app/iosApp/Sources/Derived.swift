@@ -45,6 +45,34 @@ extension EventBundle {
             .joined(separator: ", ")
     }
 
+    var sortedSessions: [Session] {
+        sessions.sorted { ($0.startsAt ?? "", $0.sort ?? 0) < ($1.startsAt ?? "", $1.sort ?? 0) }
+    }
+
+    func session(_ id: Int64?) -> Session? {
+        guard let id = id else { return nil }
+        return sessions.first { $0.id == id }
+    }
+
+    func talks(forSession sessionId: Int64) -> [Talk] {
+        sortedTalks.filter { $0.sessionId == sessionId }
+    }
+
+    func moderators(forSession sessionId: Int64) -> [Speaker] {
+        sessionModerators.filter { $0.sessionId == sessionId }
+            .sorted { ($0.sort ?? 0) < ($1.sort ?? 0) }
+            .compactMap { m in speakers.first { $0.id == m.speakerId } }
+    }
+
+    func moderatorNames(forSession sessionId: Int64) -> String {
+        moderators(forSession: sessionId).map { $0.fullName }.filter { !$0.isEmpty }.joined(separator: ", ")
+    }
+
+    func sessions(moderatedBy speakerId: Int64) -> [Session] {
+        let ids = Set(sessionModerators.filter { $0.speakerId == speakerId }.map { $0.sessionId })
+        return sortedSessions.filter { ids.contains($0.id) }
+    }
+
     func talks(forSpeaker speakerId: Int64) -> [Talk] {
         let ids = talkSpeakers.filter { $0.speakerId == speakerId }.map { $0.talkId }
         return sortedTalks.filter { ids.contains($0.id) }
