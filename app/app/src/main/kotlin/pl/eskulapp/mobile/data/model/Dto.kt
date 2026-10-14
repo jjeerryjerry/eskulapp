@@ -32,6 +32,7 @@ data class EventDto(
     @SerialName("map_image_url") val mapImageUrl: String? = null,
     @SerialName("map_embed") val mapEmbed: String? = null,
     @SerialName("map_enabled") val mapEnabled: Boolean = true,
+    @SerialName("header_image_url") val headerImageUrl: String? = null,
     // Oceny prelekcji (SPEC-OCENY). Brak pol = bundel sprzed modulu ocen = oceny ukryte.
     @SerialName("ratings_enabled") val ratingsEnabled: Boolean = false,
     @SerialName("ratings_open_after_start_min") val ratingsOpenAfterStartMin: Int = 10,
@@ -132,11 +133,16 @@ data class NewsDto(
     @SerialName("published_at") val publishedAt: String? = null,
 )
 
-/** POST /api/public/events/{code}/talks/{talkId}/rating */
+/**
+ * POST /api/public/events/{code}/talks/{talkId}/rating. Od 1.4: answers (3 pytania).
+ * score tylko dla glosow zapisanych przez starsza wersje apki (brak odpowiedzi).
+ * Pola null nie sa wysylane (encodeDefaults = false).
+ */
 @Serializable
 data class RatingRequestDto(
     @SerialName("install_id") val installId: String,
-    val score: Int,
+    val answers: List<Int>? = null,
+    val score: Int? = null,
 )
 
 /** Element GET /api/public/events/{code}/ratings/mine */
@@ -144,4 +150,5 @@ data class RatingRequestDto(
 data class MyRatingDto(
     @SerialName("talk_id") val talkId: Long,
     val score: Int,
+    val answers: List<Int>? = null,
 )

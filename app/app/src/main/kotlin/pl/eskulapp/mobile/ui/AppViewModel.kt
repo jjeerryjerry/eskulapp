@@ -14,6 +14,7 @@ import pl.eskulapp.mobile.agenda.Conflicts
 import pl.eskulapp.mobile.data.local.ReminderEntity
 import pl.eskulapp.mobile.data.local.SessionEntity
 import pl.eskulapp.mobile.data.local.SessionReminderEntity
+import pl.eskulapp.mobile.ratings.RATING_QUESTIONS
 import pl.eskulapp.mobile.ratings.RatingPhase
 import pl.eskulapp.mobile.ratings.RatingWindows
 import pl.eskulapp.mobile.reminders.Reminders
@@ -79,10 +80,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Ocena prelekcji 1..10: zapis lokalny + wysylka w tle (SPEC-OCENY §5). */
-    fun rateTalk(eventId: Long, eventCode: String, talkId: Long, score: Int) {
-        if (score !in 1..10) return
-        viewModelScope.launch { repo.rate(eventId, eventCode, talkId, score) }
+    /** Ocena prelekcji: 3 odpowiedzi 1..10, zapis lokalny + wysylka w tle (SPEC-OCENY §5). */
+    fun rateTalk(eventId: Long, eventCode: String, talkId: Long, answers: List<Int>) {
+        if (answers.size != RATING_QUESTIONS.size || answers.any { it !in 1..10 }) return
+        viewModelScope.launch { repo.rate(eventId, eventCode, talkId, answers) }
     }
 
     /** Ostrzezenie o konflikcie czasowym czekajace na decyzje uczestnika (null = brak). */

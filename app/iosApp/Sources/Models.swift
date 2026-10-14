@@ -17,6 +17,8 @@ struct EventDTO: Codable {
     let mapImageUrl: String?
     let mapEmbed: String?
     let mapEnabled: Bool?
+    /// Opcjonalna grafika naglowka z CMS (plik lokalny: HeaderImages).
+    let headerImageUrl: String?
     // Oceny prelekcji (SPEC-OCENY)
     let ratingsEnabled: Bool?
     let ratingsOpenAfterStartMin: Int?
@@ -35,6 +37,7 @@ struct EventDTO: Codable {
         case mapImageUrl = "map_image_url"
         case mapEmbed = "map_embed"
         case mapEnabled = "map_enabled"
+        case headerImageUrl = "header_image_url"
         case ratingsEnabled = "ratings_enabled"
         case ratingsOpenAfterStartMin = "ratings_open_after_start_min"
         case ratingsCloseAfterEndMin = "ratings_close_after_end_min"

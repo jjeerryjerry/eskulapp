@@ -8,6 +8,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import pl.eskulapp.mobile.data.HeaderImages
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +37,21 @@ fun EventScreen(vm: AppViewModel, id: Long) {
     val ev = event ?: return
 
     Column(Modifier.fillMaxSize().background(Bg)) {
+        // Opcjonalna grafika organizatora (z CMS, plik lokalny) nad domyslnym naglowkiem.
+        val ctx = LocalContext.current
+        val headerBitmap by produceState<ImageBitmap?>(null, ev.id, ev.headerImageUrl) {
+            val url = ev.headerImageUrl
+            value = if (url == null) null else withContext(Dispatchers.IO) {
+                HeaderImages.load(HeaderImages.file(ctx, ev.id, url))?.asImageBitmap()
+            }
+        }
+        headerBitmap?.let {
+            Image(
+                it, contentDescription = "Grafika wydarzenia ${ev.name}",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().aspectRatio(12f / 5f),
+            )
+        }
         // header
         Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 22.dp, bottomEnd = 22.dp))

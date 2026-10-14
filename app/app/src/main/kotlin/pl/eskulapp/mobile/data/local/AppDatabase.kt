@@ -64,10 +64,16 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        // v5 -> v6: sesje (blok z moderatorami i podwykladami) + przypomnienia o sesjach.
+        // v5 -> v6: sesje (blok z moderatorami i podwykladami) + przypomnienia o sesjach,
+        // oceny 3 pytania (q1..q3 w talk_ratings; stare glosy maja sam score),
+        // opcjonalna grafika naglowka eventu.
         private val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE `talks` ADD COLUMN `sessionId` INTEGER")
+                db.execSQL("ALTER TABLE `events` ADD COLUMN `headerImageUrl` TEXT")
+                db.execSQL("ALTER TABLE `talk_ratings` ADD COLUMN `q1` INTEGER")
+                db.execSQL("ALTER TABLE `talk_ratings` ADD COLUMN `q2` INTEGER")
+                db.execSQL("ALTER TABLE `talk_ratings` ADD COLUMN `q3` INTEGER")
                 db.execSQL(
                     "CREATE TABLE IF NOT EXISTS `sessions` (`id` INTEGER NOT NULL, `eventId` INTEGER NOT NULL, " +
                         "`dayId` INTEGER, `roomId` INTEGER, `title` TEXT NOT NULL, `description` TEXT, " +

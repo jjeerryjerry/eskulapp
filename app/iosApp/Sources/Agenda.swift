@@ -375,8 +375,8 @@ private struct TalkRatingBlock: View {
     var body: some View {
         TimelineView(.periodic(from: Date(), by: 15)) { ctx in
             if let panel = makePanel(now: ctx.date) {
-                RatingSectionView(panel: panel) { score in
-                    store.rate(eventId: eventId, talkId: talk.id, score: score)
+                RatingSectionView(panel: panel, saved: store.ratings[talk.id]?.answers) { answers in
+                    store.rate(eventId: eventId, talkId: talk.id, answers: answers)
                 }
                 .padding(.top, 24)
             }
@@ -394,10 +394,13 @@ private struct TalkRatingBlock: View {
     }
 }
 
-/// 10 kropli 1..10 (petrol aktywne, coral wybrane), bez srednich.
+/// 3 pytania, kazde 10 kropli 1..10 (petrol aktywne, coral wybrane), bez srednich.
+/// Glos zapisuje sie sam, gdy sa odpowiedzi na wszystkie pytania; kolejne zmiany nadpisuja.
 struct RatingSectionView: View {
     let panel: RatingPanel
-    let onRate: (Int) -> Void
+    let saved: [Int]?
+    let onRate: ([Int]) -> Void
+    @State private var draft: [Int?] = Array(repeating: nil, count: ratingQuestions.count)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -407,15 +410,26 @@ struct RatingSectionView: View {
                 .font(.system(size: 13))
                 .foregroundColor(panel.warning ? C.coralDark : C.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Spacer().frame(height: 14)
-            VStack(spacing: 10) {
-                ForEach([Array(1...5), Array(6...10)], id: \.self) { row in
-                    HStack(spacing: 10) {
-                        ForEach(row, id: \.self) { n in
-                            ScoreDrop(n: n, selected: panel.selected == n, enabled: panel.enabled) { onRate(n) }
+            ForEach(Array(ratingQuestions.enumerated()), id: \.offset) { i, q in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(i + 1). \(q.label)").font(.system(size: 14, weight: .semibold)).foregroundColor(C.ink)
+                    Text(q.text).font(.system(size: 13)).foregroundColor(C.muted).fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 4) {
+                        ForEach(1...10, id: \.self) { n in
+                            ScoreDrop(n: n, selected: draft[i] == n, enabled: panel.enabled, label: "\(q.label): \(n)") {
+                                draft[i] = n
+                                let complete = draft.compactMap { $0 }
+                                if complete.count == ratingQuestions.count { onRate(complete) }
+                            }
                         }
                     }
+                    .padding(.top, 6)
                 }
+                .padding(.top, 16)
+            }
+            if panel.enabled && draft.contains(where: { $0 == nil }) {
+                Text("Ocena zapisze się po odpowiedzi na wszystkie 3 pytania.")
+                    .font(.system(size: 12)).foregroundColor(C.faint).padding(.top, 12)
             }
         }
         .padding(16)
@@ -423,6 +437,8 @@ struct RatingSectionView: View {
         .background(C.surface)
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(C.line, lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .onAppear { if let saved, saved.count == draft.count { draft = saved.map { $0 } } }
+        .onChange(of: saved) { new in if let new, new.count == draft.count { draft = new.map { $0 } } }
     }
 }
 
@@ -430,6 +446,7 @@ private struct ScoreDrop: View {
     let n: Int
     let selected: Bool
     let enabled: Bool
+    let label: String
     let action: () -> Void
 
     var body: some View {
@@ -438,7 +455,7 @@ private struct ScoreDrop: View {
         let fg: Color = selected ? C.ink : (enabled ? C.petrol : C.faint)
         Button(action: action) {
             Text("\(n)")
-                .font(.system(size: 17, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .foregroundColor(fg)
                 .frame(maxWidth: .infinity)
                 .aspectRatio(1, contentMode: .fit)
@@ -446,7 +463,7 @@ private struct ScoreDrop: View {
         }
         .buttonStyle(.plain)
         .disabled(!enabled)
-        .accessibilityLabel("Ocena \(n)")
+        .accessibilityLabel(label)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

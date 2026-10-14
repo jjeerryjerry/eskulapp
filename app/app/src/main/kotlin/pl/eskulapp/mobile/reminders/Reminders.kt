@@ -60,7 +60,7 @@ object Reminders {
         val req = OneTimeWorkRequestBuilder<ReminderWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .setInputData(workDataOf("title" to title, "headline" to "Oceń wykład: $title",
-                "subtitle" to "Ocenianie jest już otwarte. Wybierz ocenę od 1 do 10."))
+                "subtitle" to "Ocenianie jest już otwarte. Odpowiedz na 3 krótkie pytania."))
             .addTag("reminder")
             .build()
         WorkManager.getInstance(ctx).enqueueUniqueWork("rate_$talkId", ExistingWorkPolicy.REPLACE, req)

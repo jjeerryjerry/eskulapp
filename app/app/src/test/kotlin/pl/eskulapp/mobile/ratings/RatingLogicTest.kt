@@ -109,10 +109,10 @@ class RatingLogicTest {
         val rated = panel(waw(s, 1200), 8, RatingStatus.SYNCED)!!
         assertTrue(rated.enabled)
         assertEquals(8, rated.selected)
-        assertEquals("Oceniono (8). Możesz zmienić do 11:15", rated.message)
+        assertEquals("Oceniono. Możesz zmienić do 11:15", rated.message)
         val pending = panel(waw(s, 1200), 6, RatingStatus.PENDING)!!
         assertEquals(6, pending.selected)
-        assertTrue(pending.message.startsWith("Oceniono (6)."))
+        assertTrue(pending.message.startsWith("Oceniono. Zapiszemy"))
     }
 
     @Test fun sekcja_zamknieta_i_odrzucona() {
@@ -121,7 +121,7 @@ class RatingLogicTest {
         assertEquals("Ocenianie zamknięte.", closed.message)
         val closedRated = panel(waw(e, 31 * 60), 9, RatingStatus.SYNCED)!!
         assertEquals(9, closedRated.selected)
-        assertEquals("Oceniono (9). Ocenianie zamknięte.", closedRated.message)
+        assertEquals("Oceniono. Ocenianie zamknięte.", closedRated.message)
         // glos oddany offline w oknie, doslany po zamknieciu: serwer 409 window_closed
         val rejected = panel(waw(e, 31 * 60), 9, RatingStatus.REJECTED, "window_closed")!!
         assertTrue(rejected.warning)
@@ -150,5 +150,13 @@ class RatingLogicTest {
         assertEquals(RatingResult.Retry, ratingResultFor(429, """{"error":"rate_limited"}""", 7))
         assertEquals(RatingResult.Retry, ratingResultFor(503, """{"error":"unavailable"}""", 7))
         assertEquals(RatingResult.Retry, ratingResultFor(-1, null, 7))
+    }
+
+    @Test fun overallScoreRoundsLikeServer() {
+        assertEquals(8, overallScore(listOf(7, 8, 9)))
+        assertEquals(8, overallScore(listOf(7, 8, 8)))
+        assertEquals(7, overallScore(listOf(7, 7, 8)))
+        assertEquals(10, overallScore(listOf(10, 9, 10)))
+        assertEquals(3, RATING_QUESTIONS.size)
     }
 }

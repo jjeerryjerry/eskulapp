@@ -17,6 +17,8 @@ data class EventEntity(
     val mapImageUrl: String?,
     val mapEmbed: String?,
     val mapEnabled: Boolean = true,
+    /** Opcjonalna grafika naglowka (plik lokalny: data/HeaderImages). */
+    val headerImageUrl: String? = null,
     val ratingsEnabled: Boolean = false,
     val ratingsOpenMin: Int = 10,
     val ratingsCloseMin: Int = 30,
@@ -180,4 +182,10 @@ data class TalkRatingEntity(
     val status: String,
     val error: String?,
     val updatedAt: Long,
-)
+    /** Odpowiedzi na 3 pytania; null = glos ze starszej wersji (sam score). */
+    val q1: Int? = null,
+    val q2: Int? = null,
+    val q3: Int? = null,
+) {
+    val answers: List<Int>? get() = if (q1 != null && q2 != null && q3 != null) listOf(q1, q2, q3) else null
+}

@@ -17,6 +17,7 @@ require __DIR__ . '/config.php';
 require __DIR__ . '/security.php';
 require __DIR__ . '/lib/Bundle.php';
 require __DIR__ . '/lib/Events.php';
+require __DIR__ . '/lib/EventHeader.php';
 require __DIR__ . '/lib/Ratings.php';
 
 if (!defined('BASE')) define('BASE', '');
@@ -183,6 +184,12 @@ if ($path === '/events' && $method === 'POST') {
     if (!csrf_check() || !$pdo) { header('Location: ' . BASE . '/events/new'); exit; }
     [$errors, $newId] = Events::save($pdo, $_POST, null);
     if ($errors) { view('event_form', ['isNew' => true, 'ev' => $_POST, 'errors' => $errors, 'csrf' => csrf_token()]); exit; }
+    // Grafika naglowka po utworzeniu (potrzebne id); blad = event jest, wracamy do edycji.
+    $hErr = EventHeader::handle($pdo, (int)$newId, $_FILES['header_image'] ?? null, false);
+    if ($hErr !== null) {
+        $ev = Events::get($pdo, (int)$newId);
+        view('event_form', ['isNew' => false, 'ev' => $ev, 'errors' => ['header_image' => $hErr], 'csrf' => csrf_token()]); exit;
+    }
     header('Location: ' . BASE . '/dashboard'); exit;
 }
 
@@ -216,8 +223,13 @@ if (preg_match('#^/events/(\d+)(/delete)?$#', $path, $m)) {
     if ($method === 'POST') {
         if (!csrf_check() || !$pdo) { header('Location: ' . BASE . '/events/' . $id); exit; }
         [$errors, ] = Events::save($pdo, $_POST, $id);
+        if (!$errors) {
+            $hErr = EventHeader::handle($pdo, $id, $_FILES['header_image'] ?? null, !empty($_POST['header_remove']));
+            if ($hErr !== null) $errors['header_image'] = $hErr;
+        }
         if ($errors) {
             $ev = $_POST; $ev['id'] = $id;
+            $ev['header_image_url'] = Events::get($pdo, $id)['header_image_url'] ?? null;
             view('event_form', ['isNew' => false, 'ev' => $ev, 'errors' => $errors, 'csrf' => csrf_token()]); exit;
         }
         header('Location: ' . BASE . '/dashboard'); exit;

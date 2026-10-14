@@ -79,6 +79,19 @@ object RatingWindows {
     }
 }
 
+/** Pytanie oceny: krotka etykieta + pelna tresc. Kolejnosc = q1, q2, q3 na serwerze. */
+data class RatingQuestion(val label: String, val text: String)
+
+/** 3 pytania o wystapienie (decyzja Jarka 2026-10-14, NOTATKA-AGENCJA). */
+val RATING_QUESTIONS = listOf(
+    RatingQuestion("Wartość merytoryczna", "Na ile treść była aktualna i oparta na wiedzy?"),
+    RatingQuestion("Przydatność w praktyce", "Na ile wykorzystasz to w codziennej pracy?"),
+    RatingQuestion("Sposób przekazania", "Na ile prelegent przedstawił temat jasno i ciekawie?"),
+)
+
+/** Ocena ogolna = srednia odpowiedzi zaokraglona (jak Ratings::overallScore na serwerze). */
+fun overallScore(answers: List<Int>): Int = Math.round(answers.sum().toDouble() / answers.size).toInt()
+
 /** Co pokazac w sekcji "Oceń wykład" (tekst, aktywnosc przyciskow, zaznaczona ocena). */
 data class RatingPanel(val enabled: Boolean, val message: String, val selected: Int?, val warning: Boolean = false)
 
@@ -112,14 +125,14 @@ fun ratingPanel(
             RatingPanel(false, "Ocena od " + RatingWindows.clock(window.opensAt!!, now), null)
         RatingPhase.OPEN -> when {
             kept != null && status == RatingStatus.PENDING ->
-                RatingPanel(true, "Oceniono ($kept). Zapiszemy ocenę, gdy będzie internet.", kept)
-            kept != null -> RatingPanel(true, "Oceniono ($kept). Możesz zmienić do $until", kept)
-            else -> RatingPanel(true, "Wybierz ocenę od 1 do 10. Głos jest anonimowy.", null)
+                RatingPanel(true, "Oceniono. Zapiszemy ocenę, gdy będzie internet.", kept)
+            kept != null -> RatingPanel(true, "Oceniono. Możesz zmienić do $until", kept)
+            else -> RatingPanel(true, "Odpowiedz na 3 pytania w skali od 1 do 10. Głos jest anonimowy.", null)
         }
         RatingPhase.CLOSED -> when {
             kept != null && status == RatingStatus.PENDING ->
-                RatingPanel(false, "Oceniono ($kept). Zapiszemy ocenę, gdy będzie internet.", kept)
-            kept != null -> RatingPanel(false, "Oceniono ($kept). Ocenianie zamknięte.", kept)
+                RatingPanel(false, "Oceniono. Zapiszemy ocenę, gdy będzie internet.", kept)
+            kept != null -> RatingPanel(false, "Oceniono. Ocenianie zamknięte.", kept)
             else -> RatingPanel(false, "Ocenianie zamknięte.", null)
         }
         RatingPhase.UNRATEABLE -> null

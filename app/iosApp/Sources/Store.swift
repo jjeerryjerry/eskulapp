@@ -36,6 +36,8 @@ final class AppStore: ObservableObject {
     /// Ostrzezenie o konflikcie czasowym czekajace na decyzje uczestnika.
     @Published var conflictPrompt: ConflictPrompt?
     @Published private(set) var readNewsIds: Set<Int64> = []
+    /// Zmienia sie po pobraniu grafiki naglowka (ekran eventu przeladowuje obraz).
+    @Published private(set) var headerVersion = 0
     /// Glosy tego urzadzenia (oceny prelekcji), klucz = talkId. Trwale w ratings.json.
     @Published private(set) var ratings: [Int64: LocalRating] = [:]
 
@@ -175,6 +177,7 @@ final class AppStore: ObservableObject {
     func addEvent(_ code: String) async throws -> Int64 {
         let bundle = try await fetchSmart(code)
         upsert(bundle)
+        await ensureHeader(bundle.event)
         // W tle: odtworz oceny tego urzadzenia (np. event usuniety i dodany ponownie).
         if bundle.event.ratingsOn {
             let ev = bundle.event
@@ -183,9 +186,23 @@ final class AppStore: ObservableObject {
         return bundle.event.id
     }
 
-    /// Odswiezenie: pobiera bundel tylko gdy wersja w manifescie sie zmienila.
+    /// Odswiezenie: pobiera bundel tylko gdy wersja w manifescie sie zmienila. Grafike
+    /// naglowka dociaga zawsze, gdy jej brak (np. poprzednie pobranie sie nie udalo).
     func refresh(_ code: String) async {
         let c = code.trimmingCharacters(in: .whitespaces).uppercased()
+        await refreshBundle(c)
+        if let ev = storedEvents.first(where: { $0.bundle.event.accessCode.uppercased() == c })?.bundle.event {
+            await ensureHeader(ev)
+        }
+    }
+
+    private func ensureHeader(_ ev: EventDTO) async {
+        let had = HeaderImages.load(eventId: ev.id, url: ev.headerImageUrl) != nil
+        await HeaderImages.ensure(eventId: ev.id, url: ev.headerImageUrl)
+        if !had { headerVersion += 1 }
+    }
+
+    private func refreshBundle(_ c: String) async {
         do {
             let m = try await fetchManifest(c)
             let exists = storedEvents.contains { $0.bundle.event.accessCode.uppercased() == c }
@@ -219,6 +236,7 @@ final class AppStore: ObservableObject {
     func deleteEvent(_ id: Int64) {
         storedEvents.removeAll { $0.id == id }
         save()
+        HeaderImages.delete(eventId: id)
     }
 
     func openEvent(_ id: Int64) { top = .event(id) }
@@ -353,7 +371,7 @@ final class AppStore: ObservableObject {
         guard delay > 0 else { return }
         let content = UNMutableNotificationContent()
         content.title = "Oceń wykład: \(title)"
-        content.body = "Ocenianie jest już otwarte. Wybierz ocenę od 1 do 10."
+        content.body = "Ocenianie jest już otwarte. Odpowiedz na 3 krótkie pytania."
         content.sound = .default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "rate_\(talkId)", content: content, trigger: trigger))
@@ -371,13 +389,14 @@ final class AppStore: ObservableObject {
         return v
     }
 
-    /// Ocena 1..10: zapis lokalny jako "pending" i wysylka od razu (albo gdy wroci siec).
-    func rate(eventId: Int64, talkId: Int64, score: Int) {
-        guard (1...10).contains(score), let ev = event(eventId) else { return }
+    /// Ocena: 3 odpowiedzi 1..10, zapis lokalny jako "pending" i wysylka od razu (albo gdy wroci siec).
+    func rate(eventId: Int64, talkId: Int64, answers: [Int]) {
+        guard answers.count == ratingQuestions.count, answers.allSatisfy({ (1...10).contains($0) }),
+              let ev = event(eventId) else { return }
         let version = max(Date().timeIntervalSince1970, (ratings[talkId]?.updatedAt ?? 0) + 0.001)
         ratings[talkId] = LocalRating(talkId: talkId, eventId: eventId,
-                                      eventCode: ev.bundle.event.accessCode.uppercased(), score: score,
-                                      status: RatingStatus.pending, error: nil, updatedAt: version)
+                                      eventCode: ev.bundle.event.accessCode.uppercased(), score: overallScore(answers),
+                                      status: RatingStatus.pending, error: nil, updatedAt: version, answers: answers)
         saveRatings()
         Task { await syncPendingRatings() }
     }
@@ -435,7 +454,9 @@ final class AppStore: ObservableObject {
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         req.setValue("application/json", forHTTPHeaderField: "Accept")
         req.timeoutInterval = 15
-        let payload: [String: Any] = ["install_id": Self.installId, "score": r.score]
+        // Od 1.4 odpowiedzi na 3 pytania; sam score tylko dla glosow ze starszej wersji apki.
+        let payload: [String: Any] = r.answers.map { ["install_id": Self.installId, "answers": $0] }
+            ?? ["install_id": Self.installId, "score": r.score]
         req.httpBody = try? JSONSerialization.data(withJSONObject: payload)
         do {
             let (data, resp) = try await URLSession.shared.data(for: req)
@@ -455,11 +476,12 @@ final class AppStore: ObservableObject {
         for m in mine {
             if let local = ratings[m.talkId] {
                 if local.status == RatingStatus.pending { continue }
-                if local.status == RatingStatus.synced && local.score == m.score { continue }
+                if local.status == RatingStatus.synced && local.score == m.score && local.answers == m.answers { continue }
             }
             ratings[m.talkId] = LocalRating(talkId: m.talkId, eventId: eventId, eventCode: code.uppercased(),
                                             score: m.score, status: RatingStatus.synced, error: nil,
-                                            updatedAt: Date().timeIntervalSince1970)
+                                            updatedAt: Date().timeIntervalSince1970,
+                                            answers: m.answers?.count == ratingQuestions.count ? m.answers : nil)
             changed = true
         }
         if changed { saveRatings() }

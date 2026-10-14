@@ -7,6 +7,7 @@ import pl.eskulapp.mobile.data.model.BundleDto
 import pl.eskulapp.mobile.ratings.InstallId
 import pl.eskulapp.mobile.ratings.RatingStatus
 import pl.eskulapp.mobile.ratings.RatingSyncWorker
+import pl.eskulapp.mobile.ratings.overallScore
 
 class Repo(context: Context) {
     private val db = AppDatabase.get(context)
@@ -23,24 +24,31 @@ class Repo(context: Context) {
         val c = code.trim().uppercase()
         val b = fetchSmart(c)
         saveBundle(b)
+        HeaderImages.ensure(appContext, b.event.id, b.event.headerImageUrl)
         return dao.eventByCode(b.event.accessCode) ?: error("brak eventu po zapisie")
     }
 
-    /** Odswiezenie: pobiera bundel tylko gdy wersja w manifescie sie zmienila. */
-    suspend fun refresh(code: String): Boolean = try {
+    /**
+     * Odswiezenie: pobiera bundel tylko gdy wersja w manifescie sie zmienila. Grafike
+     * naglowka dociaga zawsze, gdy jej brak (np. poprzednie pobranie sie nie udalo).
+     */
+    suspend fun refresh(code: String): Boolean {
         val c = code.trim().uppercase()
-        try {
-            val m = ApiClient.fetchManifest(c)
-            val exists = dao.eventByCode(c) != null
-            if (exists && storedVersion(c) == m.version) {
-                true // aktualne, nic nie pobieramy
-            } else {
-                saveBundle(ApiClient.fetchBundleAt(m.bundlePath)); setVersion(c, m.version); true
+        val ok = try {
+            try {
+                val m = ApiClient.fetchManifest(c)
+                val exists = dao.eventByCode(c) != null
+                if (!exists || storedVersion(c) != m.version) {
+                    saveBundle(ApiClient.fetchBundleAt(m.bundlePath)); setVersion(c, m.version)
+                }
+            } catch (cdn: Exception) {
+                saveBundle(ApiClient.fetchBundle(c)) // fallback na PHP
             }
-        } catch (cdn: Exception) {
-            saveBundle(ApiClient.fetchBundle(c)); true // fallback na PHP
-        }
-    } catch (e: Exception) { false }
+            true
+        } catch (e: Exception) { false }
+        dao.eventByCode(c)?.let { HeaderImages.ensure(appContext, it.id, it.headerImageUrl) }
+        return ok
+    }
 
     /** Odswiezenie wszystkich dodanych eventow (np. przy starcie apki). Bledy ignorowane. */
     suspend fun refreshAll() {
@@ -70,6 +78,7 @@ class Repo(context: Context) {
                     venueName = b.event.venueName, city = b.event.city,
                     mapImageUrl = b.event.mapImageUrl, mapEmbed = b.event.mapEmbed,
                     mapEnabled = b.event.mapEnabled,
+                    headerImageUrl = b.event.headerImageUrl,
                     ratingsEnabled = b.event.ratingsEnabled,
                     ratingsOpenMin = b.event.ratingsOpenAfterStartMin,
                     ratingsCloseMin = b.event.ratingsCloseAfterEndMin,
@@ -94,16 +103,22 @@ class Repo(context: Context) {
         }
     }
 
-    suspend fun deleteEvent(id: Long) = db.dao().deleteEvent(id)
+    suspend fun deleteEvent(id: Long) {
+        db.dao().deleteEvent(id)
+        HeaderImages.delete(appContext, id)
+    }
 
     // ---- Oceny prelekcji (SPEC-OCENY §5): najpierw lokalnie, wysylka przez WorkManager ----
 
-    /** Zapisuje glos lokalnie jako "pending" i zleca wysylke (od razu albo po odzyskaniu sieci). */
-    suspend fun rate(eventId: Long, eventCode: String, talkId: Long, score: Int) {
+    /** Zapisuje glos (3 odpowiedzi) lokalnie jako "pending" i zleca wysylke (od razu albo po odzyskaniu sieci). */
+    suspend fun rate(eventId: Long, eventCode: String, talkId: Long, answers: List<Int>) {
         val prev = dao.ratingOnce(talkId)
         // wersja musi sie zmienic przy kazdej zmianie oceny (setRatingStatus porownuje updatedAt)
         val version = maxOf(System.currentTimeMillis(), (prev?.updatedAt ?: 0L) + 1)
-        dao.putRating(TalkRatingEntity(talkId, eventId, eventCode.uppercase(), score, RatingStatus.PENDING, null, version))
+        dao.putRating(
+            TalkRatingEntity(talkId, eventId, eventCode.uppercase(), overallScore(answers), RatingStatus.PENDING, null, version,
+                answers[0], answers[1], answers[2])
+        )
         RatingSyncWorker.enqueue(appContext)
     }
 
@@ -122,9 +137,11 @@ class Repo(context: Context) {
             for (m in mine) {
                 val local = dao.ratingOnce(m.talkId)
                 if (local != null && local.status == RatingStatus.PENDING) continue
-                if (local != null && local.status == RatingStatus.SYNCED && local.score == m.score) continue
+                if (local != null && local.status == RatingStatus.SYNCED && local.score == m.score && local.answers == m.answers) continue
+                val a = m.answers?.takeIf { it.size == 3 }
                 dao.putRating(
-                    TalkRatingEntity(m.talkId, eventId, code.uppercase(), m.score, RatingStatus.SYNCED, null, System.currentTimeMillis())
+                    TalkRatingEntity(m.talkId, eventId, code.uppercase(), m.score, RatingStatus.SYNCED, null, System.currentTimeMillis(),
+                        a?.get(0), a?.get(1), a?.get(2))
                 )
             }
         }

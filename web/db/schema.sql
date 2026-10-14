@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS events (
   map_image_url VARCHAR(255) NULL,
   map_embed   TEXT NULL,
   map_enabled TINYINT(1) NOT NULL DEFAULT 1,       -- 0 = apka ukrywa Mape
+  header_image_url VARCHAR(255) NULL,              -- opcjonalna grafika naglowka (CMS)
   ratings_enabled TINYINT NOT NULL DEFAULT 1,      -- oceny prelekcji 1-10 (SPEC-OCENY)
   ratings_open_after_start_min INT NOT NULL DEFAULT 10,  -- okno: od starts_at + N min
   ratings_close_after_end_min  INT NOT NULL DEFAULT 30,  -- do ends_at + N min

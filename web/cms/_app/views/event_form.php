@@ -24,7 +24,7 @@ require APP_DIR . '/views/_head.php';
   <h1 style="font-size:26px"><?= e($title) ?></h1>
   <?php if ($errors): ?><div class="msg-err" style="margin-top:14px">Popraw zaznaczone pola.</div><?php endif; ?>
 
-  <form method="post" action="<?= BASE ?>/events<?= $isNew ? '' : '/' . (int)$ev['id'] ?>" style="margin-top:18px">
+  <form method="post" enctype="multipart/form-data" action="<?= BASE ?>/events<?= $isNew ? '' : '/' . (int)$ev['id'] ?>" style="margin-top:18px">
     <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
 
     <div class="field">
@@ -94,6 +94,19 @@ require APP_DIR . '/views/_head.php';
                value="<?= $val('ratings_close_after_end_min', Ratings::DEFAULT_CLOSE_MIN) ?>">
         <?php if (isset($errors['ratings_close_after_end_min'])): ?><div class="ferr"><?= e($errors['ratings_close_after_end_min']) ?></div><?php endif; ?>
       </div>
+    </div>
+
+    <div class="field" style="margin-top:6px">
+      <label>Grafika nagłówka w aplikacji (opcjonalnie)</label>
+      <?php if (!empty($ev['header_image_url'])): ?>
+        <img src="<?= e($ev['header_image_url']) ?>" alt="Aktualna grafika nagłówka" style="display:block;width:100%;max-width:480px;aspect-ratio:12/5;object-fit:cover;border-radius:12px;border:1px solid var(--line);margin:6px 0 10px">
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:400">
+          <input type="checkbox" name="header_remove" value="1" style="width:auto"> Usuń grafikę (wróci domyślny nagłówek)
+        </label>
+      <?php endif; ?>
+      <input type="file" name="header_image" accept="image/jpeg,image/png,image/webp" style="margin-top:6px">
+      <div style="color:var(--muted);font-size:13px;margin-top:4px">JPG, PNG lub WebP, maks. 3 MB. Zalecany rozmiar 1200 x 500 px (proporcje 12:5); brzegi mogą zostać przycięte na mniejszych ekranach.</div>
+      <?php if (isset($errors['header_image'])): ?><div class="ferr"><?= e($errors['header_image']) ?></div><?php endif; ?>
     </div>
 
     <div style="display:flex;gap:12px;align-items:center;margin-top:22px">

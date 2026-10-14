@@ -109,6 +109,15 @@ struct EventHomeView: View {
             let archived = ev.statusOrDefault == "archived"
 
             VStack(spacing: 0) {
+                // Opcjonalna grafika organizatora (z CMS, plik lokalny) nad domyslnym naglowkiem.
+                if let img = HeaderImages.load(eventId: ev.id, url: ev.headerImageUrl) {
+                    Color.clear
+                        .aspectRatio(12.0 / 5.0, contentMode: .fit)
+                        .overlay(Image(uiImage: img).resizable().scaledToFill())
+                        .clipped()
+                        .accessibilityLabel("Grafika wydarzenia \(ev.name)")
+                        .id(store.headerVersion)
+                }
                 header(ev, archived: archived)
                 VStack(spacing: 0) {
                     if !stored.bundle.news.isEmpty {

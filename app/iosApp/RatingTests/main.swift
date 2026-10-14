@@ -82,11 +82,17 @@ eq(true, panel(waw(s, 1200), enabled: false) == nil, "oceny wylaczone")
 eq("Ocena od 10:10", panel(waw(s, 60))?.message ?? "", "jeszcze nieaktywne")
 eq(false, panel(waw(s, 60))?.enabled ?? true, "nieaktywne przyciski")
 eq("Ocena od 20.10, 10:10", panel(waw(s, -86400))?.message ?? "", "inny dzien")
-eq("Oceniono (8). Możesz zmienić do 11:15", panel(waw(s, 1200), 8, RatingStatus.synced)?.message ?? "", "oceniono")
+eq("Oceniono. Możesz zmienić do 11:15", panel(waw(s, 1200), 8, RatingStatus.synced)?.message ?? "", "oceniono")
 eq(8, panel(waw(s, 1200), 8, RatingStatus.synced)?.selected ?? 0, "zaznaczona ocena")
 eq("Ocenianie zamknięte.", panel(waw(e, 31 * 60))?.message ?? "", "zamkniete")
 eq("Nie udało się zapisać, okno oceniania zamknięte.",
    panel(waw(e, 31 * 60), 9, RatingStatus.rejected, "window_closed")?.message ?? "", "409 po zamknieciu")
+
+// ocena ogolna z 3 odpowiedzi (jak serwer)
+eq(8, overallScore([7, 8, 9]), "srednia 8")
+eq(8, overallScore([7, 8, 8]), "7,67 w gore")
+eq(7, overallScore([7, 7, 8]), "7,33 w dol")
+eq(3, ratingQuestions.count, "3 pytania")
 
 // odpowiedzi serwera
 eq(RatingResult.saved(7), ratingResult(httpCode: 200, body: Data("{\"ok\":true,\"score\":7}".utf8), score: 7), "200")

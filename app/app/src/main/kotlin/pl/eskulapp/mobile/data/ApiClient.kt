@@ -65,10 +65,11 @@ object ApiClient {
     // ---- Oceny prelekcji (SPEC-OCENY §4): zawsze PHP API, nigdy CDN ----
 
     /** Wysyla glos. Nie rzuca: siec/429/5xx = Retry, odrzucenie przez serwer = Rejected. */
-    suspend fun postRating(code: String, talkId: Long, installId: String, score: Int): RatingResult =
+    suspend fun postRating(code: String, talkId: Long, installId: String, score: Int, answers: List<Int>?): RatingResult =
         withContext(Dispatchers.IO) {
             val c = URLEncoder.encode(code.trim().uppercase(), "UTF-8")
-            val payload = json.encodeToString(RatingRequestDto.serializer(), RatingRequestDto(installId, score))
+            val req = if (answers != null) RatingRequestDto(installId, answers = answers) else RatingRequestDto(installId, score = score)
+            val payload = json.encodeToString(RatingRequestDto.serializer(), req)
             val conn = try {
                 (URL("${BuildConfig.API_BASE}/public/events/$c/talks/$talkId/rating").openConnection() as HttpURLConnection)
             } catch (e: IOException) {

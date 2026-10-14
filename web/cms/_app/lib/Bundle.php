@@ -54,6 +54,8 @@ final class Bundle
                 'venue_name' => $ev['venue_name'], 'city' => $ev['city'],
                 'map_image_url' => $ev['map_image_url'], 'map_embed' => $ev['map_embed'],
                 'map_enabled' => (bool)($ev['map_enabled'] ?? 1),
+                // Opcjonalna grafika naglowka (CMS); null = domyslny naglowek w apce.
+                'header_image_url' => $ev['header_image_url'] ?? null,
                 // Oceny prelekcji (SPEC-OCENY): apka liczy okno lokalnie (UI),
                 // serwer (POST .../rating) jest jedynym zrodlem prawdy.
                 'ratings_enabled' => (bool)($ev['ratings_enabled'] ?? 1),
