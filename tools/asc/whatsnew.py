@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Podmiana pola „Co nowego” (pl) w wersji ASC_VERSION, bez ruszania reszty i bez zmiany stanu recenzji.
 Tekst: blok „Co nowego” z docs/PUBLIKACJA.md. Bez --apply: tylko podglad."""
-import os, sys
-sys.argv += []
 import prepare as P
 
 t = P.texts()
