@@ -1,6 +1,6 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-10-14 (1.4.0: sesje, konflikty, oceny 3 pytania, nagłówek eventu)_
+_Ostatnia aktualizacja: 2026-10-15 (1.4.0 wysłane do sklepów)_
 
 ## 1.4.0: sesje, konflikty, oceny 3 pytania, nagłówek eventu (2026-10-14, gałąź `feature/sesje`)
 Źródło: `docs/NOTATKA-AGENCJA-2026-10-14.md` (spotkanie z agencją + decyzje Jarka).
@@ -21,7 +21,11 @@ _Ostatnia aktualizacja: 2026-10-14 (1.4.0: sesje, konflikty, oceny 3 pytania, na
 - Backend (`_app`) WDROŻONY, TEST02 upieczony do CDN. Backupy DB przed migracjami: `backups/` (lokalnie, poza repo).
 - Testy: PHP 31/31 z MySQL (CI), JVM 21/21, Swift: oceny + konflikty (CI).
 - APK testowy 1.4.0 (debug, obok wersji ze sklepu): https://drive.google.com/open?id=1qTRwU42lAAEcat8d1rsdGJuNJFNkZ3H4
-- **Czeka**: test Jarka na telefonie, potem merge do `main` (odpali TestFlight) i wydanie 1.4.0 w sklepach.
+- **2026-10-15 WYSŁANE DO SKLEPÓW** (polecenie Jarka „wrzucaj je na produkcje”): PR #2 scalony do `main`.
+  Play: vc 22 na **production** (completed, 100%), czeka na recenzję Google. Notatki z `docs/PUBLIKACJA.md`.
+  iOS: ios.yml run 38708408412 (build **18**, TestFlight + grupa Jerry), `asc-prepare.yml` (apply+submit,
+  version=1.4.0 build=18): nowa wersja 1.4.0 z „Co nowego”, **WAITING_FOR_REVIEW**, wydanie RĘCZNE.
+  `prepare.py` umie teraz aktualizacje (zakłada nową wersję, ustawia whatsNew). Po akceptacji Apple: `asc-release.yml -f version=1.4.0`.
 - QR check-in: odłożone („na przyszłość”).
 
 ## Gdzie jesteśmy
