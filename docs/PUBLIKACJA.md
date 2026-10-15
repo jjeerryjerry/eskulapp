@@ -1,6 +1,6 @@
 # Eskulapp, publikacja w sklepach (Google Play + App Store)
 
-_Stan: 2026-10-05. Wersja do wydania: Android 1.3.0 (versionCode 21), iOS 1.3.0 (build 17)._
+_Stan: 2026-10-15. Wersja do wydania: Android 1.4.0 (versionCode 22), iOS 1.4.0. Poprzednia: 1.3.0 (vc 21, iOS build 17)._
 
 Kody testowe (także dla recenzentów Google i Apple):
 
@@ -32,13 +32,13 @@ Jak zacząć
 Wpisz kod wydarzenia, który otrzymasz od organizatora. Aplikacja pobierze cały program na telefon. Nie zakładasz konta i nie podajesz żadnych danych.
 
 Co znajdziesz w środku
-• Agenda: program podzielony na dni, filtr sal, lista obserwowanych prelekcji i przypomnienie przed ich startem.
-• Prelegenci: sylwetki, afiliacje i lista wystąpień każdej osoby.
+• Agenda: program podzielony na dni i sesje, filtr sal, przypomnienia o sesjach i prelekcjach oraz ostrzeżenie, gdy dwie wybrane pozycje odbywają się w tym samym czasie.
+• Prelegenci: sylwetki, afiliacje, wystąpienia i moderowane sesje każdej osoby.
 • Partnerzy: wystawcy z opisem, stroną www i numerem stoiska.
 • Mapa: plan strefy wystawców z zaznaczonymi stoiskami (gdy organizator udostępnia plan).
 • Aktualności: zmiany sal, przesunięcia i ogłoszenia organizatora.
 • Kontakt: telefon i e-mail do biura wydarzenia jednym dotknięciem.
-• Oceny: anonimowa ocena prelekcji w skali od 1 do 10, gdy organizator ją włączy.
+• Oceny: anonimowa ocena prelekcji w 3 krótkich pytaniach (skala od 1 do 10), gdy organizator ją włączy.
 
 Działa offline
 Po pobraniu programu korzystasz z aplikacji bez zasięgu: na sali wykładowej, w hali wystawienniczej, w podziemiach centrum kongresowego.
@@ -52,11 +52,12 @@ Aplikacja nie wymaga konta, nie wyświetla reklam i nie śledzi użytkownika. Da
 Jesteś organizatorem i chcesz mieć swoje wydarzenie w Eskulapp? Napisz: kontakt@eskulapp.pl
 ```
 
-**Co nowego w 1.3.0** (500):
+**Co nowego w 1.4.0** (500):
 ```
-• Oceń wysłuchane prelekcje w skali od 1 do 10. Ocena jest anonimowa.
-• Aplikacja przypomni Ci o ocenie prelekcji, które obserwujesz.
-• Drobne poprawki wyglądu i tekstów.
+• Sesje w agendzie: blok z moderatorem i listą wykładów. Przypomnienie możesz ustawić na całą sesję albo na wybrane wykłady.
+• Ostrzeżenie o kolizji: aplikacja podpowie, gdy dwie wybrane pozycje trwają w tym samym czasie.
+• Nowa ocena prelekcji: 3 krótkie pytania o wartość merytoryczną, przydatność w praktyce i sposób przekazania.
+• Organizator może dodać własną grafikę wydarzenia.
 ```
 
 **Kategoria:** Wydarzenia • **E-mail:** kontakt@eskulapp.pl • **WWW:** https://eskulapp.pl •
@@ -101,7 +102,8 @@ TEST02 (upcoming event)
 TEST03 (past event without a venue map)
 
 Steps: open the app, type TEST01, tap "Pobierz wydarzenie". Local notifications are used only for talk reminders the user sets (bell icon in Agenda).
-Talk ratings (1-10, anonymous) can be tested with TEST02: open Agenda, pick any talk, scroll to "Oceń wykład". Ratings are sent with a random per-install ID only (no personal data).
+Talk ratings (3 questions, scale 1-10, anonymous) can be tested with TEST02: open Agenda, pick any talk, scroll to "Oceń wykład". Ratings are sent with a random per-install ID only (no personal data).
+Sessions (a block with a moderator and several talks) and the time conflict warning can be tested with TEST02, day 1: tap the bell on "Sesja I" and then on the 10:30 talk in Sala Morska.
 ```
 Login wymagany: **NIE** (odznaczyć „Sign-in required").
 

@@ -13,6 +13,14 @@ on:
         description: "Po zapisie wyslij wersje do recenzji Apple"
         type: boolean
         default: false
+      version:
+        description: "Wersja (np. 1.4.0)"
+        type: string
+        default: "1.4.0"
+      build:
+        description: "Numer buildu (run_number z ios.yml)"
+        type: string
+        required: true
       territories:
         description: "Kraje: POL albo ALL"
         type: string
@@ -30,4 +38,6 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
           ASC_TERRITORIES: ${{ inputs.territories }}
+          ASC_VERSION: ${{ inputs.version }}
+          ASC_BUILD: ${{ inputs.build }}
         run: python3 tools/asc/prepare.py ${{ inputs.apply && '--apply' || '' }} ${{ inputs.submit && '--submit' || '' }}

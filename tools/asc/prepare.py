@@ -61,7 +61,9 @@ def texts():
     sub = re.search(r"\*\*Podtytuł\*\*[^`]*`([^`]+)`", md).group(1)
     t = {"description": blocks["Pełny opis"], "keywords": blocks["Słowa kluczowe"],
          "promotionalText": blocks["Tekst promocyjny"], "subtitle": sub,
-         "notes": blocks["Uwagi dla recenzenta (App Review Information, Notes):"]}
+         "notes": blocks["Uwagi dla recenzenta (App Review Information, Notes):"],
+         "whatsNew": next(v for k, v in blocks.items() if k.startswith("Co nowego"))}
+    assert len(t["whatsNew"]) <= 4000
     assert len(t["subtitle"]) <= 30 and len(t["keywords"]) <= 100 and len(t["promotionalText"]) <= 170
     assert len(t["description"]) <= 4000 and len(t["notes"]) <= 4000
     for v in t.values():
@@ -77,10 +79,19 @@ def main():
     vers = api(f"/v1/apps/{APP_ID}/appStoreVersions?filter[platform]=IOS&limit=10")["data"]
     ver = next((v for v in vers if v["attributes"]["appStoreState"] in
                 ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED")), None)
-    if not ver:
-        print("Brak edytowalnej wersji:", [(v["attributes"]["versionString"], v["attributes"]["appStoreState"]) for v in vers])
+    if not ver and any(v["attributes"]["versionString"] == VERSION for v in vers):
+        print("Wersja", VERSION, "juz nieedytowalna:", [(v["attributes"]["versionString"], v["attributes"]["appStoreState"]) for v in vers])
         raise SystemExit(1)
+    if not ver:
+        # Aktualizacja: poprzednia wersja jest w sprzedazy, zakladamy nowa
+        print(("ZAPIS " if APPLY else "PLAN  ") + f"nowa wersja {VERSION}")
+        if not APPLY:
+            print("Podglad konczy sie tu (reszta wymaga istniejacej wersji)."); return
+        ver = api("/v1/appStoreVersions", "POST", {"data": {"type": "appStoreVersions",
+                  "attributes": {"platform": "IOS", "versionString": VERSION, "releaseType": "MANUAL"},
+                  "relationships": {"app": {"data": {"type": "apps", "id": APP_ID}}}}})["data"]
     vid = ver["id"]
+    update = any(v["attributes"]["appStoreState"] == "READY_FOR_SALE" for v in vers)
     write(f"wersja {ver['attributes']['versionString']} na {VERSION}, copyright, wydanie MANUAL",
           f"/v1/appStoreVersions/{vid}", "PATCH",
           {"data": {"type": "appStoreVersions", "id": vid, "attributes": {
@@ -102,7 +113,7 @@ def main():
           {"data": {"type": "appStoreVersionLocalizations", "id": loc["id"], "attributes": {
               "description": t["description"], "keywords": t["keywords"],
               "promotionalText": t["promotionalText"], "supportUrl": "https://eskulapp.pl",
-              "marketingUrl": "https://eskulapp.pl"}}})
+              "marketingUrl": "https://eskulapp.pl", **({"whatsNew": t["whatsNew"]} if update else {})}}})
 
     # App info: podtytul, polityka, kategorie, ocena wiekowa
     info = next(i for i in api(f"/v1/apps/{APP_ID}/appInfos")["data"]
