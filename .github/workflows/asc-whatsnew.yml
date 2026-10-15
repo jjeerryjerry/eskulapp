@@ -1,0 +1,27 @@
+name: ASC whatsNew (App Store)
+
+# Podmienia tylko pole „Co nowego” (pl) w podanej wersji. Tekst z docs/PUBLIKACJA.md.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        default: "1.4.0"
+      apply:
+        type: boolean
+        default: false
+
+jobs:
+  whatsnew:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install "pyjwt[crypto]"
+      - env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_VERSION: ${{ inputs.version }}
+        working-directory: tools/asc
+        run: python3 whatsnew.py ${{ inputs.apply && '--apply' || '' }}

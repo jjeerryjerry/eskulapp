@@ -57,7 +57,6 @@ Jesteś organizatorem i chcesz mieć swoje wydarzenie w Eskulapp? Napisz: kontak
 • Sesje w agendzie: blok z moderatorem i listą wykładów. Przypomnienie możesz ustawić na całą sesję albo na wybrane wykłady.
 • Ostrzeżenie o kolizji: aplikacja podpowie, gdy dwie wybrane pozycje trwają w tym samym czasie.
 • Nowa ocena prelekcji: 3 krótkie pytania o wartość merytoryczną, przydatność w praktyce i sposób przekazania.
-• Organizator może dodać własną grafikę wydarzenia.
 ```
 
 **Kategoria:** Wydarzenia • **E-mail:** kontakt@eskulapp.pl • **WWW:** https://eskulapp.pl •
