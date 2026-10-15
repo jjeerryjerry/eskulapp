@@ -4,6 +4,7 @@ import UIKit
 // Cele nawigacji wpychane w stosy zakladek.
 enum Route: Hashable {
     case talk(Int64)
+    case session(Int64)
     case speaker(Int64)
     case speakers
     case partner(Int64)
@@ -17,6 +18,7 @@ enum Route: Hashable {
 func routeView(_ route: Route, eventId: Int64) -> some View {
     switch route {
     case .talk(let id):     TalkView(eventId: eventId, talkId: id)
+    case .session(let id):  SessionView(eventId: eventId, sessionId: id)
     case .speaker(let id):  SpeakerDetailView(eventId: eventId, speakerId: id)
     case .speakers:         SpeakersView(eventId: eventId)
     case .partner(let id):  PartnerDetailView(eventId: eventId, partnerId: id)
@@ -73,6 +75,24 @@ struct EventContainerView: View {
             .tabItem { Label("Więcej", systemImage: "ellipsis") }.tag(4)
         }
         .tint(C.petrol)
+        .alert("Kolizja czasowa", isPresented: Binding(
+            get: { store.conflictPrompt != nil },
+            set: { if !$0 { store.conflictPrompt = nil } }
+        ), presenting: store.conflictPrompt) { _ in
+            Button("Ustaw mimo to") { store.confirmConflict() }
+            Button("Anuluj", role: .cancel) { store.conflictPrompt = nil }
+        } message: { p in
+            Text(conflictMessage(p))
+        }
+    }
+
+    private func conflictMessage(_ p: ConflictPrompt) -> String {
+        let lines = p.conflicts.map { c -> String in
+            let time = [hhmm(c.startsAt), hhmm(c.endsAt)].filter { !$0.isEmpty }.joined(separator: " - ")
+            let meta = [time.isEmpty ? nil : time, c.room].compactMap { $0 }.joined(separator: " \u{00B7} ")
+            return (c.isSession ? "Sesja: " : "") + c.title + (meta.isEmpty ? "" : "\n" + meta)
+        }
+        return "W tym czasie obserwujesz już:\n\n" + lines.joined(separator: "\n\n") + "\n\nUstawić przypomnienie mimo to?"
     }
 }
 
@@ -89,6 +109,15 @@ struct EventHomeView: View {
             let archived = ev.statusOrDefault == "archived"
 
             VStack(spacing: 0) {
+                // Opcjonalna grafika organizatora (z CMS, plik lokalny) nad domyslnym naglowkiem.
+                if let img = HeaderImages.load(eventId: ev.id, url: ev.headerImageUrl) {
+                    Color.clear
+                        .aspectRatio(12.0 / 5.0, contentMode: .fit)
+                        .overlay(Image(uiImage: img).resizable().scaledToFill())
+                        .clipped()
+                        .accessibilityLabel("Grafika wydarzenia \(ev.name)")
+                        .id(store.headerVersion)
+                }
                 header(ev, archived: archived)
                 VStack(spacing: 0) {
                     if !stored.bundle.news.isEmpty {

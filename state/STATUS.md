@@ -1,6 +1,28 @@
 # STATUS — Eskulapp
 
-_Ostatnia aktualizacja: 2026-10-06 (iOS 1.3.0 WYDANY w App Store; Play produkcja w recenzji)_
+_Ostatnia aktualizacja: 2026-10-14 (1.4.0: sesje, konflikty, oceny 3 pytania, nagłówek eventu)_
+
+## 1.4.0: sesje, konflikty, oceny 3 pytania, nagłówek eventu (2026-10-14, gałąź `feature/sesje`)
+Źródło: `docs/NOTATKA-AGENCJA-2026-10-14.md` (spotkanie z agencją + decyzje Jarka).
+- **Sesje**: `sessions`, `session_moderators`, `talks.session_id` (migracja `2026_10_sessions.sql`,
+  ZROBIONA na produkcji). Bundel: `sessions[]`, `session_moderators[]`. Apki: karta sesji z
+  podwykładami w Agendzie, ekran Sesji, przypomnienie o sesji i o każdym podwykładzie,
+  Prelegent: „Moderuje” / „Wykłada”. Treść sesji wprowadzamy SQL-em (CMS agendy jeszcze nie ma).
+  Demo: `web/db/seed_test02_sessions.sql` (TEST02, 2 sesje, celowa kolizja 10:30).
+- **Konflikty czasowe**: tylko apki (`agenda/Conflicts.kt`, `Conflicts.swift`): ostrzeżenie
+  przy włączaniu dzwonka + etykieta „Kolizja czasowa” na liście. Sesja i jej podwykład to nie kolizja.
+- **Oceny 3 pytania** (merytoryka, praktyka, przekaz; skala 1-10; eventu nie oceniamy):
+  `talk_ratings.q1..q3` (migracja `2026_10_rating_questions.sql`, ZROBIONA), API `answers`,
+  score = zaokrąglona średnia; stare apki 1.3.0 dalej wysyłają `score` (zgodność). CMS: kolumny
+  średnich per pytanie + CSV.
+- **Nagłówek eventu**: `events.header_image_url` (migracja ZROBIONA), upload w edycji eventu
+  (JPG/PNG/WebP, maks. 3 MB, min. 600 px, zalecane 1200 x 500), pliki w `public_html/media/events/<id>/`.
+  Apki pobierają grafikę lokalnie (offline). TEST02 ma grafikę demo.
+- Backend (`_app`) WDROŻONY, TEST02 upieczony do CDN. Backupy DB przed migracjami: `backups/` (lokalnie, poza repo).
+- Testy: PHP 31/31 z MySQL (CI), JVM 21/21, Swift: oceny + konflikty (CI).
+- APK testowy 1.4.0 (debug, obok wersji ze sklepu): https://drive.google.com/open?id=1qTRwU42lAAEcat8d1rsdGJuNJFNkZ3H4
+- **Czeka**: test Jarka na telefonie, potem merge do `main` (odpali TestFlight) i wydanie 1.4.0 w sklepach.
+- QR check-in: odłożone („na przyszłość”).
 
 ## Gdzie jesteśmy
 **Faza 0 — Fundament / środowisko: ZROBIONE.** Kod aplikacji ani backendu
@@ -750,3 +772,11 @@ Na polecenie Jarka (demo ocen dla klientów).
 - **2026-10-06: iOS 1.3.0 WYDANY** (Apple zaakceptował, wydanie przez API `asc-release.yml`, stan READY_FOR_SALE, tylko Polska).
   Link: https://apps.apple.com/pl/app/id6810647099 (publicznie widoczny po propagacji, do 24 h).
   Play: produkcja vc 21 nadal w recenzji Google (strona sklepu 404). Linki na eskulapp.pl po działających stronach obu sklepów.
+
+## 2026-10-08: notatki „Co nowego” 1.3.0 przepisane pod uczestnika
+- Play produkcja (vc 21, completed): releaseNotes podmienione przez `tools/play/promote.py --commit`, źródło `docs/PUBLIKACJA.md`.
+- App Store: 1.3.0 READY_FOR_SALE, „What's New” nieedytowalne. Nowy tekst wejdzie z następną wersją.
+
+## 2026-10-10: linki do sklepów na eskulapp.pl
+- Motyw v1.4: przycisk „Pobierz z Google Play” w kroku 2 + link w stopce. Lista sklepów: `eskulapp_store_links()` w `functions.php`.
+- 2026-10-10: App Store WŁĄCZONY (Jarek potwierdził, że link działa na telefonie; z serwera nadal 404/lookup 0, czyli problem po stronie zapytań z serwera). Teksty FAQ/schema: „Google Play lub App Store”. Motyw v1.5.

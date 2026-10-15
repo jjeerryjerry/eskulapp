@@ -11,6 +11,8 @@ data class BundleDto(
     val talks: List<TalkDto> = emptyList(),
     val speakers: List<SpeakerDto> = emptyList(),
     @SerialName("talk_speakers") val talkSpeakers: List<TalkSpeakerDto> = emptyList(),
+    val sessions: List<SessionDto> = emptyList(),
+    @SerialName("session_moderators") val sessionModerators: List<SessionModeratorDto> = emptyList(),
     val partners: List<PartnerDto> = emptyList(),
     val contacts: List<ContactDto> = emptyList(),
     val news: List<NewsDto> = emptyList(),
@@ -30,6 +32,7 @@ data class EventDto(
     @SerialName("map_image_url") val mapImageUrl: String? = null,
     @SerialName("map_embed") val mapEmbed: String? = null,
     @SerialName("map_enabled") val mapEnabled: Boolean = true,
+    @SerialName("header_image_url") val headerImageUrl: String? = null,
     // Oceny prelekcji (SPEC-OCENY). Brak pol = bundel sprzed modulu ocen = oceny ukryte.
     @SerialName("ratings_enabled") val ratingsEnabled: Boolean = false,
     @SerialName("ratings_open_after_start_min") val ratingsOpenAfterStartMin: Int = 10,
@@ -50,10 +53,31 @@ data class TalkDto(
     val id: Long,
     @SerialName("day_id") val dayId: Long? = null,
     @SerialName("room_id") val roomId: Long? = null,
+    @SerialName("session_id") val sessionId: Long? = null,
     val title: String,
     val abstract: String? = null,
     @SerialName("starts_at") val startsAt: String? = null,
     @SerialName("ends_at") val endsAt: String? = null,
+    val sort: Int = 0,
+)
+
+/** Sesja: blok tematyczny z moderatorami; podwyklady wskazuja ja przez talks.session_id. */
+@Serializable
+data class SessionDto(
+    val id: Long,
+    @SerialName("day_id") val dayId: Long? = null,
+    @SerialName("room_id") val roomId: Long? = null,
+    val title: String,
+    val description: String? = null,
+    @SerialName("starts_at") val startsAt: String? = null,
+    @SerialName("ends_at") val endsAt: String? = null,
+    val sort: Int = 0,
+)
+
+@Serializable
+data class SessionModeratorDto(
+    @SerialName("session_id") val sessionId: Long,
+    @SerialName("speaker_id") val speakerId: Long,
     val sort: Int = 0,
 )
 
@@ -109,11 +133,16 @@ data class NewsDto(
     @SerialName("published_at") val publishedAt: String? = null,
 )
 
-/** POST /api/public/events/{code}/talks/{talkId}/rating */
+/**
+ * POST /api/public/events/{code}/talks/{talkId}/rating. Od 1.4: answers (3 pytania).
+ * score tylko dla glosow zapisanych przez starsza wersje apki (brak odpowiedzi).
+ * Pola null nie sa wysylane (encodeDefaults = false).
+ */
 @Serializable
 data class RatingRequestDto(
     @SerialName("install_id") val installId: String,
-    val score: Int,
+    val answers: List<Int>? = null,
+    val score: Int? = null,
 )
 
 /** Element GET /api/public/events/{code}/ratings/mine */
@@ -121,4 +150,5 @@ data class RatingRequestDto(
 data class MyRatingDto(
     @SerialName("talk_id") val talkId: Long,
     val score: Int,
+    val answers: List<Int>? = null,
 )

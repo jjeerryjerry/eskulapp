@@ -28,15 +28,36 @@ struct LocalRating: Codable, Equatable {
     var status: String
     var error: String?
     var updatedAt: Double
+    /// Odpowiedzi na 3 pytania; nil = glos ze starszej wersji (sam score).
+    var answers: [Int]? = nil
+}
+
+/// Pytanie oceny: krotka etykieta + pelna tresc. Kolejnosc = q1, q2, q3 na serwerze.
+struct RatingQuestion {
+    let label: String
+    let text: String
+}
+
+/// 3 pytania o wystapienie (decyzja Jarka 2026-10-14), 1:1 z Androidem.
+let ratingQuestions = [
+    RatingQuestion(label: "Wartość merytoryczna", text: "Na ile treść była aktualna i oparta na wiedzy?"),
+    RatingQuestion(label: "Przydatność w praktyce", text: "Na ile wykorzystasz to w codziennej pracy?"),
+    RatingQuestion(label: "Sposób przekazania", text: "Na ile prelegent przedstawił temat jasno i ciekawie?"),
+]
+
+/// Ocena ogolna = srednia odpowiedzi zaokraglona (jak Ratings::overallScore na serwerze).
+func overallScore(_ answers: [Int]) -> Int {
+    Int((Double(answers.reduce(0, +)) / Double(answers.count)).rounded(.toNearestOrAwayFromZero))
 }
 
 /// Element GET /api/public/events/{code}/ratings/mine
 struct MyRatingDTO: Decodable {
     let talkId: Int64
     let score: Int
+    let answers: [Int]?
     enum CodingKeys: String, CodingKey {
         case talkId = "talk_id"
-        case score
+        case score, answers
     }
 }
 
@@ -139,7 +160,7 @@ func ratingPanel(ratingsEnabled: Bool, window: RatingWindow, score: Int?, status
         }
         return RatingPanel(enabled: open, message: msg, selected: nil, warning: true)
     }
-    let pendingMsg = "Oceniono (\(kept ?? 0)). Zapiszemy ocenę, gdy będzie internet."
+    let pendingMsg = "Oceniono. Zapiszemy ocenę, gdy będzie internet."
     switch window.phase {
     case .notOpen:
         let from = window.opensAt.map { RatingTime.clock($0, now: now) } ?? ""
@@ -149,15 +170,15 @@ func ratingPanel(ratingsEnabled: Bool, window: RatingWindow, score: Int?, status
             return RatingPanel(enabled: true, message: pendingMsg, selected: k)
         }
         if let k = kept {
-            return RatingPanel(enabled: true, message: "Oceniono (\(k)). Możesz zmienić do \(until)", selected: k)
+            return RatingPanel(enabled: true, message: "Oceniono. Możesz zmienić do \(until)", selected: k)
         }
-        return RatingPanel(enabled: true, message: "Wybierz ocenę od 1 do 10. Głos jest anonimowy.", selected: nil)
+        return RatingPanel(enabled: true, message: "Odpowiedz na 3 pytania w skali od 1 do 10. Głos jest anonimowy.", selected: nil)
     case .closed:
         if let k = kept, status == RatingStatus.pending {
             return RatingPanel(enabled: false, message: pendingMsg, selected: k)
         }
         if let k = kept {
-            return RatingPanel(enabled: false, message: "Oceniono (\(k)). Ocenianie zamknięte.", selected: k)
+            return RatingPanel(enabled: false, message: "Oceniono. Ocenianie zamknięte.", selected: k)
         }
         return RatingPanel(enabled: false, message: "Ocenianie zamknięte.", selected: nil)
     case .unrateable:

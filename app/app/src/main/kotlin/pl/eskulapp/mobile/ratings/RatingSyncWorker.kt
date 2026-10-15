@@ -27,7 +27,7 @@ class RatingSyncWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker
         var retry = false
         for (r in dao.pendingRatings()) {
             val res = try {
-                ApiClient.postRating(r.eventCode, r.talkId, installId, r.score)
+                ApiClient.postRating(r.eventCode, r.talkId, installId, r.score, r.answers)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

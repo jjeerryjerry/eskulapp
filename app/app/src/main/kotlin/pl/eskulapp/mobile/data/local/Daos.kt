@@ -43,6 +43,25 @@ interface EskDao {
     @Query("SELECT * FROM talks WHERE id = :id LIMIT 1")
     suspend fun talkOnce(id: Long): TalkEntity?
 
+    // sesje
+    @Query("SELECT * FROM sessions WHERE eventId = :e ORDER BY startsAt, sort")
+    fun sessions(e: Long): Flow<List<SessionEntity>>
+
+    @Query("SELECT * FROM sessions WHERE id = :id LIMIT 1")
+    fun session(id: Long): Flow<SessionEntity?>
+
+    @Query("SELECT * FROM talks WHERE sessionId = :sessionId ORDER BY startsAt, sort")
+    fun talksForSession(sessionId: Long): Flow<List<TalkEntity>>
+
+    @Query("SELECT * FROM session_moderators WHERE eventId = :e ORDER BY sessionId, sort")
+    fun sessionModerators(e: Long): Flow<List<SessionModeratorEntity>>
+
+    @Query("SELECT s.* FROM speakers s JOIN session_moderators m ON m.speakerId = s.id WHERE m.sessionId = :sessionId ORDER BY m.sort")
+    fun moderatorsForSession(sessionId: Long): Flow<List<SpeakerEntity>>
+
+    @Query("SELECT x.* FROM sessions x JOIN session_moderators m ON m.sessionId = x.id WHERE m.speakerId = :speakerId ORDER BY x.startsAt, x.sort")
+    fun sessionsModeratedBy(speakerId: Long): Flow<List<SessionEntity>>
+
     @Query("SELECT * FROM speakers WHERE eventId = :e ORDER BY sort, lastName")
     fun speakers(e: Long): Flow<List<SpeakerEntity>>
 
@@ -86,6 +105,26 @@ interface EskDao {
     @Query("DELETE FROM reminders WHERE talkId = :talkId")
     suspend fun removeReminder(talkId: Long)
 
+    // przypomnienia o sesjach (osobno od podwykladow)
+    @Query("SELECT sessionId FROM session_reminders")
+    fun sessionReminderIds(): Flow<List<Long>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addSessionReminder(r: SessionReminderEntity)
+
+    @Query("DELETE FROM session_reminders WHERE sessionId = :sessionId")
+    suspend fun removeSessionReminder(sessionId: Long)
+
+    // do wykrywania konfliktow czasowych (obserwowane pozycje jednego eventu)
+    @Query("SELECT t.* FROM talks t JOIN reminders r ON r.talkId = t.id WHERE t.eventId = :e")
+    suspend fun followedTalks(e: Long): List<TalkEntity>
+
+    @Query("SELECT x.* FROM sessions x JOIN session_reminders r ON r.sessionId = x.id WHERE x.eventId = :e")
+    suspend fun followedSessions(e: Long): List<SessionEntity>
+
+    @Query("SELECT * FROM rooms WHERE eventId = :e")
+    suspend fun roomsOnce(e: Long): List<RoomEntity>
+
     // powiadomienia per-event (subskrypcja lokalna, przetrwa odswiezenie bundle)
     @Query("SELECT eventId FROM event_notify")
     fun notifyIds(): Flow<List<Long>>
@@ -125,6 +164,8 @@ interface EskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putDays(x: List<DayEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putRooms(x: List<RoomEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putTalks(x: List<TalkEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putSessions(x: List<SessionEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putSessionModerators(x: List<SessionModeratorEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putSpeakers(x: List<SpeakerEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putTalkSpeakers(x: List<TalkSpeakerEntity>)
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun putPartners(x: List<PartnerEntity>)
@@ -135,6 +176,8 @@ interface EskDao {
     @Query("DELETE FROM rooms WHERE eventId = :e") suspend fun clearRooms(e: Long)
     @Query("DELETE FROM talks WHERE eventId = :e") suspend fun clearTalks(e: Long)
     @Query("DELETE FROM speakers WHERE eventId = :e") suspend fun clearSpeakers(e: Long)
+    @Query("DELETE FROM sessions WHERE eventId = :e") suspend fun clearSessions(e: Long)
+    @Query("DELETE FROM session_moderators WHERE eventId = :e") suspend fun clearSessionModerators(e: Long)
     @Query("DELETE FROM talk_speakers WHERE eventId = :e") suspend fun clearTalkSpeakers(e: Long)
     @Query("DELETE FROM partners WHERE eventId = :e") suspend fun clearPartners(e: Long)
     @Query("DELETE FROM contacts WHERE eventId = :e") suspend fun clearContacts(e: Long)

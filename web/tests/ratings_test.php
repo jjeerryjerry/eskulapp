@@ -253,7 +253,19 @@ test('sortowanie prelekcji: srednia (bez glosow na koncu), glosy, agenda', funct
     same([0, 1, 2, 3], array_column(Ratings::sortTalks($rows, 'time', 'asc'), 'order'));
 });
 
-test('CSV: liczby z przecinkiem, neutralizacja formul, naglowek i 10 kolumn rozkladu', function () {
+test('3 pytania: dokladnie 3 inty 1..10, ocena ogolna = zaokraglona srednia', function () {
+    same([7, 8, 9], Ratings::validAnswers([7, 8, 9]));
+    foreach ([null, 7, [7, 8], [7, 8, 9, 10], [7, 8, '9'], [7, 8, 0], [7, 8, 11], [7, 8.0, 9], ['a' => 7, 'b' => 8, 'c' => 9]] as $bad) {
+        same(null, Ratings::validAnswers($bad), 'answers ' . json_encode($bad));
+    }
+    same(8, Ratings::overallScore([7, 8, 9]));
+    same(8, Ratings::overallScore([7, 8, 8]), '7,67 w gore');
+    same(7, Ratings::overallScore([7, 7, 8]), '7,33 w dol');
+    same(1, Ratings::overallScore([1, 1, 1]));
+    same(10, Ratings::overallScore([10, 10, 10]));
+});
+
+test('CSV: liczby z przecinkiem, neutralizacja formul, naglowek, 3 pytania i 10 kolumn rozkladu', function () {
     same('7,7', Ratings::num(7.666));
     same('', Ratings::num(null));
     same("'=HYPERLINK(\"x\")", Ratings::csvCell('=HYPERLINK("x")'));
@@ -263,15 +275,18 @@ test('CSV: liczby z przecinkiem, neutralizacja formul, naglowek i 10 kolumn rozk
     $rows = Ratings::csvTalks([[
         'title' => '@cmd', 'speakers' => 'Anna Kowalska', 'room' => 'Sala A', 'day' => 'Dzień 1 20.10',
         'time' => '10:00 do 10:45', 'stats' => Ratings::stats([7 => 2, 9 => 1]),
+        'questions' => ['n' => 2, 'avg' => [8.5, 6.0, 7.25]],
     ]]);
-    same(19, count($rows[0]));
-    same(['Tytuł', 'Prelegenci', 'Sala', 'Dzień', 'Godzina', 'Liczba głosów', 'Średnia', 'Mediana', 'Mała próba', 'Ocena 1'],
-        array_slice($rows[0], 0, 10));
-    same(["'@cmd", 'Anna Kowalska', 'Sala A', 'Dzień 1 20.10', '10:00 do 10:45', '3', '7,7', '7,0', 'tak', '0'],
-        array_slice($rows[1], 0, 10));
-    same('2', $rows[1][15], 'Ocena 7');
+    same(22, count($rows[0]));
+    same(['Tytuł', 'Prelegenci', 'Sala', 'Dzień', 'Godzina', 'Liczba głosów', 'Średnia', 'Mediana', 'Mała próba',
+          'Wartość merytoryczna (średnia)', 'Przydatność w praktyce (średnia)', 'Sposób przekazania (średnia)', 'Ocena 1'],
+        array_slice($rows[0], 0, 13));
+    same(["'@cmd", 'Anna Kowalska', 'Sala A', 'Dzień 1 20.10', '10:00 do 10:45', '3', '7,7', '7,0', 'tak', '8,5', '6,0', '7,3', '0'],
+        array_slice($rows[1], 0, 13));
+    same('2', $rows[1][18], 'Ocena 7');
     $rows = Ratings::csvTalks([['title' => 'x', 'speakers' => '', 'room' => null, 'day' => '', 'time' => '', 'stats' => Ratings::stats([])]]);
     same(['0', '', '', ''], array_slice($rows[1], 5, 4), 'bez glosow: puste srednia, mediana, mala proba');
+    same(['', '', ''], array_slice($rows[1], 9, 3), 'bez odpowiedzi: puste srednie pytan');
 });
 
 // ---------------------------------------------------------------- baza danych
@@ -320,6 +335,19 @@ if ($dsn === '') {
         check($col('talk_ratings', 'voter_hash') !== null, 'talk_ratings istnieje');
         check($col('rating_rate_hits', 'key_hash') !== null, 'rating_rate_hits istnieje');
         $runSql($root . '/db/schema.sql');   // schema.sql na zmigrowanej bazie tez przechodzi
+    });
+
+    test('migracje 2026-10 (3 pytania, sesje): 2x, idempotentne', function () use ($runSql, $col, $root) {
+        // talk_ratings z migracji 2026_09 nie ma q1..q3 (jak produkcja przed 2026-10)
+        check($col('talk_ratings', 'q1') === null, 'q1 jeszcze brak');
+        foreach (['2026_10_rating_questions.sql', '2026_10_sessions.sql'] as $m) {
+            $runSql($root . '/db/migrations/' . $m);
+            $runSql($root . '/db/migrations/' . $m);
+        }
+        foreach (['q1', 'q2', 'q3'] as $c) same('YES', $col('talk_ratings', $c)['IS_NULLABLE'] ?? null, $c);
+        check($col('talks', 'session_id') !== null, 'talks.session_id');
+        check($col('session_moderators', 'speaker_id') !== null, 'session_moderators');
+        $runSql($root . '/db/schema.sql');
     });
 
     // ---- dane testowe (kody RTEST*, sprzatane na starcie i koncu)
@@ -457,12 +485,12 @@ if ($dsn === '') {
         }
     });
 
-    test('GET mine: oceny tylko tego urzadzenia [{talk_id, score}]', function () use ($pdo, $salt, $t1, $uuidA, $uuidB) {
+    test('GET mine: oceny tylko tego urzadzenia [{talk_id, score, answers}]', function () use ($pdo, $salt, $t1, $uuidA, $uuidB) {
         [$st, $body] = Ratings::mine($pdo, 'RTEST1', $uuidA, '203.0.113.7', $salt, waw('2026-10-20 12:00:00'));
         same(200, $st);
-        same([['talk_id' => $t1, 'score' => 3]], $body);
+        same([['talk_id' => $t1, 'score' => 3, 'answers' => null]], $body);
         [, $body] = Ratings::mine($pdo, 'rtest1', strtoupper($uuidB), '203.0.113.7', $salt, waw('2026-10-20 12:00:00'));
-        same([['talk_id' => $t1, 'score' => 6]], $body);
+        same([['talk_id' => $t1, 'score' => 6, 'answers' => null]], $body);
         [, $body] = Ratings::mine($pdo, 'RTEST1', '99999999-2222-4333-8444-555555555555', '203.0.113.7', $salt, waw('2026-10-20 12:00:00'));
         same([], $body);
         same([422, ['error' => 'invalid_install_id']], Ratings::mine($pdo, 'RTEST1', 'zly', '203.0.113.7', $salt, waw('2026-10-20 12:00:00')));
@@ -484,6 +512,30 @@ if ($dsn === '') {
         same($sp1, $rep['speakers'][0]['speaker_id']);
         same(6, $rep['speakers'][0]['votes']);
         same(count($rep['talks']) + 1, count(Ratings::csvTalks($rep['talks'])), 'CSV: naglowek + wiersz na prelekcje');
+    });
+
+    test('3 pytania: POST answers, upsert, mine, glos starej apki zeruje odpowiedzi, raport per pytanie', function () use ($submit, $row, $pdo, $salt, $ev1, $t1, $inWindow) {
+        $uuidC = '33333333-2222-4333-8444-555555555555';
+        same([422, ['error' => 'invalid_answers']], $submit('RTEST1', $t1, ['install_id' => $uuidC, 'answers' => [7, 8]], $inWindow));
+        same([422, ['error' => 'invalid_answers']], $submit('RTEST1', $t1, ['install_id' => $uuidC, 'answers' => [7, 8, 11]], $inWindow));
+        same([200, ['ok' => true, 'score' => 8, 'answers' => [7, 8, 9]]],
+            $submit('RTEST1', $t1, ['install_id' => $uuidC, 'answers' => [7, 8, 9]], $inWindow));
+        $r = $row($t1, $uuidC);
+        same([8, 7, 8, 9], [(int)$r['score'], (int)$r['q1'], (int)$r['q2'], (int)$r['q3']]);
+        [, $body] = Ratings::mine($pdo, 'RTEST1', $uuidC, '203.0.113.7', $salt, waw('2026-10-20 12:00:00'));
+        same([['talk_id' => $t1, 'score' => 8, 'answers' => [7, 8, 9]]], $body);
+        // zmiana odpowiedzi w oknie (upsert)
+        same(200, $submit('RTEST1', $t1, ['install_id' => $uuidC, 'answers' => [10, 9, 10]], $inWindow)[0]);
+        same(10, (int)$row($t1, $uuidC)['score'], '9,67 w gore');
+        $rep = Ratings::report($pdo, $ev1);
+        $q = array_column($rep['talks'], null, 'id')[$t1]['questions'];
+        same(1, $q['n'], 'stare glosy (bez odpowiedzi) nie licza sie do srednich pytan');
+        same(['10,0', '9,0', '10,0'], array_map(fn($a) => Ratings::num($a), $q['avg']));
+        same(3, array_column($rep['talks'], null, 'id')[$t1]['stats']['votes'], 'ocena ogolna liczy wszystkie glosy');
+        // glos starej wersji apki (sam score) nadpisuje calosc
+        same([200, ['ok' => true, 'score' => 4]], $submit('RTEST1', $t1, ['install_id' => $uuidC, 'score' => 4], $inWindow));
+        $r = $row($t1, $uuidC);
+        same([4, null, null, null], [(int)$r['score'], $r['q1'], $r['q2'], $r['q3']]);
     });
 
     test('usuniecie eventu kasuje jego oceny (FK ON DELETE CASCADE)', function () use ($pdo, $ev1) {

@@ -54,9 +54,8 @@ Jesteś organizatorem i chcesz mieć swoje wydarzenie w Eskulapp? Napisz: kontak
 
 **Co nowego w 1.3.0** (500):
 ```
-• Nowość: anonimowa ocena prelekcji w skali od 1 do 10.
-• Przypomnienie o ocenie dla obserwowanych prelekcji.
-• Moduł Mapa pojawia się tylko wtedy, gdy organizator udostępnia plan wydarzenia.
+• Oceń wysłuchane prelekcje w skali od 1 do 10. Ocena jest anonimowa.
+• Aplikacja przypomni Ci o ocenie prelekcji, które obserwujesz.
 • Drobne poprawki wyglądu i tekstów.
 ```
 

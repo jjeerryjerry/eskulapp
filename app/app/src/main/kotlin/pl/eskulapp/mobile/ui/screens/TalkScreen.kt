@@ -12,6 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import pl.eskulapp.mobile.R
+import pl.eskulapp.mobile.ratings.RATING_QUESTIONS
 import pl.eskulapp.mobile.ratings.RatingPanel
 import pl.eskulapp.mobile.ratings.RatingWindows
 import pl.eskulapp.mobile.ratings.ratingPanel
@@ -45,6 +48,7 @@ fun TalkScreen(vm: AppViewModel, talkId: Long, eventId: Long) {
         while (true) { delay(15_000); value = Instant.now() }
     }
     val t = talk ?: return
+    val session by vm.repo.dao.session(t.sessionId ?: -1).collectAsStateWithLifecycle(null)
     val room = rooms.firstOrNull { it.id == t.roomId }?.name
     val on = t.id in reminderIds
 
@@ -55,6 +59,19 @@ fun TalkScreen(vm: AppViewModel, talkId: Long, eventId: Long) {
             Row {
                 if (time.isNotBlank()) Pill(time, Tint, Petrol)
                 if (room != null) { Spacer(Modifier.width(8.dp)); Pill(room, Grey, Muted) }
+            }
+            session?.let { x ->
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Tint.copy(alpha = 0.45f))
+                        .clickable { vm.nav.push(Screen.Session(x.id, eventId)) }.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("SESJA", color = CoralDark, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Text(x.title, color = Ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Ico(R.drawable.ic_chevron, Petrol, 16)
+                }
             }
             Spacer(Modifier.height(16.dp))
             Text(t.title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Ink, lineHeight = 28.sp)
@@ -85,7 +102,7 @@ fun TalkScreen(vm: AppViewModel, talkId: Long, eventId: Long) {
                 val panel = ratingPanel(ev.ratingsEnabled, window, rating?.score, rating?.status, rating?.error, now)
                 if (panel != null) {
                     Spacer(Modifier.height(24.dp))
-                    RatingSection(panel) { score -> vm.rateTalk(eventId, ev.accessCode, t.id, score) }
+                    RatingSection(panel, rating?.answers) { answers -> vm.rateTalk(eventId, ev.accessCode, t.id, answers) }
                 }
             }
         }
@@ -109,10 +126,16 @@ fun Pill(text: String, bg: androidx.compose.ui.graphics.Color, fg: androidx.comp
     }
 }
 
-/** Sekcja "Oceń wykład": 10 kropli 1..10 (petrol aktywne, coral wybrane), bez srednich. */
+/**
+ * Sekcja "Oceń wykład": 3 pytania, kazde 10 kropli 1..10 (petrol aktywne, coral wybrane),
+ * bez srednich. Glos zapisuje sie sam, gdy sa odpowiedzi na wszystkie pytania; kazda
+ * kolejna zmiana w oknie nadpisuje glos.
+ */
 @Composable
-private fun RatingSection(panel: RatingPanel, onRate: (Int) -> Unit) {
+private fun RatingSection(panel: RatingPanel, saved: List<Int>?, onRate: (List<Int>) -> Unit) {
     val shape = RoundedCornerShape(16.dp)
+    // Szkic odpowiedzi: startuje od zapisanego glosu (odswiezany, gdy glos sie zmieni).
+    val draft = remember(saved) { mutableStateListOf<Int?>().apply { addAll(saved ?: List(RATING_QUESTIONS.size) { null }) } }
     Column(
         Modifier.fillMaxWidth().clip(shape).background(Surface).border(1.dp, Line, shape).padding(16.dp)
     ) {
@@ -122,22 +145,30 @@ private fun RatingSection(panel: RatingPanel, onRate: (Int) -> Unit) {
             panel.message, fontSize = 13.sp, lineHeight = 18.sp,
             color = if (panel.warning) CoralDark else Muted,
         )
-        Spacer(Modifier.height(14.dp))
-        for (row in listOf(1..5, 6..10)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                for (n in row) {
-                    ScoreDrop(n, selected = panel.selected == n, enabled = panel.enabled, modifier = Modifier.weight(1f)) {
-                        onRate(n)
+        RATING_QUESTIONS.forEachIndexed { i, q ->
+            Spacer(Modifier.height(16.dp))
+            Text("${i + 1}. ${q.label}", fontWeight = FontWeight.SemiBold, color = Ink, fontSize = 14.sp)
+            Text(q.text, fontSize = 13.sp, color = Muted, lineHeight = 17.sp, modifier = Modifier.padding(top = 2.dp))
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                for (n in 1..10) {
+                    ScoreDrop(n, selected = draft[i] == n, enabled = panel.enabled, modifier = Modifier.weight(1f), label = "${q.label}: $n") {
+                        draft[i] = n
+                        val complete = draft.filterNotNull()
+                        if (complete.size == RATING_QUESTIONS.size) onRate(complete)
                     }
                 }
             }
-            if (row.first == 1) Spacer(Modifier.height(10.dp))
+        }
+        if (panel.enabled && draft.any { it == null }) {
+            Spacer(Modifier.height(12.dp))
+            Text("Ocena zapisze się po odpowiedzi na wszystkie 3 pytania.", fontSize = 12.sp, color = Faint)
         }
     }
 }
 
 @Composable
-private fun ScoreDrop(n: Int, selected: Boolean, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
+private fun ScoreDrop(n: Int, selected: Boolean, enabled: Boolean, modifier: Modifier, label: String, onClick: () -> Unit) {
     // Kontrast wg marki: na coralu tekst ink; aktywne petrol na jasnym petrolu; nieaktywne wygaszone.
     val bg = when {
         selected && enabled -> Coral
@@ -157,11 +188,11 @@ private fun ScoreDrop(n: Int, selected: Boolean, enabled: Boolean, modifier: Mod
             .background(bg)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .semantics {
-                contentDescription = "Ocena $n"
+                contentDescription = label
                 this.selected = selected
             },
         contentAlignment = Alignment.Center,
     ) {
-        Text(n.toString(), color = fg, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        Text(n.toString(), color = fg, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }

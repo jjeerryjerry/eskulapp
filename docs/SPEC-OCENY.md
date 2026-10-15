@@ -1,5 +1,7 @@
 # SPEC — Oceny prelekcji 1–10 (anonimowe)
 
+_Aktualizacja 2026-10-14: ocena = **3 pytania** o wystąpienie (wartość merytoryczna, przydatność w praktyce, sposób przekazania), każde 1-10; `score` = zaokrąglona średnia; API przyjmuje `answers` (nowe apki) i `score` (stare). Szczegóły: `NOTATKA-AGENCJA-2026-10-14.md`._
+
 _Decyzja Jarka 2026-09-25. Zakres: tylko oceny (bez grywalizacji, bez komentarzy tekstowych)._
 
 ## 1. Zasady produktowe

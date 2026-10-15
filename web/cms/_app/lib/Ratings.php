@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 /**
  * Oceny prelekcji 1-10, anonimowe (docs/SPEC-OCENY.md).
+ * Od 2026-10: 3 pytania (QUESTIONS, NOTATKA-AGENCJA-2026-10-14), score = ocena ogolna
+ * = zaokraglona srednia odpowiedzi. Stare wersje apki wysylaja sam score (q1..q3 = NULL).
  *
  * Czesc czysta (bez DB, testowana w web/tests/ratings_test.php): parseLocal(),
  * window(), validScore(), validInstallId(), voterHash(), stats(),
@@ -31,6 +33,9 @@ final class Ratings
     public const RL_WINDOW_SEC = 600;
     public const RL_IP_MAX_DEFAULT = 600;
     public const RL_VOTER_MAX_DEFAULT = 30;
+
+    /** Krotkie etykiety 3 pytan do CMS/CSV (pelna tresc pytan jest w apkach). */
+    public const QUESTIONS = ['Wartość merytoryczna', 'Przydatność w praktyce', 'Sposób przekazania'];
 
     public static function tz(): DateTimeZone
     {
@@ -114,6 +119,20 @@ final class Ratings
         return (is_int($v) && $v >= self::SCORE_MIN && $v <= self::SCORE_MAX) ? $v : null;
     }
 
+    /** Odpowiedzi na 3 pytania: lista dokladnie 3 liczb calkowitych 1..10. */
+    public static function validAnswers(mixed $v): ?array
+    {
+        if (!is_array($v) || !array_is_list($v) || count($v) !== count(self::QUESTIONS)) return null;
+        foreach ($v as $a) if (self::validScore($a) === null) return null;
+        return $v;
+    }
+
+    /** Ocena ogolna z odpowiedzi: srednia zaokraglona (polowki w gore). */
+    public static function overallScore(array $answers): int
+    {
+        return (int)round(array_sum($answers) / count($answers));
+    }
+
     /** install_id: UUID v4 (wielkosc liter dowolna, iOS generuje wielkie). */
     public static function validInstallId(mixed $v): bool
     {
@@ -148,7 +167,9 @@ final class Ratings
     // ------------------------------------------------------------ API (DB)
 
     /**
-     * POST /api/public/events/{code}/talks/{talkId}/rating  body {"install_id","score"}
+     * POST /api/public/events/{code}/talks/{talkId}/rating
+     *   body {"install_id","answers":[q1,q2,q3]}  (apka od 1.4)
+     *   body {"install_id","score"}               (starsze wersje, nadal przyjmowane)
      * @return array{0:int,1:array} [status HTTP, cialo JSON]
      */
     public static function submit(PDO $pdo, string $code, int $talkId, ?array $body, string $ip,
@@ -160,8 +181,15 @@ final class Ratings
 
         $installId = $body['install_id'] ?? null;
         if (!self::validInstallId($installId)) return [422, ['error' => 'invalid_install_id']];
-        $score = self::validScore($body['score'] ?? null);
-        if ($score === null) return [422, ['error' => 'invalid_score']];
+        $answers = null;
+        if (array_key_exists('answers', $body)) {
+            $answers = self::validAnswers($body['answers']);
+            if ($answers === null) return [422, ['error' => 'invalid_answers']];
+            $score = self::overallScore($answers);
+        } else {
+            $score = self::validScore($body['score'] ?? null);
+            if ($score === null) return [422, ['error' => 'invalid_score']];
+        }
 
         $voter = self::voterHash($installId, $salt);
         if (!self::hit($pdo, 'voter', $voter, self::voterLimit(), $now)) return [429, ['error' => 'rate_limited']];
@@ -190,17 +218,20 @@ final class Ratings
 
         // Czas lokalny Warszawy, jak pozostale DATETIME (nie NOW() MySQL, patrz §2 spec).
         $ts = $now->setTimezone(self::tz())->format('Y-m-d H:i:s');
-        $pdo->prepare('INSERT INTO talk_ratings (event_id, talk_id, voter_hash, score, created_at, updated_at, ip_hash)
-                       VALUES (?, ?, ?, ?, ?, ?, ?)
-                       ON DUPLICATE KEY UPDATE score = VALUES(score), updated_at = VALUES(updated_at),
+        // Glos starej wersji apki nadpisuje tez odpowiedzi (NULL): liczy sie ostatni glos.
+        $pdo->prepare('INSERT INTO talk_ratings (event_id, talk_id, voter_hash, score, q1, q2, q3, created_at, updated_at, ip_hash)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                       ON DUPLICATE KEY UPDATE score = VALUES(score), q1 = VALUES(q1), q2 = VALUES(q2),
+                                               q3 = VALUES(q3), updated_at = VALUES(updated_at),
                                                ip_hash = VALUES(ip_hash)')
-            ->execute([(int)$ev['id'], $talkId, $voter, $score, $ts, $ts, $ipHash]);
-        return [200, ['ok' => true, 'score' => $score]];
+            ->execute([(int)$ev['id'], $talkId, $voter, $score, $answers[0] ?? null, $answers[1] ?? null,
+                       $answers[2] ?? null, $ts, $ts, $ipHash]);
+        return [200, $answers === null ? ['ok' => true, 'score' => $score] : ['ok' => true, 'score' => $score, 'answers' => $answers]];
     }
 
     /**
      * GET /api/public/events/{code}/ratings/mine?install_id=...
-     * Oceny tego urzadzenia: [{talk_id, score}] (odtworzenie stanu apki).
+     * Oceny tego urzadzenia: [{talk_id, score, answers|null}] (odtworzenie stanu apki).
      * @return array{0:int,1:array}
      */
     public static function mine(PDO $pdo, string $code, mixed $installId, string $ip, string $salt,
@@ -218,10 +249,13 @@ final class Ratings
         $eventId = $st->fetchColumn();
         if ($eventId === false) return [404, ['error' => 'not_found']];
 
-        $st = $pdo->prepare('SELECT talk_id, score FROM talk_ratings WHERE event_id = ? AND voter_hash = ? ORDER BY talk_id');
+        $st = $pdo->prepare('SELECT talk_id, score, q1, q2, q3 FROM talk_ratings WHERE event_id = ? AND voter_hash = ? ORDER BY talk_id');
         $st->execute([(int)$eventId, $voter]);
         $out = [];
-        foreach ($st->fetchAll() as $r) $out[] = ['talk_id' => (int)$r['talk_id'], 'score' => (int)$r['score']];
+        foreach ($st->fetchAll() as $r) {
+            $answers = $r['q1'] === null ? null : [(int)$r['q1'], (int)$r['q2'], (int)$r['q3']];
+            $out[] = ['talk_id' => (int)$r['talk_id'], 'score' => (int)$r['score'], 'answers' => $answers];
+        }
         return [200, $out];
     }
 
@@ -380,6 +414,13 @@ final class Ratings
         $talkSpeakers = $q('SELECT ts.talk_id, ts.speaker_id FROM talk_speakers ts
                             JOIN talks t ON t.id = ts.talk_id WHERE t.event_id = ?');
         $voters = $q('SELECT COUNT(DISTINCT voter_hash) AS n FROM talk_ratings WHERE event_id = ?');
+        // Srednie per pytanie (tylko glosy z odpowiedziami, bez starych pojedynczych ocen).
+        $qRows = $q('SELECT talk_id, COUNT(*) AS n, AVG(q1) AS a1, AVG(q2) AS a2, AVG(q3) AS a3
+                     FROM talk_ratings WHERE event_id = ? AND q1 IS NOT NULL GROUP BY talk_id');
+        $qAvg = [];
+        foreach ($qRows as $r) {
+            $qAvg[(int)$r['talk_id']] = ['n' => (int)$r['n'], 'avg' => [(float)$r['a1'], (float)$r['a2'], (float)$r['a3']]];
+        }
 
         $dist = [];
         foreach ($distRows as $r) $dist[(int)$r['talk_id']][(int)$r['score']] = (int)$r['c'];
@@ -412,6 +453,7 @@ final class Ratings
                 'room' => $t['room'], 'day' => self::dayLabel($t['day_label'], $t['day_date']),
                 'time' => self::timeRange($t['starts_at'], $t['ends_at']),
                 'stats' => $s,
+                'questions' => $qAvg[$tid] ?? ['n' => 0, 'avg' => [null, null, null]],
             ];
         }
         return [
@@ -454,6 +496,7 @@ final class Ratings
     {
         $out = [array_merge(
             ['Tytuł', 'Prelegenci', 'Sala', 'Dzień', 'Godzina', 'Liczba głosów', 'Średnia', 'Mediana', 'Mała próba'],
+            array_map(static fn(string $q): string => $q . ' (średnia)', self::QUESTIONS),
             array_map(static fn(int $s): string => 'Ocena ' . $s, range(self::SCORE_MIN, self::SCORE_MAX))
         )];
         foreach ($rows as $r) {
@@ -463,7 +506,8 @@ final class Ratings
                 self::csvCell($r['day']), self::csvCell($r['time']),
                 (string)$s['votes'], self::num($s['avg']), self::num($s['median']),
                 $s['votes'] === 0 ? '' : ($s['small'] ? 'tak' : 'nie'),
-            ], array_map('strval', array_values($s['dist'])));
+            ], array_map(static fn(?float $a): string => self::num($a), $r['questions']['avg'] ?? [null, null, null]),
+               array_map('strval', array_values($s['dist'])));
         }
         return $out;
     }

@@ -85,7 +85,7 @@ add_action('wp_head', function () {
             'applicationCategory' => 'BusinessApplication',
             'operatingSystem'     => 'Android',
             'url'                 => $home,
-            'description'         => 'Aplikacja eventowa dla uczestnikow konferencji medycznych: agenda, prelegenci, mapa stoisk, powiadomienia push, tryb offline. Uczestnik pobiera aplikacje z Google Play i dolacza jednym kodem wydarzenia.',
+            'description'         => 'Aplikacja eventowa dla uczestnikow konferencji medycznych: agenda, prelegenci, mapa stoisk, powiadomienia push, tryb offline. Uczestnik pobiera aplikacje z Google Play lub App Store i dolacza jednym kodem wydarzenia.',
             'offers'              => [
                 '@type'         => 'Offer',
                 'price'         => '0',
@@ -98,7 +98,7 @@ add_action('wp_head', function () {
             '@context'   => 'https://schema.org',
             '@type'      => 'FAQPage',
             'mainEntity' => [
-                ['@type' => 'Question', 'name' => 'Czy uczestnik musi instalowac aplikacje ze sklepu?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Tak - uczestnik pobiera bezplatna aplikacje Eskulapp z Google Play, a nastepnie dolacza do wydarzenia jednym kodem (np. EVENT2026), bez zakladania konta. Caly program ma wtedy zawsze przy sobie, takze offline.']],
+                ['@type' => 'Question', 'name' => 'Czy uczestnik musi instalowac aplikacje ze sklepu?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Tak - uczestnik pobiera bezplatna aplikacje Eskulapp z Google Play lub App Store, a nastepnie dolacza do wydarzenia jednym kodem (np. EVENT2026), bez zakladania konta. Caly program ma wtedy zawsze przy sobie, takze offline.']],
                 ['@type' => 'Question', 'name' => 'Ile trwa wdrozenie?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Standardowo przygotowujemy aplikacje na podstawie przeslanej agendy i listy prelegentow. Termin uruchomienia ustalamy pod date wydarzenia, tak aby wszystko bylo gotowe przed pierwszym dniem konferencji.']],
                 ['@type' => 'Question', 'name' => 'Czy Eskulapp nadaje sie do kongresu wielodniowego i wielosalowego?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Tak. Agenda obsluguje wiele dni, wiele sal i rownoleglych sciezek tematycznych, a uczestnik filtruje program po dniu, sali i temacie.']],
                 ['@type' => 'Question', 'name' => 'Co z danymi uczestnikow i RODO?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Dane uczestnikow przetwarzamy zgodnie z RODO, a hosting utrzymujemy w Unii Europejskiej. Dostep do wydarzenia jest zamkniety - otwiera go tylko indywidualny kod eventu.']],
@@ -113,3 +113,20 @@ add_action('wp_head', function () {
         echo '<script type="application/ld+json">' . wp_json_encode($faq, $flags) . '</script>' . "\n";
     }
 }, 5);
+
+/* Linki do aplikacji w sklepach. */
+function eskulapp_store_links() {
+    $stores = [
+        ['name' => 'Google Play', 'url' => 'https://play.google.com/store/apps/details?id=pl.eskulapp.mobile', 'on' => true],
+        ['name' => 'App Store',   'url' => 'https://apps.apple.com/pl/app/id6810647099',                     'on' => true],
+    ];
+    return array_values(array_filter($stores, fn($s) => $s['on']));
+}
+
+function eskulapp_store_buttons($class = 'store-links') {
+    $out = '<div class="' . esc_attr($class) . '">';
+    foreach (eskulapp_store_links() as $s) {
+        $out .= '<a class="btn btn-ghost store-btn" href="' . esc_url($s['url']) . '" target="_blank" rel="noopener">Pobierz z ' . esc_html($s['name']) . '</a>';
+    }
+    return $out . '</div>';
+}

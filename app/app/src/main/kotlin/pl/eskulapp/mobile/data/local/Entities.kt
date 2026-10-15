@@ -17,6 +17,8 @@ data class EventEntity(
     val mapImageUrl: String?,
     val mapEmbed: String?,
     val mapEnabled: Boolean = true,
+    /** Opcjonalna grafika naglowka (plik lokalny: data/HeaderImages). */
+    val headerImageUrl: String? = null,
     val ratingsEnabled: Boolean = false,
     val ratingsOpenMin: Int = 10,
     val ratingsCloseMin: Int = 30,
@@ -53,6 +55,28 @@ data class TalkEntity(
     val abstract: String?,
     val startsAt: String?,
     val endsAt: String?,
+    val sort: Int,
+    val sessionId: Long? = null,
+)
+
+@Entity(tableName = "sessions")
+data class SessionEntity(
+    @PrimaryKey val id: Long,
+    val eventId: Long,
+    val dayId: Long?,
+    val roomId: Long?,
+    val title: String,
+    val description: String?,
+    val startsAt: String?,
+    val endsAt: String?,
+    val sort: Int,
+)
+
+@Entity(tableName = "session_moderators", primaryKeys = ["sessionId", "speakerId"])
+data class SessionModeratorEntity(
+    val sessionId: Long,
+    val speakerId: Long,
+    val eventId: Long,
     val sort: Int,
 )
 
@@ -122,6 +146,16 @@ data class ReminderEntity(
     val triggerAt: Long,
 )
 
+/** Przypomnienie o calej sesji (osobno od przypomnien o podwykladach). */
+@Entity(tableName = "session_reminders")
+data class SessionReminderEntity(
+    @PrimaryKey val sessionId: Long,
+    val eventId: Long,
+    val title: String,
+    val subtitle: String?,
+    val triggerAt: Long,
+)
+
 @Entity(tableName = "event_notify")
 data class EventNotifyEntity(
     @PrimaryKey val eventId: Long,
@@ -148,4 +182,10 @@ data class TalkRatingEntity(
     val status: String,
     val error: String?,
     val updatedAt: Long,
-)
+    /** Odpowiedzi na 3 pytania; null = glos ze starszej wersji (sam score). */
+    val q1: Int? = null,
+    val q2: Int? = null,
+    val q3: Int? = null,
+) {
+    val answers: List<Int>? get() = if (q1 != null && q2 != null && q3 != null) listOf(q1, q2, q3) else null
+}

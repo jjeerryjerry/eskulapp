@@ -30,6 +30,11 @@ jobs:
           swiftc app/iosApp/Sources/Ratings.swift app/iosApp/RatingTests/main.swift -o "$RUNNER_TEMP/ratingcheck"
           "$RUNNER_TEMP/ratingcheck"
 
+      - name: Testy logiki konfliktow czasowych
+        run: |
+          swiftc app/iosApp/Sources/Conflicts.swift app/iosApp/ConflictTests/main.swift -o "$RUNNER_TEMP/conflictcheck"
+          "$RUNNER_TEMP/conflictcheck"
+
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
 
@@ -49,5 +54,5 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE_SPECIFIER="" CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="" \
-            | tee "$RUNNER_TEMP/xcodebuild.log" | grep -E "error:|warning: .*(Rating|Store|Agenda|Models)|BUILD (SUCCEEDED|FAILED)" || true
+            | tee "$RUNNER_TEMP/xcodebuild.log" | grep -E "error:|warning: .*(Rating|Store|Agenda|Models|Session|Conflict)|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" "$RUNNER_TEMP/xcodebuild.log"

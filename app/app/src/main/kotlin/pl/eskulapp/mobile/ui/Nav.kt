@@ -16,6 +16,7 @@ sealed interface Screen {
     data class Contact(val id: Long) : Screen
     data class News(val id: Long) : Screen
     data class Talk(val id: Long, val eventId: Long) : Screen
+    data class Session(val id: Long, val eventId: Long) : Screen
     data class More(val id: Long) : Screen
     data class PartnerDetail(val partnerId: Long, val eventId: Long) : Screen
     data class SpeakerDetail(val speakerId: Long, val eventId: Long) : Screen

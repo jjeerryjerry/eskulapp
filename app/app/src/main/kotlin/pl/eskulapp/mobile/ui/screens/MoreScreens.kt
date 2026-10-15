@@ -478,6 +478,7 @@ fun PartnerDetailScreen(vm: AppViewModel, partnerId: Long, eventId: Long) {
 fun SpeakerDetailScreen(vm: AppViewModel, speakerId: Long, eventId: Long) {
     val speaker by vm.repo.dao.speaker(speakerId).collectAsStateWithLifecycle(null)
     val talks by vm.repo.dao.talksForSpeaker(speakerId).collectAsStateWithLifecycle(emptyList())
+    val moderated by vm.repo.dao.sessionsModeratedBy(speakerId).collectAsStateWithLifecycle(emptyList())
     val rooms by vm.repo.dao.rooms(eventId).collectAsStateWithLifecycle(emptyList())
     val s = speaker ?: return
     Column(Modifier.fillMaxSize().background(Bg)) {
@@ -500,9 +501,31 @@ fun SpeakerDetailScreen(vm: AppViewModel, speakerId: Long, eventId: Long) {
                 Spacer(Modifier.height(18.dp))
                 Text(s.bio!!, fontSize = 15.sp, color = Muted, lineHeight = 22.sp)
             }
+            if (moderated.isNotEmpty()) {
+                Spacer(Modifier.height(20.dp))
+                Text("Moderuje", fontWeight = FontWeight.SemiBold, color = Ink, fontSize = 15.sp)
+                Spacer(Modifier.height(8.dp))
+                moderated.forEach { x ->
+                    val room = rooms.firstOrNull { it.id == x.roomId }?.name
+                    val sub = listOfNotNull(dayShort(x.startsAt?.substring(0, 10)).ifBlank { null }, hhmm(x.startsAt).ifBlank { null }, room).joinToString(" · ")
+                    Row(
+                        Modifier.fillMaxWidth().padding(vertical = 5.dp).clip(RoundedCornerShape(12.dp))
+                            .background(Surface).border(1.dp, Line, RoundedCornerShape(12.dp))
+                            .clickable { vm.nav.push(Screen.Session(x.id, eventId)) }.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text("SESJA", color = CoralDark, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.sp)
+                            Text(x.title, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = Ink, lineHeight = 18.sp)
+                            if (sub.isNotBlank()) Text(sub, fontSize = 12.sp, color = Muted, modifier = Modifier.padding(top = 3.dp))
+                        }
+                        Ico(R.drawable.ic_chevron, Line, 18)
+                    }
+                }
+            }
             if (talks.isNotEmpty()) {
                 Spacer(Modifier.height(20.dp))
-                Text("Wystąpienia", fontWeight = FontWeight.SemiBold, color = Ink, fontSize = 15.sp)
+                Text(if (moderated.isNotEmpty()) "Wykłada" else "Wystąpienia", fontWeight = FontWeight.SemiBold, color = Ink, fontSize = 15.sp)
                 Spacer(Modifier.height(8.dp))
                 talks.forEach { t ->
                     val room = rooms.firstOrNull { it.id == t.roomId }?.name

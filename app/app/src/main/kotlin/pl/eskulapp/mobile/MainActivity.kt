@@ -80,6 +80,7 @@ class MainActivity : ComponentActivity() {
                         is Screen.News -> current.id
                         is Screen.More -> current.id
                         is Screen.Talk -> current.eventId
+                        is Screen.Session -> current.eventId
                         is Screen.PartnerDetail -> current.eventId
                         is Screen.SpeakerDetail -> current.eventId
                         else -> null
@@ -126,6 +127,7 @@ class MainActivity : ComponentActivity() {
                             is Screen.Contact -> ContactScreen(vm, s.id)
                             is Screen.News -> NewsScreen(vm, s.id)
                             is Screen.Talk -> TalkScreen(vm, s.id, s.eventId)
+                            is Screen.Session -> SessionScreen(vm, s.id, s.eventId)
                             is Screen.More -> MoreScreen(vm, s.id)
                             is Screen.PartnerDetail -> PartnerDetailScreen(vm, s.partnerId, s.eventId)
                             is Screen.SpeakerDetail -> SpeakerDetailScreen(vm, s.speakerId, s.eventId)
@@ -140,6 +142,7 @@ class MainActivity : ComponentActivity() {
                           BottomBar(current, eventTabs(tabEventId, tabEvent?.mapEnabled ?: true)) { sc, fwd -> nav.sectionWithDir(sc, fwd) }
                       }
                     }
+                    vm.conflictPrompt?.let { ConflictDialog(it, onConfirm = vm::confirmConflict, onDismiss = vm::dismissConflict) }
                 }
             }
         }
